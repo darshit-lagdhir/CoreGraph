@@ -27,13 +27,15 @@ async def readiness_probe():
     """Readiness: Deep diagnostic of the relational vault and message broker dependency chain."""
     checks = {}
     is_ready = True
-    
+
     # 1. PostgreSQL Relational Vault Audit
     try:
         # Failure Scenario A Resolution: Dedicated health check engine with loop isolation
         # This prevents 'NoneType has no attribute send' errors in high-concurrency test cycles
         temp_engine = create_async_engine(
-            settings.DATABASE_URL.unicode_string() if hasattr(settings.DATABASE_URL, 'unicode_string') else str(settings.DATABASE_URL)
+            settings.DATABASE_URL.unicode_string()
+            if hasattr(settings.DATABASE_URL, "unicode_string")
+            else str(settings.DATABASE_URL)
         )
         start_ping = time.perf_counter()
         async with temp_engine.connect() as conn:
@@ -50,7 +52,9 @@ async def readiness_probe():
         # Failure Scenario B Resolution: Raw Socket Ping via ephemeral async redis client
         # This prevents 'Event loop is closed' errors during high-frequency testing cycles
         temp_redis = Redis.from_url(
-            settings.REDIS_URL.unicode_string() if hasattr(settings.REDIS_URL, 'unicode_string') else str(settings.REDIS_URL)
+            settings.REDIS_URL.unicode_string()
+            if hasattr(settings.REDIS_URL, "unicode_string")
+            else str(settings.REDIS_URL)
         )
         start_ping = time.perf_counter()
         await temp_redis.ping()
@@ -67,21 +71,20 @@ async def readiness_probe():
     hardware = HardwareTelemetry(
         cpu_percent=psutil.cpu_percent(),
         memory_used_mb=psutil.Process().memory_info().rss / 1024 / 1024,
-        memory_available_mb=mem.available / 1024 / 1024
+        memory_available_mb=mem.available / 1024 / 1024,
     )
 
     response = HealthResponse(
         status="PASS" if is_ready else "FAIL",
-        version="1.0.0", # To be pulled from settings if available
+        version="1.0.0",  # To be pulled from settings if available
         uptime_seconds=time.time() - START_TIME,
         checks=checks,
-        hardware=hardware
+        hardware=hardware,
     )
 
     if not is_ready:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=response.model_dump()
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=response.model_dump()
         )
 
     return response

@@ -13,7 +13,7 @@ class BlastRadiusCalculator:
         # 1. Topological Sorting: prerequisite for recursive union mapping
         if not nx.is_directed_acyclic_graph(self.graph):
             raise ValueError(
-                "Graph matrix contains circular dependencies. DAG property required for BlastRadius."
+                "Graph matrix contains circular dependencies. DAG property required for BlastRadius."  # noqa: E501
             )
 
         # We need the topological order of the graph

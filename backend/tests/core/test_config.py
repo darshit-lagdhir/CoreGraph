@@ -19,10 +19,10 @@ def test_strict_type_enforcement_and_coercion():
 def test_secret_redaction_and_repr_proxy():
     # Failure 3 Resolution: Verification of SecretStr redaction in all representations
     settings = Settings(GITHUB_GRAPHQL_TOKEN="sk-9x-api-key-high-value")
-    
+
     # 1. Pydantic's internal SecretStr redaction
     assert str(settings.GITHUB_GRAPHQL_TOKEN) == "**********"
-    
+
     # 2. Custom __repr__ proxy for diagnostic traces
     repr_str = repr(settings)
     assert "sk-9x-api-key-high-value" not in repr_str
@@ -33,8 +33,8 @@ def test_secret_redaction_and_repr_proxy():
 def test_hardware_limit_compliance_matrix():
     # Enforcing the 24-core i9-13980hx hypervisor boundaries
     with pytest.raises(pydantic.ValidationError):
-        Settings(CELERY_WORKER_CONCURRENCY=32) # Exceeds 24 cores
-    
+        Settings(CELERY_WORKER_CONCURRENCY=32)  # Exceeds 24 cores
+
     settings = Settings(CELERY_WORKER_CONCURRENCY=24)
     assert settings.CELERY_WORKER_CONCURRENCY == 24
 
@@ -51,6 +51,6 @@ def test_environment_aware_branching_logic():
     # Testing dynamic behavior based on ENVIRONMENT enum
     settings_dev = Settings(ENVIRONMENT="DEVELOPMENT")
     assert settings_dev.ENVIRONMENT == EnvironmentType.DEVELOPMENT
-    
+
     settings_prod = Settings(ENVIRONMENT="PRODUCTION")
     assert settings_prod.ENVIRONMENT == EnvironmentType.PRODUCTION

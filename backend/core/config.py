@@ -12,7 +12,7 @@ from pydantic import (
     RedisDsn,
     SecretStr,
     field_validator,
-    computed_field
+    computed_field,
 )
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -25,11 +25,11 @@ class EnvironmentType(str, Enum):
 
 class Settings(BaseSettings):
     """Global Configuration Manager: The supreme authority for system state and security secrets."""
-    
+
     # 1. Environment Metadata
     ENVIRONMENT: EnvironmentType = EnvironmentType.DEVELOPMENT
     DEBUG: bool = False
-    
+
     # 2. Relational Vault Parameters
     DB_USER: str = "postgres"
     DB_PASSWORD: str = "postgres"
@@ -51,12 +51,14 @@ class Settings(BaseSettings):
         # Sanitizing credentials to handle special characters (@, #, etc.) in the .env matrix
         user = quote_plus(self.DB_USER)
         password = quote_plus(self.DB_PASSWORD)
-        return f"postgresql+asyncpg://{user}:{password}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+        return (
+            f"postgresql+asyncpg://{user}:{password}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+        )
 
     # 3. Message Broker Parameters
     REDIS_URL: RedisDsn = Field(
         default="redis://localhost:6379/0",
-        validation_alias=AliasChoices("REDIS_URL", "CELERY_BROKER_URL")
+        validation_alias=AliasChoices("REDIS_URL", "CELERY_BROKER_URL"),
     )
 
     # 4. OSINT Secret Interface
@@ -73,7 +75,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=str(Path(__file__).parent.parent.parent / ".env"),
         env_file_encoding="utf-8",
-        extra="ignore"
+        extra="ignore",
     )
 
     @field_validator("ENVIRONMENT", mode="before")
@@ -83,12 +85,12 @@ class Settings(BaseSettings):
 
     def __repr__(self) -> str:
         """Hardened representation proxy: Masking all sensitive strings from diagnostic traces."""
-        return f"Settings(ENVIRONMENT='{self.ENVIRONMENT}', DEBUG={self.DEBUG}, DATABASE_URL='REDACTED', GITHUB_GRAPHQL_TOKEN='**********')"
+        return f"Settings(ENVIRONMENT='{self.ENVIRONMENT}', DEBUG={self.DEBUG}, DATABASE_URL='REDACTED', GITHUB_GRAPHQL_TOKEN='**********')"  # noqa: E501
 
 
 @lru_cache()
 def get_settings() -> Settings:
-    """Singleton Registry: Ensures atomic configuration state across the distributed 24-core i9 grid."""
+    """Singleton Registry: Ensures atomic configuration state across the distributed 24-core i9 grid."""  # noqa: E501
     return Settings()
 
 

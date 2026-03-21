@@ -9,7 +9,7 @@ import os
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
-from clients.base import ResilientClient, CircuitBreakerException
+from clients.base import ResilientClient, CircuitBreakerException  # noqa: E402
 
 
 @pytest.mark.asyncio

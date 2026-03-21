@@ -41,6 +41,9 @@ class GraphSerializer:
     def get_raw_size(self) -> int:
         return len(
             json.dumps(
-                {"nodes": [n for n in self.graph.nodes()], "links": [l for l in self.graph.edges()]}
+                {
+                    "nodes": [n for n in self.graph.nodes()],
+                    "links": [link for link in self.graph.edges()],
+                }
             )
         )

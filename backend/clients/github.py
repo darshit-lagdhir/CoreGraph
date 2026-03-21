@@ -56,7 +56,7 @@ class GitHubGraphQLClient:
 
         return "query {" + " ".join(query_fragments) + "}"
 
-    async def ingest_telemetry_batch(self, packages: List[Dict[str, Any]]):
+    async def ingest_telemetry_batch(self, packages: List[Dict[str, Any]]):  # noqa: C901
         if not packages:
             return
 

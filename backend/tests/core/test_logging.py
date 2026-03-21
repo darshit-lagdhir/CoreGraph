@@ -49,7 +49,7 @@ def test_non_blocking_telemetry_throughput():
 
     start_time = time.perf_counter()
     for i in range(1000):
-        logging.info(f"HIGH_FREQUENCY_TRAVERSE_{i}")
+        logger.info(f"HIGH_FREQUENCY_TRAVERSE_{i}")
 
     end_time = time.perf_counter()
     duration = end_time - start_time

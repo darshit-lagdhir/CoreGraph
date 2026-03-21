@@ -18,12 +18,12 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-import os
-import sys
+import os  # noqa: E402
+import sys  # noqa: E402
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-from core.config import settings
-from models import Base
+from core.config import settings  # noqa: E402
+from models import Base  # noqa: E402
 
 target_metadata = Base.metadata
 

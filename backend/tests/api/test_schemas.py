@@ -8,7 +8,7 @@ import os
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
-from schemas import PackageSchema, IngestRequestSchema
+from schemas import PackageSchema, IngestRequestSchema  # noqa: E402
 
 
 def test_package_schema_integrity():

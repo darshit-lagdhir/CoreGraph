@@ -6,8 +6,8 @@ import os
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
-from worker import celery_app
-from tasks.ingestion import ingest_ecosystem_structure
+from worker import celery_app  # noqa: E402
+from tasks.ingestion import ingest_ecosystem_structure  # noqa: E402
 
 
 @pytest.fixture(autouse=True)
