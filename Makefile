@@ -177,10 +177,18 @@ db-status:
 	@echo "Interrogating the relational vault for schema version alignment..."
 	cd backend && ..\venv\Scripts\alembic current
 
+maintenance-mode:
+	@echo "Forcefully terminating backend connections to clear Access Exclusive locks..."
+	powershell -Command "docker exec coregraph-db psql -U postgres -d coregraph -c 'SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = ''coregraph'' AND pid <> pg_backend_pid();'"
+
 clean-migrations:
 	@echo "Neutralizing orphaned revisions and diagnostic bytecode artifacts..."
-	powershell -Command "Get-ChildItem -Path backend/migrations/versions -Filter '*.py' | Where-Object { $_.Name -notmatch '^[0-9]' } | Remove-Item -Force"
+	powershell -Command "Get-ChildItem -Path backend/migrations/versions -Filter '*.py' | Where-Object { $_.Name -notmatch '^[0-9]' -and $_.Name -ne 'script.py.mako' } | Remove-Item -Force"
 	powershell -Command "Get-ChildItem -Path backend/migrations -Filter '__pycache__' -Recurse | Remove-Item -Force"
+
+prune-orphans:
+	@echo "Executing surgical removal of untracked migration artifacts..."
+	powershell -Command "gci backend/migrations/versions -Filter *.py | ? { (gc $_.FullName) -match 'REVISES: None' -and $_.Name -ne (gci backend/migrations/versions -Filter *.py | sort LastWriteTime | select -Last 1).Name } | ri -Force"
 
 install-deps:
 	@echo "Executing synchronized dependency matrix across environments..."
