@@ -99,6 +99,19 @@ clean-test-artifacts:
 	powershell -Command "if (Test-Path backend/.mypy_cache) { Remove-Item -Path backend/.mypy_cache -Recurse -Force -ErrorAction SilentlyContinue }"
 	powershell -Command "if (Test-Path frontend/coverage) { Remove-Item -Path frontend/coverage -Recurse -Force -ErrorAction SilentlyContinue }"
 
+generate-docs:
+	@echo "Extracting architectural models into static OpenAPI manifesto..."
+	powershell -Command "$$env:PYTHONPATH='backend'; .\venv\Scripts\python.exe -c \"import json; from backend.main import app; from backend.core.docs import setup_automated_docs; setup_automated_docs(app); open('docs/openapi.json', 'w').write(json.dumps(app.openapi(), indent=2))\""
+	@echo "Documentation strictly synthesized."
+
+clean-docs-cache:
+	@echo "Purging volatile OpenAPI memory caches..."
+	powershell -Command "if (Test-Path docs/openapi.json) { Remove-Item docs/openapi.json -Force }"
+
+audit-vault:
+	@echo "Scanning documentation architecture for orphaned index links..."
+	powershell -Command "$$env:PYTHONPATH='backend'; .\venv\Scripts\python.exe -m pytest backend/tests/core/test_docs.py::test_link_integrity_audit"
+
 prune-ci-containers:
 	@echo "Neutralizing stale Docker CI environments..."
 	docker container prune -f
