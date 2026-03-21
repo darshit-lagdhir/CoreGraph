@@ -1,0 +1,6 @@
+backend/core/
+infrastructure/
+.workspace/task-matrix.json
+.workspace/project-context.md
+Makefile
+docker-compose.yml

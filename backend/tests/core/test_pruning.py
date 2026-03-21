@@ -30,7 +30,13 @@ def test_dangling_layer_absence():
 def test_bytecode_eradication_proof():
     """Performs a recursive search for bytecode across the entire project root."""
     forbidden_exts = (".pyc", ".pyo", ".tsbuildinfo")
-    forbidden_dirs = ("__pycache__", ".mpy_cache", ".ruff_cache", ".pytest_cache", ".eslintcache")
+    forbidden_dirs = (
+        "__pycache__",
+        ".mpy_cache",
+        ".ruff_cache",
+        ".pytest_cache",
+        ".eslintcache",
+    )
 
     found_artifacts = []
 

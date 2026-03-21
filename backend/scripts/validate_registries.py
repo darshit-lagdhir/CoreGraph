@@ -115,7 +115,10 @@ def validate_markdown_ast(file_path: str) -> Tuple[bool, str]:
         if has_relational and has_api:
             return True, "Markdown tables for schema and payloads verified."
         else:
-            return False, "Missing Relational Schema or API Payloads sections in Markdown."
+            return (
+                False,
+                "Missing Relational Schema or API Payloads sections in Markdown.",
+            )
     except Exception as e:
         return False, f"AST parsing failed: {e}"
 

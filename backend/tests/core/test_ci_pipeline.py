@@ -3,7 +3,8 @@ import yaml  # type: ignore[import-untyped]
 from typing import Dict, Any
 
 WORKSPACE_DIR = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), ".workspace"
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))),
+    ".workspace",
 )
 
 

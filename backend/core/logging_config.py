@@ -11,7 +11,6 @@ import contextvars
 import uuid
 import re
 
-
 # Failure 1 & 3 Resolution: Context-aware Correlation ID with high-performance orjson
 correlation_id_var: contextvars.ContextVar[str] = contextvars.ContextVar(
     "correlation_id", default="SYSTEM-BOOT"

@@ -12,7 +12,9 @@ def execute_load_matrix():
 
     for i in range(1000):
         res = celery_app.send_task(
-            "tasks.ingestion.enrich_node_telemetry", args=["npm", [i]], queue="ingestion"
+            "tasks.ingestion.enrich_node_telemetry",
+            args=["npm", [i]],
+            queue="ingestion",
         )
         tasks.append(res)
 

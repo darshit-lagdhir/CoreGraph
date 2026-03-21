@@ -36,7 +36,8 @@ def test_valid_dag_execution():
 def test_markdown_ast_validation(tmp_path):
     test_file = tmp_path / "project-context.md"
     test_file.write_text(
-        "## Relational Schema\n| col | val |\n## API Payloads\n| col | val |", encoding="utf-8"
+        "## Relational Schema\n| col | val |\n## API Payloads\n| col | val |",
+        encoding="utf-8",
     )
     ok, msg = validate_markdown_ast(str(test_file))
     assert ok

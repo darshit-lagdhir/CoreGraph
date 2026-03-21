@@ -11,7 +11,6 @@ from core.config import settings
 from database import engine
 from schemas.health import HealthResponse, HealthCheckDetail, HardwareTelemetry
 
-
 router = APIRouter(prefix="/health", tags=["Diagnostic Probes"])
 START_TIME = time.time()
 
@@ -84,7 +83,8 @@ async def readiness_probe():
 
     if not is_ready:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=response.model_dump()
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=response.model_dump(),
         )
 
     return response

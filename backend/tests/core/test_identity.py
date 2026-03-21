@@ -6,7 +6,8 @@ import os
 import json
 
 WORKSPACE_DIR = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), ".workspace"
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))),
+    ".workspace",
 )
 
 

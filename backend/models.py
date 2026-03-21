@@ -58,7 +58,10 @@ class MaintainerHealth(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     package_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("packages.id", ondelete="CASCADE"), unique=True, nullable=False, index=True
+        ForeignKey("packages.id", ondelete="CASCADE"),
+        unique=True,
+        nullable=False,
+        index=True,
     )
     github_repo_url: Mapped[str | None] = mapped_column(String, nullable=True)
     commit_velocity_30d: Mapped[int] = mapped_column(Integer, default=0)
@@ -74,7 +77,10 @@ class FinancialHealth(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     package_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("packages.id", ondelete="CASCADE"), unique=True, nullable=False, index=True
+        ForeignKey("packages.id", ondelete="CASCADE"),
+        unique=True,
+        nullable=False,
+        index=True,
     )
     funding_platform: Mapped[str | None] = mapped_column(String, nullable=True)
     platform_slug: Mapped[str | None] = mapped_column(String, nullable=True)

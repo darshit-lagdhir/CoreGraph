@@ -71,7 +71,9 @@ class PyPIClient(BaseEcosystemClient):
 
             deps.append(
                 NormalizedDependency(
-                    name=self.normalize_package_name(name), version_range=v_range, ecosystem="pypi"
+                    name=self.normalize_package_name(name),
+                    version_range=v_range,
+                    ecosystem="pypi",
                 )
             )
         return deps

@@ -191,7 +191,9 @@ class PruningMatrix:
             print("[*] Flushing VRAM Buffer...")
             if os.name == "posix":
                 subprocess.run(
-                    ["nvidia-smi", "--gpu-reset"], check=False, stderr=subprocess.DEVNULL
+                    ["nvidia-smi", "--gpu-reset"],
+                    check=False,
+                    stderr=subprocess.DEVNULL,
                 )
         except Exception:
             pass

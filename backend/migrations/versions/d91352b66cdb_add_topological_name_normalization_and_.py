@@ -11,7 +11,6 @@ from typing import Sequence, Union
 from alembic import op
 import sqlalchemy as sa
 
-
 # revision identifiers, used by Alembic.
 revision: str = "d91352b66cdb"
 down_revision: Union[str, Sequence[str], None] = "e5e9c92918a5"
@@ -29,10 +28,20 @@ def upgrade() -> None:
         op.f("dependencies_target_package_id_fkey"), "dependencies", type_="foreignkey"
     )
     op.create_foreign_key(
-        None, "dependencies", "packages", ["source_package_id"], ["id"], ondelete="CASCADE"
+        None,
+        "dependencies",
+        "packages",
+        ["source_package_id"],
+        ["id"],
+        ondelete="CASCADE",
     )
     op.create_foreign_key(
-        None, "dependencies", "packages", ["target_package_id"], ["id"], ondelete="CASCADE"
+        None,
+        "dependencies",
+        "packages",
+        ["target_package_id"],
+        ["id"],
+        ondelete="CASCADE",
     )
     op.alter_column(
         "financial_health",
@@ -50,7 +59,10 @@ def upgrade() -> None:
     )
     op.drop_constraint(op.f("financial_health_package_id_key"), "financial_health", type_="unique")
     op.create_index(
-        op.f("ix_financial_health_package_id"), "financial_health", ["package_id"], unique=True
+        op.f("ix_financial_health_package_id"),
+        "financial_health",
+        ["package_id"],
+        unique=True,
     )
     op.drop_constraint(
         op.f("financial_health_package_id_fkey"), "financial_health", type_="foreignkey"
@@ -62,18 +74,31 @@ def upgrade() -> None:
         op.f("maintainer_health_package_id_key"), "maintainer_health", type_="unique"
     )
     op.create_index(
-        op.f("ix_maintainer_health_package_id"), "maintainer_health", ["package_id"], unique=True
+        op.f("ix_maintainer_health_package_id"),
+        "maintainer_health",
+        ["package_id"],
+        unique=True,
     )
     op.drop_constraint(
-        op.f("maintainer_health_package_id_fkey"), "maintainer_health", type_="foreignkey"
+        op.f("maintainer_health_package_id_fkey"),
+        "maintainer_health",
+        type_="foreignkey",
     )
     op.create_foreign_key(
-        None, "maintainer_health", "packages", ["package_id"], ["id"], ondelete="CASCADE"
+        None,
+        "maintainer_health",
+        "packages",
+        ["package_id"],
+        ["id"],
+        ondelete="CASCADE",
     )
     op.add_column("packages", sa.Column("name_normalized", sa.String(), nullable=False))
     op.drop_constraint(op.f("uix_ecosystem_name"), "packages", type_="unique")
     op.create_index(
-        op.f("ix_packages_name_normalized"), "packages", ["name_normalized"], unique=False
+        op.f("ix_packages_name_normalized"),
+        "packages",
+        ["name_normalized"],
+        unique=False,
     )
     op.create_unique_constraint(
         "uix_ecosystem_name_norm", "packages", ["ecosystem", "name_normalized"]
