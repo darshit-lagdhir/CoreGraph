@@ -11,3 +11,8 @@ Thumbs.db
 .env
 .env
 .env.example
+
+# Internal Workspaces and Context Trackers
+.workspace/
+project-context.md
+task-matrix.json

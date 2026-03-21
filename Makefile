@@ -20,3 +20,8 @@ makemigrations:
 
 migrate:
 	cd backend && alembic upgrade head
+
+sync-check:
+	cd backend && alembic current
+	cd frontend && npm install
+	.\venv\Scripts\python.exe -m pip install -r backend\requirements.txt
