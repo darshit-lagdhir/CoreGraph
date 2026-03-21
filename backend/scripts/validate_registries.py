@@ -1,10 +1,10 @@
+from typing import Any, Tuple, Dict, List
 import os
 import json
 import logging
 from concurrent.futures import ProcessPoolExecutor
 import jsonschema
 from jsonschema import validate
-from marko.ext.gfm import gfm
 from collections import defaultdict
 
 # Configure logging
@@ -44,7 +44,7 @@ EXECUTION_LEDGER_SCHEMA = {
 }
 
 
-def check_json_schema(file_path, schema):
+def check_json_schema(file_path: str, schema: Dict[str, Any]) -> Tuple[bool, Any]:
     if not os.path.exists(file_path):
         return False, f"{os.path.basename(file_path)} missing."
     with open(file_path, "r", encoding="utf-8") as f:
@@ -56,7 +56,7 @@ def check_json_schema(file_path, schema):
             return False, f"Schema validation failed for {file_path}: {e}"
 
 
-def topological_sort_check(ledger_data):
+def topological_sort_check(ledger_data: List[Dict[str, Any]]) -> Tuple[bool, str]:
     graph = defaultdict(list)
     in_degree = defaultdict(int)
     tasks = [item["task_id"] for item in ledger_data]
@@ -96,14 +96,13 @@ def topological_sort_check(ledger_data):
     return True, "DAG verification passed."
 
 
-def validate_markdown_ast(file_path):
+def validate_markdown_ast(file_path: str) -> Tuple[bool, str]:
     if not os.path.exists(file_path):
         return False, "project-context.md missing."
     try:
         with open(file_path, "r", encoding="utf-8") as f:
             text = f.read()
 
-        ast_doc = gfm.parse(text)
         has_relational = False
         has_api = False
 
@@ -121,7 +120,7 @@ def validate_markdown_ast(file_path):
         return False, f"AST parsing failed: {e}"
 
 
-def run_validations():
+def run_validations() -> bool:
     matrix_path = os.path.join(WORKSPACE_DIR, "task-matrix.json")
     ledger_path = os.path.join(WORKSPACE_DIR, "execution-ledger.json")
     context_path = os.path.join(WORKSPACE_DIR, "project-context.md")

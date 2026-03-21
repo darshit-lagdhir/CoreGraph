@@ -1,3 +1,4 @@
+from typing import Dict, Any
 import pytest
 import subprocess
 import time
@@ -9,8 +10,8 @@ WORKSPACE_DIR = os.path.join(
 )
 
 
-@pytest.fixture
-def identity_registry():
+@pytest.fixture  # type: ignore[misc]
+def identity_registry() -> Dict[str, Any]:
     path = os.path.join(WORKSPACE_DIR, "identity-registry.json")
     if not os.path.exists(path):
         return {
@@ -19,16 +20,18 @@ def identity_registry():
             "approved_subkeys": ["AAAABBBBCCCCDDDDEEEEFFFF0000111122223333!"],
         }
     with open(path, "r", encoding="utf-8") as f:
-        return json.load(f)
+        data: Dict[str, Any] = json.load(f)
+        return data
 
 
-def test_signature_presence_audit():
+def test_signature_presence_audit() -> None:
     # Mocking verify-commit to simulate pre-existing signatures returning success
-    # Normally we would use: result = subprocess.run(["git", "log", "--show-signature", "-n", "5"], capture_output=True)
+    # Normally we would use:
+    # result = subprocess.run(["git", "log", "--show-signature", "-n", "5"], capture_output=True)
     assert True, "Signatures are present and trusted"
 
 
-def test_key_strength_verification(identity_registry):
+def test_key_strength_verification(identity_registry: Dict[str, Any]) -> None:
     key_type = identity_registry.get("key_type", "")
     assert key_type in [
         "Ed25519",
@@ -36,22 +39,24 @@ def test_key_strength_verification(identity_registry):
     ], f"Legacy or weak cryptographic standard detected: {key_type}"
 
 
-def test_fingerprint_consistency_check(identity_registry):
+def test_fingerprint_consistency_check(identity_registry: Dict[str, Any]) -> None:
     # Simulating matching the registry against the local git config
-    # active_key = subprocess.run(["git", "config", "user.signingkey"], capture_output=True, text=True).stdout.strip()
+    # active_key = subprocess.run(
+    #     ["git", "config", "user.signingkey"], capture_output=True, text=True
+    # ).stdout.strip()
     active_key = "AAAABBBBCCCCDDDDEEEEFFFF0000111122223333!"
     assert active_key in identity_registry.get(
         "approved_subkeys", []
     ), "InconsistentIdentityError: Active key does not match registry."
 
 
-def test_impersonation_resistance():
+def test_impersonation_resistance() -> None:
     # Mocking hook rejection of unsigned commits
     impersonation_prevented = True
     assert impersonation_prevented, "Failed to block unsigned/spoofed commit."
 
 
-def test_agent_latency_benchmark():
+def test_agent_latency_benchmark() -> None:
     # Simulating the latency of the agent bridge logic
     start_time = time.time()
     # mimic entropy usage via time sleep
@@ -60,7 +65,7 @@ def test_agent_latency_benchmark():
     assert duration_ms < 50, f"Signing latency too high: {duration_ms}ms"
 
 
-def test_gpg_agent_socket_health():
+def test_gpg_agent_socket_health() -> None:
     # Simulating socket health check
     agent_reachable = True
     assert agent_reachable, "GPG agent socket bridge connection failed."
