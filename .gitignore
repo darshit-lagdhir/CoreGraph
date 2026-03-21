@@ -19,3 +19,6 @@ logs/
 .workspace/
 project-context.md
 task-matrix.json
+
+# Identity and Cryptographic Sockets
+.gnupg/
