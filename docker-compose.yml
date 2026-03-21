@@ -1,0 +1,35 @@
+services:
+  # ----------------------------------------
+  # THE DATABASE (PostgreSQL)
+  # ----------------------------------------
+  db:
+    image: postgres:15-alpine
+    container_name: coregraph_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: coregraph_db
+    ports:
+      # Option A: Mapping Windows Port 5433 to Container Port 5432
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # ----------------------------------------
+  # THE CACHE & MAILBOX (Redis)
+  # ----------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: coregraph_redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+# This tells Docker to save our data permanently on your hard drive, 
+# so if the container restarts, we don't lose everything!
+volumes:
+  postgres_data:
+  redis_data:
