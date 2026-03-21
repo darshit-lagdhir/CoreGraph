@@ -165,6 +165,23 @@ sanitize-env:
 	@echo "Surgically normalizing the .env environment matrix..."
 	powershell -Command "(Get-Content .env) | ForEach-Object { $_.Trim() } | Set-Content .env"
 
+migrate:
+	@echo "Executing asynchronous database evolution: Upgrading to Head revision..."
+	cd backend && ..\venv\Scripts\alembic upgrade head
+
+migrate-down:
+	@echo "Reversing the last database evolution: Rolling back 1 revision..."
+	cd backend && ..\venv\Scripts\alembic downgrade -1
+
+db-status:
+	@echo "Interrogating the relational vault for schema version alignment..."
+	cd backend && ..\venv\Scripts\alembic current
+
+clean-migrations:
+	@echo "Neutralizing orphaned revisions and diagnostic bytecode artifacts..."
+	powershell -Command "Get-ChildItem -Path backend/migrations/versions -Filter '*.py' | Where-Object { $_.Name -notmatch '^[0-9]' } | Remove-Item -Force"
+	powershell -Command "Get-ChildItem -Path backend/migrations -Filter '__pycache__' -Recurse | Remove-Item -Force"
+
 install-deps:
 	@echo "Executing synchronized dependency matrix across environments..."
 	cd frontend && npm install
