@@ -1,15 +1,17 @@
-import asyncio
-import gzip
-import json
-import networkx as nx
-from redis.asyncio import Redis
+import asyncio  # noqa: E402
+import gzip  # noqa: E402
+import json  # noqa: E402
+import networkx as nx  # noqa: E402
+from redis.asyncio import Redis  # noqa: E402
 
-import sys
-import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../backend')))
+import sys  # noqa: E402
+import os  # noqa: E402
 
-from analytics.cvi_calculator import CVICalculator
-from analytics.serializer import GraphSerializer
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../backend")))
+
+from analytics.cvi_calculator import CVICalculator  # noqa: E402
+from analytics.serializer import GraphSerializer  # noqa: E402
+
 
 async def verify_synchronization_logic():
     print("Initiating Analytical Synchronization Round-Trip Integrity Audit...")
@@ -18,7 +20,7 @@ async def verify_synchronization_logic():
     G = nx.DiGraph()
     G.add_node("node1", name="package-a", blast_radius=10)
     G.add_node("node2", name="package-b", blast_radius=5)
-    G.add_edge("node1", "node2") # node1 depends on node2
+    G.add_edge("node1", "node2")  # node1 depends on node2
 
     # 2. Run Calc and Serialization
     cvi_calc = CVICalculator(G)
@@ -29,7 +31,7 @@ async def verify_synchronization_logic():
 
     # 3. Simulate Gateway/Frontend Retrieval
     decompressed = gzip.decompress(binary_payload)
-    parsed = json.loads(decompressed.decode('utf-8'))
+    parsed = json.loads(decompressed.decode("utf-8"))
 
     # 4. Assert Coherence
     source_node = G.nodes["node1"]
@@ -44,6 +46,7 @@ async def verify_synchronization_logic():
 
     print("End-to-End Synchronization Matrix Validated.")
     sys.exit(0)
+
 
 if __name__ == "__main__":
     asyncio.run(verify_synchronization_logic())

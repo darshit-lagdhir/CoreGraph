@@ -1,3 +1,4 @@
+# Foundation-Release-1.0 : Immutable Hardware-Optimized Baseline (Module 1 SEALED)
 # Stage 1: Compilation Architecture
 FROM python:3.13-slim AS builder
 

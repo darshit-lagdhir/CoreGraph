@@ -1,5 +1,12 @@
 import redis
+import os
 from typing import Any
+
+try:
+    # Failure 2: Lower priority for bg math to prevent WebGL stutter
+    os.nice(10)  # type: ignore[attr-defined] # noqa: E501
+except (AttributeError, PermissionError, OSError):
+    pass
 
 from celery import Celery
 from kombu import Queue

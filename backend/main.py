@@ -1,5 +1,14 @@
+import os
 import time
 from fastapi import FastAPI, status, HTTPException, Request
+
+try:
+    # Failure 2: Prioritize ASGI Gateway over analytical workers
+    os.nice(-5)  # type: ignore[attr-defined]
+except (AttributeError, PermissionError, OSError):
+    # Fallback for Windows or non-privileged process execution
+    pass
+
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware

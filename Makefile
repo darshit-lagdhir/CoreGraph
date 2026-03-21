@@ -279,3 +279,27 @@ ci-prune:
 ci-clean-cache:
 	@echo "Wiping specialized matrix caches..."
 	@powershell -Command "if (Test-Path .act_cache) { Remove-Item -Recurse -Force .act_cache }"
+
+wipe-artifacts:
+	@echo "Executing final workspace pruning for Module 1 Sealing..."
+	@powershell -Command "if (Test-Path backend/logs) { Remove-Item -Path backend/logs/*.log -Force -ErrorAction SilentlyContinue }"
+	@powershell -Command "if (Test-Path frontend/dist) { Remove-Item -Path frontend/dist -Recurse -Force -ErrorAction SilentlyContinue }"
+	@powershell -Command "Get-ChildItem -Path . -Include __pycache__ -Recurse -Force | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue"
+	@powershell -Command "Get-ChildItem -Path . -Include *.pyc -Recurse -Force | Remove-Item -Force -ErrorAction SilentlyContinue"
+	@powershell -Command "if (Test-Path .pytest_cache) { Remove-Item -Path .pytest_cache -Recurse -Force -ErrorAction SilentlyContinue }"
+
+docker-clean-hard:
+	@echo "Purging local Docker caches preparing for the 3.88M node ingestion..."
+	docker system prune -a --volumes -f
+
+wipe-artifacts:
+	@echo "Executing final workspace pruning for Module 1 Sealing..."
+	@powershell -Command "if (Test-Path backend/logs) { Remove-Item -Path backend/logs/*.log -Force -ErrorAction SilentlyContinue }"
+	@powershell -Command "if (Test-Path frontend/dist) { Remove-Item -Path frontend/dist -Recurse -Force -ErrorAction SilentlyContinue }"
+	@powershell -Command "Get-ChildItem -Path . -Include __pycache__ -Recurse -Force | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue"
+	@powershell -Command "Get-ChildItem -Path . -Include *.pyc -Recurse -Force | Remove-Item -Force -ErrorAction SilentlyContinue"
+	@powershell -Command "if (Test-Path .pytest_cache) { Remove-Item -Path .pytest_cache -Recurse -Force -ErrorAction SilentlyContinue }"
+
+docker-clean-hard:
+	@echo "Purging local Docker caches preparing for the 3.88M node ingestion..."
+	docker system prune -a --volumes -f

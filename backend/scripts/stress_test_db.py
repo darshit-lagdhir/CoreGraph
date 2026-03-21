@@ -1,11 +1,12 @@
-import asyncio
-import sys
-import os
+import asyncio  # noqa: E402
+import sys  # noqa: E402
+import os  # noqa: E402
 
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), 'backend'))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), "backend"))
 
-from database import engine, AsyncSessionLocal
-from sqlalchemy import text
+from database import engine, AsyncSessionLocal  # noqa: E402
+from sqlalchemy import text  # noqa: E402
+
 
 async def execute_query(session_id: int):
     try:
@@ -16,6 +17,7 @@ async def execute_query(session_id: int):
         print(f"Exception sequence failed on {session_id}: {e}")
         return False
     return True
+
 
 async def stress_test():
     print("Initiating 50 concurrent asynchronous connections mapped to primary pool arrays...")
@@ -29,6 +31,7 @@ async def stress_test():
     else:
         print(f"Failure: Detected {success_count}/50 bounds connected securely.")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     asyncio.run(stress_test())
