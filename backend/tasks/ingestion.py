@@ -12,7 +12,7 @@ from analytics.blast_radius import BlastRadiusCalculator
 from analytics.cvi_calculator import CVICalculator
 from analytics.clustering import CommunityDetector
 from analytics.serializer import GraphSerializer
-from config import settings
+from core.config import settings
 from clients.ecosystems import EcosystemFactory
 
 

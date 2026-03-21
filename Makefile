@@ -153,6 +153,18 @@ tail-traces:
 	@echo "Streaming high-priority JSON diagnostic traces..."
 	powershell -Command "Get-Content -Path logs/coregraph.jsonl -Wait -Tail 10"
 
+audit-config:
+	@echo "Executing diagnostic configuration audit: .env vs baseline..."
+	.\venv\Scripts\python.exe backend/scripts/audit_config.py
+
+clean-config-cache:
+	@echo "Purging configuration artifacts and LRU registers..."
+	powershell -Command "Get-ChildItem -Path backend -Filter '__pycache__' -Recurse | Remove-Item -Force"
+
+sanitize-env:
+	@echo "Surgically normalizing the .env environment matrix..."
+	powershell -Command "(Get-Content .env) | ForEach-Object { $_.Trim() } | Set-Content .env"
+
 install-deps:
 	@echo "Executing synchronized dependency matrix across environments..."
 	cd frontend && npm install

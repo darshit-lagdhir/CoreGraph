@@ -22,7 +22,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-from config import settings
+from core.config import settings
 from models import Base
 
 target_metadata = Base.metadata

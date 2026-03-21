@@ -9,7 +9,7 @@ from routers.websocket import websocket_router
 from sqlalchemy import text
 from redis.asyncio import Redis
 
-from config import settings
+from core.config import settings
 from database import engine
 from worker import celery_app
 from core.logging_config import setup_observability

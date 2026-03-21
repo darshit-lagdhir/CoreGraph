@@ -7,7 +7,7 @@ from schemas import PackageSchema, IngestRequestSchema, IngestResponseSchema
 from tasks.ingestion import ingest_ecosystem_structure
 from worker import celery_app
 from redis.asyncio import Redis
-from config import settings
+from core.config import settings
 import json
 
 api_router = APIRouter()

@@ -1,7 +1,7 @@
 import networkx as nx
 from typing import Dict, Set, List, Any
 from redis.asyncio import Redis
-from config import settings
+from core.config import settings
 
 
 class RiskPropagator:

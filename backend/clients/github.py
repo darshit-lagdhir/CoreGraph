@@ -3,7 +3,7 @@ import datetime
 from typing import List, Dict, Any
 from sqlalchemy.dialects.postgresql import insert
 
-from config import settings
+from core.config import settings
 from database import AsyncSessionLocal
 from models import MaintainerHealth
 from clients.base import ResilientClient
