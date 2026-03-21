@@ -13,7 +13,9 @@ run-api:
 	cd backend && uvicorn main:app --reload
 
 run-worker:
-	cd backend && celery -A core.celery_app worker --loglevel=info
+	@echo "Terminating orphan PID variables mitigating memory collisions..."
+	powershell -Command "if (Test-Path backend/run) { Get-ChildItem -Path backend/run -File -Force | Remove-Item -Force -ErrorAction SilentlyContinue }"
+	cd backend && celery -A worker.celery_app worker -Q default,ingestion,analytics --loglevel=info --pidfile=run/celery.pid
 
 makemigrations:
 	cd backend && alembic revision --autogenerate -m "$(message)"
@@ -41,11 +43,25 @@ clean-migrations:
 	@echo "Sweeping untracked development architectures..."
 	powershell -Command "Get-ChildItem -Path backend/migrations/versions -File | Where-Object { $$_.Name -notmatch '_' } | Remove-Item -Force -ErrorAction SilentlyContinue"
 
+clean-logs:
+	@echo "Purging diagnostic telemetry logs..."
+	powershell -Command "if (Test-Path backend/logs) { Get-ChildItem -Path backend/logs -File -Force | Remove-Item -Force -ErrorAction SilentlyContinue }"
+
+flush-broker:
+	@echo "Nullifying incomplete background broker operations..."
+	docker compose exec -T redis redis-cli FLUSHALL
+    
+flush-cache: flush-broker
+
+prune-sockets:
+	@echo "Terminating inactive external network bounds..."
+	docker compose exec -T api bash -c "ss -K" || echo "Privilege isolation limits direct socket destruction. Fallback timeouts actively governing."
+
 wipe-db-data:
 	@echo "Executing destructive persistence reset..."
 	docker compose down -v
 	docker compose up -d db
 	@echo "Internal storage volumes zeroed. 'make migrate' must be executed."
 
-cleanup:
+cleanup: clean-pycache clean-logs clean-migrations prune-sockets
 	docker system prune -a --volumes -f

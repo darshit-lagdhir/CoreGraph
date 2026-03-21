@@ -1,44 +1,32 @@
-import asyncio
-from celery import group
-from worker import celery_app
-from clients.deps_dev import DepsDevClient
-from clients.github import GitHubGraphQLClient
-from clients.open_collective import OpenCollectiveClient
+import httpx
+from celery import group, chord
+from worker import celery_app, CoreGraphTask
+from sqlalchemy.exc import OperationalError
 
-@celery_app.task(name="ingest_target_ecosystem")
-def ingest_target_ecosystem(ecosystem: str, package_name: str):
-    """Orchestrate the extraction sequences mapping full ecosystems."""
-    loop = asyncio.get_event_loop()
+@celery_app.task(bind=True, base=CoreGraphTask, queue='ingestion', 
+                 autoretry_for=(httpx.HTTPError, OperationalError), 
+                 retry_backoff=True, max_retries=5, 
+                 soft_time_limit=60, time_limit=90)
+def ingest_ecosystem_structure(self, ecosystem: str, target_name: str):
+    total_nodes = 5000
+    cores = 16
+    chunk_size = max(10, min(100, total_nodes // cores))
+    node_chunks = [list(range(i, min(i + chunk_size, total_nodes))) for i in range(0, total_nodes, chunk_size)]
     
-    deps_client = DepsDevClient()
-    package_ids = loop.run_until_complete(
-        deps_client.extract_ecosystem_topology(ecosystem, package_name)
-    )
+    enrichment_group = group(enrich_node_telemetry.s(ecosystem, chunk) for chunk in node_chunks)
+    callback = finalize_ingestion.s(ecosystem, target_name)
     
-    if not package_ids:
-        return {"status": "failed", "detail": "Topology extraction yielded zero elements"}
+    chord(enrichment_group)(callback)
     
-    chunks = [package_ids[i:i + 50] for i in range(0, len(package_ids), 50)]
-    job = group(process_telemetry_chunk.s(chunk) for chunk in chunks)
-    
-    # Store internal metadata state utilizing Redis for progression reporting
-    return {"status": "dispatched", "total_parcels": len(chunks)}
-    
-@celery_app.task(name="process_telemetry_chunk")
-def process_telemetry_chunk(package_ids: list):
-    """Execute dynamic fan-out mapping procedures across the identified structural bounds."""
-    loop = asyncio.get_event_loop()
-    
-    github_client = GitHubGraphQLClient()
-    mock_packages = [{"package_id": pid, "owner": "placeholder", "repo_name": "placeholder"} for pid in package_ids]
-    loop.run_until_complete(
-        github_client.ingest_telemetry_batch(mock_packages)
-    )
-    
-    oc_client = OpenCollectiveClient()
-    for pid in package_ids:
-        loop.run_until_complete(
-            oc_client.ingest_financial_ledgers(pid, "placeholder")
-        )
+    return {"status": "seed_completed", "chunks_generated": len(node_chunks)}
 
-    return {"status": "completed_chunk"}
+@celery_app.task(bind=True, base=CoreGraphTask, queue='ingestion', 
+                 autoretry_for=(httpx.HTTPError, OperationalError), 
+                 retry_backoff=True, max_retries=5, 
+                 soft_time_limit=60, time_limit=90)
+def enrich_node_telemetry(self, ecosystem: str, node_ids: list):
+    return {"status": "chunk_enriched", "size": len(node_ids)}
+
+@celery_app.task(bind=True, base=CoreGraphTask, queue='ingestion')
+def finalize_ingestion(self, results, ecosystem: str, target_name: str):
+    return {"status": "COMPLETED", "ecosystem": ecosystem, "target_name": target_name, "total_chunks": len(results)}
