@@ -9,6 +9,11 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+        node-version: ["20", "21"]
+        architecture: ["amd64", "arm64"]
 
     services:
       postgres:
@@ -38,18 +43,21 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set up Python 3.13
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
-        python-version: "3.13"
+        python-version: ${{ matrix.python-version }}
         cache: 'pip'
 
-    - name: Set up Node.js 20
+    - name: Set up Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
-        node-version: "20"
+        node-version: ${{ matrix.node-version }}
         cache: 'npm'
         cache-dependency-path: frontend/package-lock.json
+
+    - name: Execute CI Bootstrap (Surgical Wait-for-IT)
+      run: bash scripts/ci_bootstrap.sh
 
     - name: Install Parallel Dependencies
       run: |
