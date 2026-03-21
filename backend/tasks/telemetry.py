@@ -4,16 +4,26 @@ import subprocess
 import gc
 import json
 from worker import celery_app
-from core.redis import redis_client # Assuming client is available
+from core.redis import redis_client  # Assuming client is available
 from core.logging_config import correlation_id_var
 
 
-@celery_app.task(name="telemetry.heartbeat")
-def emit_hardware_telemetry():
-    """Engine Heartbeat: Emits structured high-fidelity hardware traces into the OSINT matrix."""
-    # Failure Scenario C Resolution: Manual garbage collection call to maintain flat memory footprint
+import ctypes
+
+
+@celery_app.task(name="telemetry.heartbeat")  # type: ignore
+def emit_hardware_telemetry() -> None:
+    """
+    Engine Heartbeat: Emits structured high-fidelity hardware traces into the OSINT matrix.
+    """
+    # Failure Scenario C Resolution: Manual garbage collection call to maintain memory footprint
     gc.collect()
-    
+    try:
+        # Failure 2 Resolution: Force heap fragmentation return to WSL2
+        ctypes.CDLL("libc.so.6").malloc_trim(0)
+    except Exception:
+        pass
+
     # 1. i9-13980hx Core Utilization Analysis (Virtualized WSL2 Normalization)
     cpu_percent = psutil.cpu_percent(interval=None)
     mem = psutil.virtual_memory()
@@ -44,14 +54,22 @@ def emit_hardware_telemetry():
 
     # 3. Heartbeat Persistence (TTL-Enforced Sliding Window in Redis)
     try:
+        import asyncio
+
         # Pushing to a specialized Redis Hash Map for real-time dashboarding
-        redis_client.hset("coregraph:heartbeat", "last_pulse", json.dumps(telemetry_payload))
+        asyncio.run(
+            redis_client.hset("coregraph:heartbeat", "last_pulse", json.dumps(telemetry_payload))
+        )
     except Exception as e:
         logging.error(f"HEARTBEAT_PERSISTENCE_FAILURE: {str(e)}")
 
     # 4. Memory Boundary Alerting (8GB wsl2 hypervisor leash)
     if mem.available < (1.0 * 1024**3):
-        logging.critical("HYPERVISOR_MEMORY_CRITICAL: Less than 1GB available RAM on workstation node.")
+        logging.critical(
+            "HYPERVISOR_MEMORY_CRITICAL: Less than 1GB available RAM on workstation node."
+        )
 
     if vram_used > 7000:
-        logging.warning("VRAM_LIMIT_THRESHOLD: RTX 4060 approaching 8GB threshold. Triggering LOD Downscaler.")
+        logging.warning(
+            "VRAM_LIMIT_THRESHOLD: RTX 4060 approaching 8GB threshold. Triggering LOD Downscaler."
+        )

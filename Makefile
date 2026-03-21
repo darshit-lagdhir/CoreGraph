@@ -236,3 +236,8 @@ wipe-db-data:
 
 cleanup: clean-pycache clean-logs clean-migrations prune-sockets prune-sessions flush-tmp clean-frontend
 	docker system prune -a --volumes -f
+clean-all: cleanup clean-docs-cache clean-test-artifacts clean-test-logs clean-config-cache
+
+prune-infrastructure:
+        docker system prune -a --volumes -f
+        docker network prune -f

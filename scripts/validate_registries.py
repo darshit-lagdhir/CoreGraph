@@ -16,11 +16,21 @@ def execute_environment_diagnostics():
         sys.exit(1)
 
     try:
-        with open(matrix_path, "r", encoding="utf-8") as f:
+        with open(matrix_path, "r+", encoding="utf-8") as f:
+            try:
+                import fcntl
+                fcntl.flock(f, fcntl.LOCK_EX)
+            except ImportError:
+                pass # fcntl not available on Windows
             matrix = json.load(f)
             if "total_modules" not in matrix or "current_status" not in matrix:
                 print("CRITICAL FAILURE: Task matrix violates strict JSON schema mapping.")
                 sys.exit(1)
+            try:
+                import fcntl
+                fcntl.flock(f, fcntl.LOCK_UN)
+            except ImportError:
+                pass
     except json.JSONDecodeError:
         print("CRITICAL FAILURE: Malformed JSON integrity discovered.")
         sys.exit(1)

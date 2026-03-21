@@ -34,3 +34,13 @@ repos:
   - id: check-yaml
   - id: check-added-large-files
     args: ['--maxkb=5000']
+
+# Module 2 Transition Guardrail: Prevent foundational drift
+- repo: local
+  hooks:
+  - id: protect-foundation
+    name: Protect Sealed Foundation
+    entry: >
+      bash -c 'if [ -z "$ALLOW_FOUNDATION_EDIT" ]; then echo "Foundation is sealed. Use ALLOW_FOUNDATION_EDIT=1 to override."; exit 1; fi'
+    language: system
+    files: ^backend/(core|database\.py|migrations)/
