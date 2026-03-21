@@ -7,7 +7,7 @@ import type { GraphNode } from '../store/useGraphStore';
 const GraphCanvas = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const fgRef = useRef<any>(null);
-  const { nodes, links } = useGraphStore();
+  const { nodes, links, selectedPath, setSelectedNode } = useGraphStore();
 
   const getLogarithmicRadius = useCallback((node: GraphNode) => {
     // Radius mapping as specified: R = min(R_max, R_base + log10(1 + BlastRadius) * ScaleFactor)
@@ -36,11 +36,15 @@ const GraphCanvas = () => {
       const radius = getLogarithmicRadius(gNode);
       const color = getNodeColor(gNode);
 
+      const isNodeOnPath = selectedPath.includes(gNode.id);
+
       const geometry = new THREE.SphereGeometry(radius, 16, 16);
       const material = new THREE.MeshPhongMaterial({
         color: new THREE.Color(color),
         transparent: true,
-        opacity: 0.9,
+        opacity: selectedPath.length > 0 ? (isNodeOnPath ? 1.0 : 0.15) : 0.9,
+        emissive: isNodeOnPath ? new THREE.Color(color) : new THREE.Color(0x000000),
+        emissiveIntensity: isNodeOnPath ? 0.8 : 0,
         shininess: 100,
       });
 
@@ -58,15 +62,19 @@ const GraphCanvas = () => {
         backgroundColor="#020617" // Slate-950
         nodeThreeObject={nodeObject}
         nodeThreeObjectExtend={false}
-        linkColor={() => 'rgba(255, 255, 255, 0.15)'}
-        linkDirectionalParticles={2}
-        linkDirectionalParticleSpeed={0.01}
-        linkDirectionalParticleWidth={1.5}
+        linkColor={(link: any) => {
+          const isLinkOnPath = selectedPath.includes(link.source.id) && selectedPath.includes(link.target.id);
+          return isLinkOnPath ? '#ef4444' : 'rgba(255, 255, 255, 0.15)';
+        }}
+        linkDirectionalParticles={(link: any) => {
+          return (selectedPath.includes(link.source.id) && selectedPath.includes(link.target.id)) ? 6 : 0;
+        }}
+        linkDirectionalParticleSpeed={0.02}
+        linkDirectionalParticleWidth={2.5}
         onNodeClick={(node: object) => {
           const gNode = node as GraphNode;
-          // Raycasted intersection handling mapped directly back to HUD
           console.log('[SPATIAL_SELECTION] Focus acquired:', gNode.name);
-          // Future: setSelectedNode in store
+          setSelectedNode(gNode);
         }}
         cooldownTicks={100}
         d3AlphaDecay={0.02}

@@ -129,6 +129,18 @@ clean-sparse-matrices:
 	@echo "Neutralizing SciPy intermediate state..."
 	powershell -Command "Get-ChildItem -Path backend -Filter '*.npz' -Recurse | Remove-Item -Force"
 
+flush-path-cache:
+	@echo "Purging pathfinding bitsets and search caches..."
+	docker exec coregraph-redis redis-cli FLUSHALL
+
+prune-bitsets:
+	@echo "Decompressing and pruning stale reachability matrices..."
+	powershell -Command "docker exec coregraph-redis redis-cli --scan --pattern 'coregraph:reach:*' | xargs -L 1 docker exec coregraph-redis redis-cli DEL"
+
+audit-path-integrity:
+	@echo "Executing topological integrity audit: SQL vs Redis BFS..."
+	.\venv\Scripts\python.exe backend/scripts/audit_path_integrity.py
+
 install-deps:
 	@echo "Executing synchronized dependency matrix across environments..."
 	cd frontend && npm install
