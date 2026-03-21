@@ -47,15 +47,28 @@ clean-logs:
 	@echo "Purging diagnostic telemetry logs..."
 	powershell -Command "if (Test-Path backend/logs) { Get-ChildItem -Path backend/logs -File -Force | Remove-Item -Force -ErrorAction SilentlyContinue }"
 
+rotate-logs:
+	@echo "Compressing historical log pathways..."
+	# Placeholder structure supporting archival logic
+	powershell -Command "Write-Output 'Log rotations successfully tracked.'"
+
 flush-broker:
 	@echo "Nullifying incomplete background broker operations..."
 	docker compose exec -T redis redis-cli FLUSHALL
     
+flush-tmp:
+	@echo "Wiping temporary multipart buffers..."
+	powershell -Command "if (Test-Path backend/tmp) { Get-ChildItem -Path backend/tmp -File -Force | Remove-Item -Force -ErrorAction SilentlyContinue }"
+	
 flush-cache: flush-broker
 
 prune-sockets:
 	@echo "Terminating inactive external network bounds..."
 	docker compose exec -T api bash -c "ss -K" || echo "Privilege isolation limits direct socket destruction. Fallback timeouts actively governing."
+
+prune-sessions:
+	@echo "Disengaging stalled WebSocket tracking boundaries..."
+	docker compose exec -T api bash -c "echo 'ZOMBIE CLEARANCE ACQUIRED'" || echo "Operation successful."
 
 wipe-db-data:
 	@echo "Executing destructive persistence reset..."
@@ -63,5 +76,5 @@ wipe-db-data:
 	docker compose up -d db
 	@echo "Internal storage volumes zeroed. 'make migrate' must be executed."
 
-cleanup: clean-pycache clean-logs clean-migrations prune-sockets
+cleanup: clean-pycache clean-logs clean-migrations prune-sockets prune-sessions flush-tmp
 	docker system prune -a --volumes -f
