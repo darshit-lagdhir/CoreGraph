@@ -6,7 +6,9 @@ from fastapi import APIRouter, HTTPException, status
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 from redis.asyncio import Redis
+from sqlalchemy.ext.asyncio import create_async_engine
 from core.config import settings
+from database import engine
 from schemas.health import HealthResponse, HealthCheckDetail, HardwareTelemetry
 
 
@@ -28,12 +30,16 @@ async def readiness_probe():
     
     # 1. PostgreSQL Relational Vault Audit
     try:
-        from core.db import engine # Assuming engine is in core/db.py or database.py
-        # Failure Scenario A Resolution: Dedicated health check connection with high affinity
+        # Failure Scenario A Resolution: Dedicated health check engine with loop isolation
+        # This prevents 'NoneType has no attribute send' errors in high-concurrency test cycles
+        temp_engine = create_async_engine(
+            settings.DATABASE_URL.unicode_string() if hasattr(settings.DATABASE_URL, 'unicode_string') else str(settings.DATABASE_URL)
+        )
         start_ping = time.perf_counter()
-        async with engine.connect() as conn:
+        async with temp_engine.connect() as conn:
             await conn.execute(text("SELECT 1"))
         latency = (time.perf_counter() - start_ping) * 1000
+        await temp_engine.dispose()
         checks["postgres"] = HealthCheckDetail(status="PASS", latency_ms=latency)
     except Exception as e:
         checks["postgres"] = HealthCheckDetail(status="FAIL", message=str(e))
@@ -41,11 +47,15 @@ async def readiness_probe():
 
     # 2. Redis Message Broker Audit
     try:
-        # Failure Scenario B Resolution: Raw Socket Ping via async redis client
-        from core.redis import redis_client # Assuming client is available
+        # Failure Scenario B Resolution: Raw Socket Ping via ephemeral async redis client
+        # This prevents 'Event loop is closed' errors during high-frequency testing cycles
+        temp_redis = Redis.from_url(
+            settings.REDIS_URL.unicode_string() if hasattr(settings.REDIS_URL, 'unicode_string') else str(settings.REDIS_URL)
+        )
         start_ping = time.perf_counter()
-        await redis_client.ping()
+        await temp_redis.ping()
         latency = (time.perf_counter() - start_ping) * 1000
+        await temp_redis.aclose()
         checks["redis"] = HealthCheckDetail(status="PASS", latency_ms=latency)
     except Exception as e:
         checks["redis"] = HealthCheckDetail(status="FAIL", message=str(e))

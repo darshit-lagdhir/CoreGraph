@@ -1,5 +1,8 @@
 import redis
+from celery import Celery
+from kombu import Queue
 from celery.signals import task_prerun, task_postrun, before_task_publish
+from core.config import settings
 from core.logging_config import setup_observability, correlation_id_var
 import logging
 

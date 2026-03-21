@@ -1,13 +1,14 @@
 import pytest
 import time
-from httpx import AsyncClient
+import httpx
 from main import app
 
 
 @pytest.mark.asyncio
 async def test_liveness_responsiveness():
     """Asserts that the /health/live endpoint returns 200 OK in under 10ms."""
-    async with AsyncClient(app=app, base_url="http://test") as ac:
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://localhost") as ac:
         start_time = time.perf_counter()
         response = await ac.get("/health/live")
         latency = (time.perf_counter() - start_time) * 1000
@@ -21,7 +22,8 @@ async def test_liveness_responsiveness():
 @pytest.mark.asyncio
 async def test_readiness_dependency_chain():
     """Validates that the /health/ready endpoint performs deep diagnostic audits."""
-    async with AsyncClient(app=app, base_url="http://test") as ac:
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://localhost") as ac:
         response = await ac.get("/health/ready")
         
         # In a healthy state, this should return 200
@@ -36,7 +38,8 @@ async def test_readiness_dependency_chain():
 @pytest.mark.asyncio
 async def test_latency_reporting_integrity():
     """Verifies that diagnostic latency metrics are correctly measured and reported."""
-    async with AsyncClient(app=app, base_url="http://test") as ac:
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://localhost") as ac:
         response = await ac.get("/health/ready")
         data = response.json()
         
@@ -48,7 +51,8 @@ async def test_latency_reporting_integrity():
 @pytest.mark.asyncio
 async def test_hardware_telemetry_normalization():
     """Asserts that the heartbeat returns accurate hardware metrics for the i9-13980hx."""
-    async with AsyncClient(app=app, base_url="http://test") as ac:
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://localhost") as ac:
         response = await ac.get("/health/ready")
         hardware = response.json()["hardware"]
         
