@@ -1,0 +1,43 @@
+rules:
+  bytecode:
+    targets:
+      - "__pycache__"
+      - ".pytest_cache"
+      - ".mypy_cache"
+      - ".ruff_cache"
+      - "node_modules/.cache"
+      - ".vite"
+      - ".eslintcache"
+    extensions:
+      - ".pyc"
+      - ".pyo"
+      - ".tsbuildinfo"
+    ghost_logic_check: true
+
+  docker:
+    prune_dangling_images: true
+    prune_orphaned_volumes: true
+    clear_buildkit_cache_hours: 48
+    protected_networks:
+      - "coregraph_public"
+      - "coregraph_private"
+
+  logs:
+    max_active_window_days: 7
+    compress_format: ".gz"
+    max_dir_size_mb: 50
+
+  system:
+    fstrim_enabled: true
+    vram_flush_enabled: true
+    vram_idle_floor_mb: 400
+    celery_signal: "SIGUSR1"
+    redis_memory_purge: true
+
+  registry:
+    compaction_enabled: true
+    preserve_keys:
+      - "project"
+      - "total_tasks"
+      - "current_status"
+      - "modules"

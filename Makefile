@@ -348,3 +348,20 @@ purge-chaos:
 	git clean -fd
 	docker system prune --volumes -f
 	powershell -Command "if (Test-Path backend/logs/chaos) { Remove-Item -Path backend/logs/chaos/* -Recurse -Force }"
+clean:
+	@echo "Standard workspace cleanup..."
+	.\venv\Scripts\python.exe backend/scripts/prune_workspace.py --type clean
+
+prune:
+	@echo "Deep workspace execution..."
+	.\venv\Scripts\python.exe backend/scripts/prune_workspace.py
+
+purge:
+	@echo "Nuclear eradication of ephemeral files..."
+	.\venv\Scripts\python.exe backend/scripts/prune_workspace.py --type purge
+	powershell -Command "docker exec coregraph-redis redis-cli FLUSHALL -a gatewaypassword123" 2> $null || echo "Redis flush skipped."
+	powershell -Command "if (Test-Path backend/logs) { Remove-Item backend/logs/* -Recurse -Force -ErrorAction SilentlyContinue }"
+
+verify-purity:
+	@echo "Auditing the Sterile State of the CoreGraph foundation..."
+	$env:PYTHONPATH="backend"; .\venv\Scripts\python.exe -m pytest backend/tests/core/test_pruning.py -v
