@@ -15,7 +15,8 @@ def _inject_nested_descriptions(schema: Dict[str, Any]) -> None:
         for prop_name, prop_data in schema["properties"].items():
             if "description" not in prop_data:
                 prop_data["description"] = (
-                    f"Relational binding mapping the {prop_name} attribute within the global topology."
+                    f"Relational binding mapping the {prop_name} attribute "
+                    "within the global topology."
                 )
 
             if "items" in prop_data and isinstance(prop_data["items"], dict):
@@ -36,43 +37,59 @@ class EnhancedBaseModel(BaseModel):
 class PackageSchema(EnhancedBaseModel):
     id: uuid.UUID = Field(
         ...,
-        description="The 128-bit relational primary key universally identifying the package within the PostgreSQL vault.",
+        description=(
+            "The 128-bit relational primary key universally identifying the "
+            "package within the PostgreSQL vault."
+        ),
         examples=["4f1d4b68-6c8f-431e-a4b5-4b0d0c3ebc9c"],
     )
     ecosystem: str = Field(
         ...,
         max_length=50,
-        description="The package registry nomenclature strictly bound to the origin repository (e.g., NPM, PyPI).",
+        description=(
+            "The package registry nomenclature strictly bound to the origin "
+            "repository (e.g., NPM, PyPI)."
+        ),
         examples=["NPM"],
     )
     name: str = Field(
         ...,
         max_length=200,
-        description="The canonical structural identifier required for acyclic graph resolution.",
+        description=(
+            "The canonical structural identifier required for acyclic graph " "resolution."
+        ),
         examples=["react"],
     )
     latest_version: str | None = Field(
         None,
-        description="The semantic versioning string representing the most recent repository commit.",
+        description=(
+            "The semantic versioning string representing the most recent " "repository commit."
+        ),
     )
     created_at: datetime = Field(
         ...,
-        description="The strict chronological timestamp tracking initial ingestion into the relational cache.",
+        description=(
+            "The strict chronological timestamp tracking initial ingestion "
+            "into the relational cache."
+        ),
     )
 
 
 class DependencyEdgeSchema(EnhancedBaseModel):
     id: uuid.UUID = Field(
-        ..., description="The definitive structural edge identifier within the DAG."
+        ...,
+        description=("The definitive structural edge identifier within the DAG."),
     )
     source_package: PackageSchema = Field(
         ..., description="The downstream parent referencing the dependency."
     )
     target_package: PackageSchema = Field(
-        ..., description="The upstream dependency target forming the structural foundation."
+        ...,
+        description=("The upstream dependency target forming the structural foundation."),
     )
     is_direct: bool = Field(
-        ..., description="A boolean flag defining immediate vs transitive dependency risk."
+        ...,
+        description=("A boolean flag defining immediate vs transitive dependency risk."),
     )
 
 
@@ -81,18 +98,24 @@ class IngestRequestSchema(EnhancedBaseModel):
         ..., max_length=50, description="The targeted package ecosystem repository."
     )
     name: str = Field(
-        ..., max_length=200, description="The precise canonical name of the dependency target."
+        ...,
+        max_length=200,
+        description=("The precise canonical name of the dependency target."),
     )
 
 
 class IngestResponseSchema(EnhancedBaseModel):
     task_id: str = Field(
         ...,
-        description="The UUID tracking the execution context mapped to the 16-worker Celery pool.",
+        description=(
+            "The UUID tracking the execution context mapped to the 16-worker " "Celery pool."
+        ),
     )
     status: str = Field(
         ...,
-        description="The immediate synchronization status of the asynchronous ingestion request.",
+        description=(
+            "The immediate synchronization status of the asynchronous " "ingestion request."
+        ),
     )
 
 

@@ -2,6 +2,8 @@ import json
 import os
 import re
 from pathlib import Path
+from typing import Dict, Any
+
 from fastapi.testclient import TestClient
 
 from main import app
@@ -12,9 +14,6 @@ from schemas.api import EnhancedBaseModel
 setup_automated_docs(app)
 
 client = TestClient(app, base_url="http://localhost")
-
-
-from typing import Dict, Any
 
 
 def test_openapi_schema_integrity() -> None:
