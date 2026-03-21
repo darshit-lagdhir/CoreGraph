@@ -303,3 +303,24 @@ wipe-artifacts:
 docker-clean-hard:
 	@echo "Purging local Docker caches preparing for the 3.88M node ingestion..."
 	docker system prune -a --volumes -f
+
+docker-audit:
+	@echo "Building distroless container for mathematical proof and scanning..."
+	docker build -t coregraph-backend:latest -f infrastructure/Dockerfile .
+	@echo "Executing the Efficiency Ratio calculation and Vulnerability scan..."
+	.\venv\Scripts\python.exe backend/scripts/audit_containers.py
+	$env:PYTHONPATH="backend"; .\venv\Scripts\python.exe -m pytest backend/tests/core/test_containers.py -v
+
+docker-prune-hard:
+	@echo "Aggressively eradicating all unused image layers..."
+	docker image prune -a -f
+	docker builder prune -a -f
+
+docker-verify-distroless:
+	@echo "Asserting the absence of known shell binaries in the execution boundary..."
+	powershell -Command "docker run --rm --entrypoint /bin/sh coregraph-backend:latest -c 'ls' 2>&1 | Select-String 'executable file not found'"
+
+perms-fix:
+	@echo "Mapping host-side volume ownership to the execution barrier UID 65532..."
+	powershell -Command "if (!(Test-Path backend/logs)) { New-Item -ItemType Directory -Force -Path backend/logs | Out-Null }; icacls backend\logs /grant 'Everyone:(OI)(CI)F' /T /Q"
+	powershell -Command "if (!(Test-Path backend/run)) { New-Item -ItemType Directory -Force -Path backend/run | Out-Null }; icacls backend\run /grant 'Everyone:(OI)(CI)F' /T /Q"

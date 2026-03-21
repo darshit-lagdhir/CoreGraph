@@ -1,0 +1,10 @@
+*
+!backend/
+!backend/**/*
+!migrations/
+!migrations/**/*
+!requirements.txt
+!infrastructure/
+!infrastructure/**/*
+!Makefile
+!.env

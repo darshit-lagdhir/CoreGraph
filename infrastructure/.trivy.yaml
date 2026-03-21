@@ -1,0 +1,13 @@
+# CoreGraph Vulnerability Threshold Policy
+scan:
+  vuln-type:
+    - os
+    - library
+  security-checks:
+    - vuln
+    - config
+severity:
+  - HIGH
+  - CRITICAL
+exit-code: 1
+ignore-unfixed: true

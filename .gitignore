@@ -22,3 +22,5 @@ task-matrix.json
 
 # Identity and Cryptographic Sockets
 .gnupg/
+
+.mypy_cache/
