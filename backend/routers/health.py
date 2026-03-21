@@ -59,7 +59,7 @@ async def readiness_probe():
         start_ping = time.perf_counter()
         await temp_redis.ping()
         latency = (time.perf_counter() - start_ping) * 1000
-        await temp_redis.aclose()
+        await temp_redis.aclose()  # type: ignore[attr-defined]
         checks["redis"] = HealthCheckDetail(status="PASS", latency_ms=latency)
     except Exception as e:
         checks["redis"] = HealthCheckDetail(status="FAIL", message=str(e))

@@ -40,7 +40,7 @@ async def test_resilient_exponential_jitter():
 async def test_circuit_breaker_suspension():
     client = ResilientClient("https://api.github.com")
     route = respx.get("/outage")
-    route.side_effect = httpx.Response(500)
+    route.side_effect = httpx.Response(500)  # type: ignore[assignment]
 
     with pytest.raises(httpx.HTTPStatusError):
         await client.request_node("GET", "/outage")

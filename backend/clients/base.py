@@ -1,5 +1,6 @@
 import httpx
 import time
+from typing import Optional, Dict
 from tenacity import retry, wait_exponential_jitter, retry_if_exception_type, stop_after_attempt
 
 
@@ -8,7 +9,7 @@ class CircuitBreakerException(Exception):
 
 
 class ResilientClient:
-    def __init__(self, base_url: str = "", headers: dict = None):
+    def __init__(self, base_url: str = "", headers: Optional[Dict[str, str]] = None):
         limits = httpx.Limits(max_connections=100, max_keepalive_connections=20)
         timeout = httpx.Timeout(10.0, connect=2.0)
         self.client = httpx.AsyncClient(

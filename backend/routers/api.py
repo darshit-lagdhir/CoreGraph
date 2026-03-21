@@ -25,7 +25,7 @@ async def get_package(ecosystem: str, name: str, db: AsyncSession = Depends(get_
     cached = await redis_client.get(cache_key)
 
     if cached:
-        await redis_client.aclose()
+        await redis_client.aclose()  # type: ignore[attr-defined]
         return PackageSchema.model_validate_json(cached)
 
     result = await db.execute(
@@ -33,7 +33,7 @@ async def get_package(ecosystem: str, name: str, db: AsyncSession = Depends(get_
     )
     pkg = result.scalars().first()
     if not pkg:
-        await redis_client.aclose()
+        await redis_client.aclose()  # type: ignore[attr-defined]
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Node unmapped within persistent structures.",
@@ -41,7 +41,7 @@ async def get_package(ecosystem: str, name: str, db: AsyncSession = Depends(get_
 
     schema_dump = PackageSchema.model_validate(pkg).model_dump_json()
     await redis_client.set(cache_key, schema_dump, ex=3600)
-    await redis_client.aclose()
+    await redis_client.aclose()  # type: ignore[attr-defined]
 
     return pkg
 

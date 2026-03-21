@@ -98,7 +98,7 @@ class Pathfinder:
     def _reconstruct_path(self, target: str) -> List[str]:
         """Backtracks from the target node using the predecessor map."""
         path = []
-        current = target
+        current: Optional[str] = target
         while current is not None:
             path.append(current)
             current = self._predecessors.get(current)
@@ -111,8 +111,8 @@ class Pathfinder:
 
         q_f = [source]
         q_b = [target]
-        visited_f = {source: None}
-        visited_b = {target: None}
+        visited_f: Dict[str, Optional[str]] = {source: None}
+        visited_b: Dict[str, Optional[str]] = {target: None}
 
         while q_f and q_b:
             # Forward step

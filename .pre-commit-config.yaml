@@ -40,7 +40,6 @@ repos:
   hooks:
   - id: protect-foundation
     name: Protect Sealed Foundation
-    entry: >
-      bash -c 'if [ -z "$ALLOW_FOUNDATION_EDIT" ]; then echo "Foundation is sealed. Use ALLOW_FOUNDATION_EDIT=1 to override."; exit 1; fi'
+    entry: python -c "import os, sys; print('Foundation is sealed. Use ALLOW_FOUNDATION_EDIT=1 to override.') if not os.environ.get('ALLOW_FOUNDATION_EDIT') else sys.exit(0); sys.exit(1) if not os.environ.get('ALLOW_FOUNDATION_EDIT') else None"
     language: system
     files: ^backend/(core|database\.py|migrations)/

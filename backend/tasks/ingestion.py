@@ -52,7 +52,7 @@ def ingest_ecosystem_structure(
                 dependencies = parser.resolve_dependencies(metadata)
 
                 # Seed children with incremented depth and extended visit path
-                new_path = visit_path + [target_name]
+                new_path = (visit_path or []) + [target_name]
                 child_tasks = [
                     ingest_ecosystem_structure.s(ecosystem, dep.name, depth + 1, new_path)
                     for dep in dependencies
@@ -124,7 +124,7 @@ def finalize_ingestion(
         # This triggers the 'coregraph:telemetry' WebSocket stream in real-time
         await redis_client.publish("coregraph:telemetry", compressed_payload)
 
-        await redis_client.aclose()
+        await redis_client.aclose()  # type: ignore[attr-defined]
         return len(graph.nodes())
 
     # Running async builder within Celery worker thread execution bounds

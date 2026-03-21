@@ -41,7 +41,7 @@ class Settings(BaseSettings):
     # Explicit URL Override (Prioritized from .env)
     RAW_DATABASE_URL: Optional[str] = Field(default=None, validation_alias="DATABASE_URL")
 
-    @computed_field
+    @computed_field  # type: ignore[misc]
     @property
     def DATABASE_URL(self) -> str:
         """Dynamically synthesized PostgresDsn ensuring absolute relational integrity."""
@@ -56,14 +56,14 @@ class Settings(BaseSettings):
         )
 
     # 3. Message Broker Parameters
-    REDIS_URL: RedisDsn = Field(
+    REDIS_URL: RedisDsn = Field(  # type: ignore[assignment]
         default="redis://localhost:6379/0",
         validation_alias=AliasChoices("REDIS_URL", "CELERY_BROKER_URL"),
     )
 
     # 4. OSINT Secret Interface
     # Failure 3 Resolution: Native SecretStr redaction to prevent accidental telemetry leakage
-    GITHUB_GRAPHQL_TOKEN: SecretStr = Field(default="sk-dummy-token")
+    GITHUB_GRAPHQL_TOKEN: SecretStr = Field(default="sk-dummy-token")  # type: ignore[assignment]
 
     # 5. Hardware & Operational Constraints (Task-Specific Thresholds)
     # Failure 3 Resolution: Worker concurrency capped at 24 for the i9-13980hx cluster

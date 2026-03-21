@@ -49,7 +49,7 @@ def check_cyclomatic_complexity(target_dir, max_complexity=10):
         return str(e)
 
 
-def check_cognitive_complexity(file_path):
+def check_cognitive_complexity(file_path: str) -> int:
     with open(file_path, "r", encoding="utf-8") as f:
-        code = f.write()
+        code = f.read()
     return get_cognitive_complexity(code)
