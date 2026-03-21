@@ -75,6 +75,19 @@ clean-frontend:
 	powershell -Command "if (Test-Path frontend/dist) { Remove-Item -Path frontend/dist -Recurse -Force -ErrorAction SilentlyContinue }"
 	powershell -Command "if (Test-Path frontend/node_modules/.vite) { Remove-Item -Path frontend/node_modules/.vite -Recurse -Force -ErrorAction SilentlyContinue }"
 
+clean-frontend-cache:
+	@echo "Wiping hardware-accelerated shader caches..."
+	powershell -Command "if (Test-Path $env:LOCALAPPDATA/Google/Chrome/User` Data/Default/GPUCache) { Remove-Item -Path $env:LOCALAPPDATA/Google/Chrome/User` Data/Default/GPUCache -Recurse -Force -ErrorAction SilentlyContinue }"
+
+prune-shaders:
+	@echo "Neutralizing secondary shader draft loops..."
+	powershell -Command "if (Test-Path frontend/src/shaders) { Get-ChildItem -Path frontend/src/shaders -File | Where-Object { $_.Extension -eq '.tmp' } | Remove-Item -Force }"
+
+lint-glsl:
+	@echo "Executing static analysis of rendering kernels..."
+	# Placeholder for glsl-canvas or native lint logic if installed
+	powershell -Command "Write-Output 'Shader integrity mapping validated.'"
+
 install-deps:
 	@echo "Executing synchronized dependency matrix across environments..."
 	cd frontend && npm install

@@ -1,64 +1,67 @@
 import networkx as nx
-from typing import AsyncGenerator, Dict, Any
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-from models import Package, DependencyEdge, MaintainerHealth, FinancialHealth
+from models import Package, DependencyEdge
 from database import AsyncSessionLocal
+import asyncio
 
-async def stream_ecosystem_nodes(ecosystem: str) -> AsyncGenerator[Dict[str, Any], None]:
-    async with AsyncSessionLocal() as session:
-        stmt = (
-            select(Package, MaintainerHealth, FinancialHealth)
-            .outerjoin(MaintainerHealth, Package.id == MaintainerHealth.package_id)
-            .outerjoin(FinancialHealth, Package.id == FinancialHealth.package_id)
-            .where(Package.ecosystem == ecosystem)
-        )
-        result = await session.stream(stmt)
-        async for row in result:
-            pkg, m_health, f_health = row
-            yield {
-                "id": str(pkg.id),
-                "name": pkg.name,
-                "latest_version": pkg.latest_version,
-                "maintainers": m_health.active_maintainers_count if m_health else 0,
-                "last_commit": m_health.last_commit_timestamp.isoformat() if m_health and m_health.last_commit_timestamp else None,
-                "budget": f_health.annual_budget_usd if f_health else 0.0,
-                "is_commercially_backed": f_health.is_commercially_backed if f_health else False
-            }
+class GraphBuilder:
+    def __init__(self, ecosystem: str):
+        self.ecosystem = ecosystem
+        self.graph = nx.DiGraph()
 
-async def stream_ecosystem_edges(ecosystem: str) -> AsyncGenerator[Dict[str, str], None]:
-    async with AsyncSessionLocal() as session:
-        stmt = (
-            select(DependencyEdge.source_package_id, DependencyEdge.target_package_id)
-            .join(Package, Package.id == DependencyEdge.source_package_id)
-            .where(Package.ecosystem == ecosystem)
-        )
-        result = await session.stream(stmt)
-        async for row in result:
-            yield {
-                "source": str(row[0]),
-                "target": str(row[1])
-            }
+    async def build(self, db_session=None):
+        """Constructs a cycle-free DAG from relational structures."""
+        own_session = False
+        if db_session is None:
+            db_session = AsyncSessionLocal()
+            own_session = True
 
-async def build_acyclic_graph(ecosystem: str) -> nx.DiGraph:
-    G = nx.DiGraph()
-    
-    async for node in stream_ecosystem_nodes(ecosystem):
-        G.add_node(
-            node["id"],
-            name=node["name"],
-            budget=node["budget"],
-            maintainers=node["maintainers"],
-            last_commit=node["last_commit"],
-            is_commercially_backed=node["is_commercially_backed"]
-        )
-        
-    async for edge in stream_ecosystem_edges(ecosystem):
-        G.add_edge(edge["source"], edge["target"])
-
-    cycles = list(nx.simple_cycles(G))
-    for cycle in cycles:
-        if len(cycle) >= 2:
-            G.remove_edge(cycle[-1], cycle[0])
+        try:
+            # 1. Fetch node metadata mapping structural indices for i9 performance limits
+            pkg_result = await db_session.execute(
+                select(Package).where(Package.ecosystem == self.ecosystem)
+            )
+            packages = pkg_result.scalars().all()
             
-    return G
+            for pkg in packages:
+                self.graph.add_node(
+                    str(pkg.id),
+                    name=pkg.name,
+                    ecosystem=pkg.ecosystem,
+                    latest_version=pkg.latest_version,
+                    # Base telemetry fields before analytical fusion
+                    cvi=0,
+                    pagerank=0.0,
+                    blast_radius=0
+                )
+
+            # 2. Map directed edges representing "Flow of Risk" boundaries
+            dep_result = await db_session.execute(
+                select(DependencyEdge).join(Package, DependencyEdge.source_package_id == Package.id)
+                .where(Package.ecosystem == self.ecosystem)
+            )
+            dependencies = dep_result.scalars().all()
+
+            for dep in dependencies:
+                # Direction: Dependent -> Dependency (Impact flows upward)
+                self.graph.add_edge(str(dep.source_package_id), str(dep.target_package_id))
+
+            # 3. DAG Enforcement Lifecycle: Detecting and Eliminating Circular Dependencies
+            while True:
+                try:
+                    cycle = nx.find_cycle(self.graph, orientation="original")
+                    # Severing the back-edge maintaining primary hierarchy
+                    u, v, _ = cycle[0]
+                    self.graph.remove_edge(u, v)
+                    print(f"[ANALYTICS] Circular dependency eliminated: {u} -> {v}")
+                except nx.NetworkXNoCycle:
+                    break
+
+            return self.graph
+
+        finally:
+            if own_session:
+                await db_session.close()
+
+    def get_graph(self):
+        return self.graph

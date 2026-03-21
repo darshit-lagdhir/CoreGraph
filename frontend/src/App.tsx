@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Activity, ShieldAlert, Cpu } from 'lucide-react';
 import { useGraphStore } from './store/useGraphStore';
 import { TelemetryPipeline } from './services/websocket';
+import GraphCanvas from './components/GraphCanvas';
 
 function App() {
   const { nodes, links, isLoading } = useGraphStore();
@@ -16,8 +17,8 @@ function App() {
   return (
     <div className="relative w-full h-full bg-slate-950 text-slate-200">
       {/* 3D WebGL Canvas Layer (z-index: 0) */}
-      <div className="absolute inset-0 z-0 flex items-center justify-center">
-        <p className="text-slate-500 font-mono text-sm opacity-50 tracking-widest">[ WEBGL CONTEXT PENDING INSTANTIATION ]</p>
+      <div className="absolute inset-0 z-0">
+        <GraphCanvas />
       </div>
 
       {/* OSINT Command Sidebar (z-index: 50) */}
