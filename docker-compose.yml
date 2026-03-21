@@ -1,39 +1,35 @@
-services:
-  # ----------------------------------------
-  # THE DATABASE (PostgreSQL)
-  # ----------------------------------------
+﻿services:
   db:
     image: postgres:15-alpine
     container_name: coregraph_postgres
+    hostname: db-vj92.private.coregraph
     restart: always
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: password123
       POSTGRES_DB: coregraph_db
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=scram-sha-256"
+      POSTGRES_HOST_AUTH_METHOD: "scram-sha-256"
+    command: postgres -c "listen_addresses='*'" -c "hba_file=/etc/postgresql/pg_hba.conf"
     ports:
-      - "5433:5432"
+      - "127.0.0.1:5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./infrastructure/pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
     networks:
-      - coregraph_internal_network
+      coregraph_private:
 
-  # ----------------------------------------
-  # THE CACHE & MAILBOX (Redis)
-  # ----------------------------------------
   redis:
     image: redis:7-alpine
     container_name: coregraph_redis
     restart: always
-    ports:
-      - "6379:6379"
+    command: redis-server /usr/local/etc/redis/redis.conf
     volumes:
       - redis_data:/data
+      - ./infrastructure/redis.conf:/usr/local/etc/redis/redis.conf:ro
     networks:
-      - coregraph_internal_network
+      coregraph_private:
 
-  # ----------------------------------------
-  # THE APPLICATION SERVER (FastAPI)
-  # ----------------------------------------
   api:
     build:
       context: .
@@ -42,18 +38,16 @@ services:
     restart: always
     command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4", "--loop", "uvloop", "--http", "httptools"]
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     env_file:
       - .env
     networks:
-      - coregraph_internal_network
+      coregraph_public:
+      coregraph_private:
     depends_on:
       - db
       - redis
 
-  # ----------------------------------------
-  # THE DISTRIBUTED QUEUE (Celery)
-  # ----------------------------------------
   worker:
     build:
       context: .
@@ -64,18 +58,27 @@ services:
     env_file:
       - .env
     networks:
-      - coregraph_internal_network
+      coregraph_private:
     depends_on:
       - db
       - redis
       - api
 
-# This tells Docker to save our data permanently on your hard drive,
-# so if the container restarts, we don't lose everything!
 volumes:
   postgres_data:
   redis_data:
 
 networks:
-  coregraph_internal_network:
+  coregraph_public:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+  coregraph_private:
+    driver: bridge
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16
+  default:
+    driver: none

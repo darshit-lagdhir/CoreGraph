@@ -1,4 +1,4 @@
-import logging
+﻿import logging
 import logging.handlers
 import multiprocessing
 import os
@@ -9,12 +9,28 @@ import orjson
 from typing import Any, Dict, Optional
 import contextvars
 import uuid
+import re
 
 
 # Failure 1 & 3 Resolution: Context-aware Correlation ID with high-performance orjson
 correlation_id_var: contextvars.ContextVar[str] = contextvars.ContextVar(
     "correlation_id", default="SYSTEM-BOOT"
 )
+
+
+class PacketRedactorFilter(logging.Filter):
+    """Sanitizes internal IP and MAC addresses from logs to prevent network topology leakage."""
+
+    IP_PATTERN = re.compile(
+        r"\b(?:172\.(?:1[6-9]|2[0-9]|3[0-1])\.|192\.168\.|10\.)[0-9]{1,3}\.[0-9]{1,3}\b"
+    )
+    MAC_PATTERN = re.compile(r"\b(?:[0-9A-Fa-f]{2}[:-]){5}(?:[0-9A-Fa-f]{2})\b")
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        if isinstance(record.msg, str):
+            record.msg = self.IP_PATTERN.sub("[REDACTED_IP]", record.msg)
+            record.msg = self.MAC_PATTERN.sub("[REDACTED_MAC]", record.msg)
+        return True
 
 
 class JSONFormatter(logging.Formatter):
@@ -58,10 +74,12 @@ def setup_observability():
     log_file = os.path.join(log_dir, "coregraph.jsonl")
     file_handler = ConcurrentRotatingFileHandler(log_file, "a", 100 * 1024 * 1024, 10)
     file_handler.setFormatter(JSONFormatter())
+    file_handler.addFilter(PacketRedactorFilter())
 
     # 2. Console Handler for Real-Time HUD monitoring
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setFormatter(JSONFormatter())
+    console_handler.addFilter(PacketRedactorFilter())
 
     # 3. QueueListener establishing the Telemetry Bridge
     # This thread consumes the memory queue and performs the actual disk/console write
@@ -69,6 +87,10 @@ def setup_observability():
         log_queue, file_handler, console_handler, respect_handler_level=True
     )
     listener.start()
+
+    import atexit
+
+    atexit.register(listener.stop)
 
     # 4. Root Logger Configuration bypassing standard blocking handlers
     root_logger = logging.getLogger()

@@ -1,4 +1,4 @@
-up:
+﻿up:
 	docker compose -f docker-compose.yml up -d --build --remove-orphans
 
 down:
@@ -53,8 +53,10 @@ rotate-logs:
 	powershell -Command "Write-Output 'Log rotations successfully tracked.'"
 
 flush-broker:
-	@echo "Nullifying incomplete background broker operations..."
+	@echo "Nullifying incomplete background broker operations and scanning for orphaned result stubs..."
 	docker compose exec -T redis redis-cli FLUSHALL
+	powershell -Command "docker exec coregraph_redis redis-cli --scan --pattern 'celery-task-meta-*' | xargs -L 1 docker exec coregraph_redis redis-cli DEL"
+	powershell -Command "docker exec coregraph_redis redis-cli --scan --pattern 'celery-task-meta-*' | xargs -L 1 docker exec coregraph_redis redis-cli DEL"
 
 flush-tmp:
 	@echo "Wiping temporary multipart buffers..."
@@ -324,3 +326,25 @@ perms-fix:
 	@echo "Mapping host-side volume ownership to the execution barrier UID 65532..."
 	powershell -Command "if (!(Test-Path backend/logs)) { New-Item -ItemType Directory -Force -Path backend/logs | Out-Null }; icacls backend\logs /grant 'Everyone:(OI)(CI)F' /T /Q"
 	powershell -Command "if (!(Test-Path backend/run)) { New-Item -ItemType Directory -Force -Path backend/run | Out-Null }; icacls backend\run /grant 'Everyone:(OI)(CI)F' /T /Q"
+
+network-audit:
+	@echo "Executing packet-level validation and generating Topology Map..."
+	powershell -Command "pytest backend/tests/core/test_network_isolation.py -v"
+
+network-prune:
+	@echo "Forcefully removing orphaned Docker networks not associated with the active CoreGraph stack..."
+	docker network prune -f
+
+flush-arp:
+	@echo "Clearing the ARP cache within the WSL2 environment to prevent Ghost IP collisions..."
+	powershell -Command "wsl -u root ip -s -s neigh flush all"
+
+chaos-run:
+	@echo "Executing the Master Stress Validation Suite..."
+	pytest backend/tests/core/test_chaos_resilience.py -v
+
+purge-chaos:
+	@echo "Eradicating artifacts and untracked code files generated during the Chaos bypass tests..."
+	git clean -fd
+	docker system prune --volumes -f
+	powershell -Command "if (Test-Path backend/logs/chaos) { Remove-Item -Path backend/logs/chaos/* -Recurse -Force }"

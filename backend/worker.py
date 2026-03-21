@@ -1,4 +1,4 @@
-import redis
+﻿import redis
 import os
 from typing import Any
 
@@ -43,7 +43,8 @@ celery_app.conf.update(
     worker_prefetch_multiplier=1,
     worker_max_tasks_per_child=50,
     worker_max_memory_per_child=512000,
-    result_expires=3600,
+    result_expires=300,
+    task_time_limit=300,  # Dead-Letter Heartbeat enforcement
     task_track_started=True,
     broker_connection_retry_on_startup=True,
 )
