@@ -1,10 +1,10 @@
 import uuid
-from typing import Dict, Any, List
-from sqlalchemy.dialects.postgresql import insert
+from typing import Any, Dict, List
 
+from clients.base import ResilientClient
 from database import AsyncSessionLocal
 from models import FinancialHealth
-from clients.base import ResilientClient
+from sqlalchemy.dialects.postgresql import insert
 
 
 class OpenCollectiveClient:

@@ -1,19 +1,19 @@
-import httpx
-from celery import group, chord
-from worker import celery_app, CoreGraphTask
-from sqlalchemy.exc import OperationalError
-from redis.asyncio import Redis
 import asyncio
 import json
-from typing import List, Optional, Dict, Any
+from typing import Any, Dict, List, Optional
 
-from analytics.graph_builder import GraphBuilder
+import httpx
 from analytics.blast_radius import BlastRadiusCalculator
-from analytics.cvi_calculator import CVICalculator
 from analytics.clustering import CommunityDetector
+from analytics.cvi_calculator import CVICalculator
+from analytics.graph_builder import GraphBuilder
 from analytics.serializer import GraphSerializer
-from core.config import settings
+from celery import chord, group
 from clients.ecosystems import EcosystemFactory
+from core.config import settings
+from redis.asyncio import Redis
+from sqlalchemy.exc import OperationalError
+from worker import CoreGraphTask, celery_app
 
 
 @celery_app.task(

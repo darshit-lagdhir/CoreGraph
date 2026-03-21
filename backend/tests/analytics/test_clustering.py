@@ -1,6 +1,6 @@
-import pytest
 import networkx as nx
 import numpy as np
+import pytest
 from analytics.clustering import CommunityDetector
 
 

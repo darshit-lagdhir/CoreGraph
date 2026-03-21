@@ -1,8 +1,9 @@
 import asyncio
+import zlib
+
+from core.config import settings
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from redis.asyncio import Redis
-from core.config import settings
-import zlib
 
 websocket_router = APIRouter()
 

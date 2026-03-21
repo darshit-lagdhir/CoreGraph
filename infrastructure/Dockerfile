@@ -43,7 +43,7 @@ COPY --from=security-patcher /patched/usr/lib/ /usr/lib/
 COPY --from=builder /app/site-packages /app/site-packages
 ENV PYTHONPATH=/app/site-packages:/app
 
-# Copy Project Code 
+# Copy Project Code
 COPY --chown=65532:65532 backend/ /app/backend/
 COPY --chown=65532:65532 Makefile /app/Makefile
 COPY --from=security-patcher --chown=65532:65532 /app/backend/logs /app/backend/logs

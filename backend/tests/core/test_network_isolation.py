@@ -1,7 +1,8 @@
-import pytest
-import socket
 import http.client
 import os
+import socket
+
+import pytest
 
 
 @pytest.mark.asyncio

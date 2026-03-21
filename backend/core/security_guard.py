@@ -1,7 +1,8 @@
+import json
 import os
 import subprocess
+
 from .ast_visitor import get_cognitive_complexity
-import json
 
 
 def run_bandit_scan(target_dir):

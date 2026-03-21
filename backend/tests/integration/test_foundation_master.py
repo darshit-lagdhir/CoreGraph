@@ -1,11 +1,12 @@
-import pytest
-import os
-import json
 import asyncio
+import json
+import os
 from pathlib import Path
+
+import pytest
+from core.redis import redis_client
 from fastapi.testclient import TestClient
 from main import app
-from core.redis import redis_client
 
 client = TestClient(app, base_url="http://localhost")
 

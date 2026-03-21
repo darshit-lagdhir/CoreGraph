@@ -1,7 +1,8 @@
-import pytest
 import os
+
 import pydantic
-from core.config import Settings, EnvironmentType, get_settings
+import pytest
+from core.config import EnvironmentType, Settings, get_settings
 
 
 def test_strict_type_enforcement_and_coercion():

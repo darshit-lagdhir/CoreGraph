@@ -1,5 +1,5 @@
-from redis.asyncio import Redis
 from core.config import settings
+from redis.asyncio import Redis
 
 # Unified asynchronous message broker registry for the CoreGraph cluster
 redis_client = Redis.from_url(

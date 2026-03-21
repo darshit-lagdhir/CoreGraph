@@ -1,14 +1,13 @@
-import logging
-import psutil
-import subprocess
+import ctypes
 import gc
 import json
-from worker import celery_app
-from core.redis import redis_client  # Assuming client is available
+import logging
+import subprocess
+
+import psutil
 from core.logging_config import correlation_id_var
-
-
-import ctypes
+from core.redis import redis_client  # Assuming client is available
+from worker import celery_app
 
 
 @celery_app.task(name="telemetry.heartbeat")  # type: ignore

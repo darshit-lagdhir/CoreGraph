@@ -1,7 +1,8 @@
 import uuid
+
+from core.logging_config import correlation_id_var
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
-from core.logging_config import correlation_id_var
 
 
 class TraceMiddleware(BaseHTTPMiddleware):

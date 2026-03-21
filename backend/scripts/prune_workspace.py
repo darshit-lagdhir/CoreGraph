@@ -4,15 +4,16 @@ Pruning Matrix: Automated Environment Pruning and NVMe Artifact Eradication.
 Task 024 implementation.
 """
 
+import concurrent.futures
+import json
 import os
-import time
 import shutil
 import subprocess
-import json
+import time
 import zlib
-import concurrent.futures
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import Any, Dict, List, Optional
+
 from pydantic import BaseModel, Field
 
 WORKSPACE_ROOT = Path(__file__).parent.parent.parent

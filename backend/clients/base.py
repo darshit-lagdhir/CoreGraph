@@ -1,12 +1,8 @@
-import httpx
 import time
-from typing import Optional, Dict
-from tenacity import (
-    retry,
-    wait_exponential_jitter,
-    retry_if_exception_type,
-    stop_after_attempt,
-)
+from typing import Dict, Optional
+
+import httpx
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential_jitter
 
 
 class CircuitBreakerException(Exception):

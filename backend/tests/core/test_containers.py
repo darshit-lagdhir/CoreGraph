@@ -1,6 +1,7 @@
-import subprocess
-import pytest
 import shutil
+import subprocess
+
+import pytest
 
 IMAGE_NAME = "coregraph-backend:latest"
 

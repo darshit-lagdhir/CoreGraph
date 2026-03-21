@@ -1,9 +1,10 @@
 import asyncio
 import logging
-from sqlalchemy import inspect
-from sqlalchemy.ext.asyncio import create_async_engine
+
 from core.config import settings
 from models import Base
+from sqlalchemy import inspect
+from sqlalchemy.ext.asyncio import create_async_engine
 
 
 async def audit_schema_integrity():

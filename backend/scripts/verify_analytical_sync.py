@@ -1,11 +1,11 @@
 import asyncio  # noqa: E402
 import gzip  # noqa: E402
 import json  # noqa: E402
+import os  # noqa: E402
+import sys  # noqa: E402
+
 import networkx as nx  # noqa: E402
 from redis.asyncio import Redis  # noqa: E402
-
-import sys  # noqa: E402
-import os  # noqa: E402
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../backend")))
 

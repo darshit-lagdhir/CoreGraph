@@ -1,15 +1,15 @@
 import asyncio
-import pytest
-import respx
-import httpx
+import os
+import sys
 import time
 
-import sys
-import os
+import httpx
+import pytest
+import respx
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
-from clients.base import ResilientClient, CircuitBreakerException  # noqa: E402
+from clients.base import CircuitBreakerException, ResilientClient  # noqa: E402
 
 
 @pytest.mark.asyncio

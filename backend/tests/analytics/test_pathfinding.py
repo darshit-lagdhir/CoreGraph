@@ -1,5 +1,5 @@
-import pytest
 import networkx as nx
+import pytest
 from analytics.pathfinder import Pathfinder
 from analytics.propagation import RiskPropagator
 

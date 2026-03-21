@@ -1,7 +1,8 @@
+from typing import Any, Dict, List, Set
+
 import networkx as nx
-from typing import Dict, Set, List, Any
-from redis.asyncio import Redis
 from core.config import settings
+from redis.asyncio import Redis
 
 
 class RiskPropagator:

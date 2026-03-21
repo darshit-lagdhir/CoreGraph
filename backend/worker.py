@@ -1,6 +1,7 @@
-﻿import redis
-import os
+﻿import os
 from typing import Any
+
+import redis
 
 try:
     # Failure 2: Lower priority for bg math to prevent WebGL stutter
@@ -8,12 +9,13 @@ try:
 except (AttributeError, PermissionError, OSError):
     pass
 
-from celery import Celery
-from kombu import Queue
-from celery.signals import task_prerun, task_postrun, before_task_publish
-from core.config import settings
-from core.logging_config import setup_observability, correlation_id_var
 import logging
+
+from celery import Celery
+from celery.signals import before_task_publish, task_postrun, task_prerun
+from core.config import settings
+from core.logging_config import correlation_id_var, setup_observability
+from kombu import Queue
 
 # Initialize structured observability matrix for high-concurrency trace captures
 setup_observability()  # type: ignore

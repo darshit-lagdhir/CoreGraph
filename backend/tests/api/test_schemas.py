@@ -1,14 +1,14 @@
+import os
+import sys
+import uuid
+from datetime import datetime
+
 import pytest
 from pydantic import ValidationError
-from datetime import datetime
-import uuid
-
-import sys
-import os
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
-from schemas import PackageSchema, IngestRequestSchema  # noqa: E402
+from schemas import IngestRequestSchema, PackageSchema  # noqa: E402
 
 
 def test_package_schema_integrity():

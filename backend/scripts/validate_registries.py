@@ -1,11 +1,12 @@
-from typing import Any, Tuple, Dict, List
-import os
 import json
 import logging
+import os
+from collections import defaultdict
 from concurrent.futures import ProcessPoolExecutor
+from typing import Any, Dict, List, Tuple
+
 import jsonschema
 from jsonschema import validate
-from collections import defaultdict
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")

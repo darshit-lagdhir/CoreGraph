@@ -1,7 +1,8 @@
 import functools
+from typing import Any, Dict
+
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
-from typing import Dict, Any
 
 
 def _redact_secrets(schema: Dict[str, Any]) -> None:

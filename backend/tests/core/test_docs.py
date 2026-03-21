@@ -2,12 +2,11 @@ import json
 import os
 import re
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict
 
-from fastapi.testclient import TestClient
-
-from main import app
 from core.docs import setup_automated_docs
+from fastapi.testclient import TestClient
+from main import app
 from schemas.api import EnhancedBaseModel
 
 # Initialize documentation engine for the strict testing protocol

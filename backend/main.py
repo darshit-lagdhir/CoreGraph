@@ -1,19 +1,19 @@
+import hashlib
+import json
+import os
+from contextlib import asynccontextmanager
+from multiprocessing import Pool, cpu_count
+from pathlib import Path
+
+from core.logging_config import setup_observability
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
-from contextlib import asynccontextmanager
-import os
-import json
-import hashlib
-from pathlib import Path
-from multiprocessing import Pool, cpu_count
-
-from routers.health import router as health_router
-from routers.api import api_router
-from routers.websocket import websocket_router
 from middleware.trace_middleware import TraceMiddleware
-from core.logging_config import setup_observability
+from routers.api import api_router
+from routers.health import router as health_router
+from routers.websocket import websocket_router
 
 WORKSPACE_ROOT = Path(__file__).parent.parent
 MANIFEST_PATH = WORKSPACE_ROOT / ".workspace" / "manifest.json"

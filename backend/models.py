@@ -1,16 +1,17 @@
 import uuid
 from datetime import datetime
+
 from sqlalchemy import (
+    Boolean,
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
+    Numeric,
     String,
     Text,
-    Boolean,
-    Integer,
-    Float,
-    DateTime,
-    ForeignKey,
     UniqueConstraint,
     func,
-    Numeric,
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 

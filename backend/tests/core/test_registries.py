@@ -1,11 +1,12 @@
-import os
 import json
+import os
+
 import pytest
 from scripts.validate_registries import (
+    EXECUTION_LEDGER_SCHEMA,
+    check_json_schema,
     topological_sort_check,
     validate_markdown_ast,
-    check_json_schema,
-    EXECUTION_LEDGER_SCHEMA,
 )
 
 pytestmark = pytest.mark.asyncio

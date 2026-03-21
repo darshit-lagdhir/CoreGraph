@@ -1,6 +1,7 @@
-import networkx as nx
 import heapq
-from typing import Dict, List, Optional, Tuple, Set, Any
+from typing import Any, Dict, List, Optional, Set, Tuple
+
+import networkx as nx
 
 
 class Pathfinder:

@@ -1,8 +1,9 @@
-import pytest
 import json
-import uuid
-import time
 import logging
+import time
+import uuid
+
+import pytest
 from core.logging_config import correlation_id_var, setup_observability
 
 

@@ -1,8 +1,9 @@
-import pytest
 import asyncio
 import os
+from unittest.mock import MagicMock, patch
+
 import psutil
-from unittest.mock import patch, MagicMock
+import pytest
 
 # -----------------------------------------------------------------------------
 # TOTAL PERFORMANCE PARADIGM: FINAL BENCHMARK VALIDATION SUITE (TASK 020)

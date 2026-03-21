@@ -1,10 +1,10 @@
 import asyncio  # noqa: E402
-import sys  # noqa: E402
 import os  # noqa: E402
+import sys  # noqa: E402
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), "backend"))
 
-from database import engine, AsyncSessionLocal  # noqa: E402
+from database import AsyncSessionLocal, engine  # noqa: E402
 from sqlalchemy import text  # noqa: E402
 
 

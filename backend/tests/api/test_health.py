@@ -1,6 +1,7 @@
-import pytest
 import time
+
 import httpx
+import pytest
 from main import app
 
 

@@ -1,12 +1,13 @@
-import pytest
 import asyncio
 import os
 import uuid
-from sqlalchemy import text, inspect
-from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.ext.asyncio import create_async_engine
+
+import pytest
 from core.config import settings
 from models import Base
+from sqlalchemy import inspect, text
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.ext.asyncio import create_async_engine
 
 
 @pytest.mark.asyncio

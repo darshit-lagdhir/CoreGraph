@@ -1,15 +1,16 @@
-﻿import logging
+﻿import contextvars
+import logging
 import logging.handlers
 import multiprocessing
 import os
+import re
 import sys
 import threading
-from datetime import datetime
-import orjson
-from typing import Any, Dict, Optional
-import contextvars
 import uuid
-import re
+from datetime import datetime
+from typing import Any, Dict, Optional
+
+import orjson
 
 # Failure 1 & 3 Resolution: Context-aware Correlation ID with high-performance orjson
 correlation_id_var: contextvars.ContextVar[str] = contextvars.ContextVar(

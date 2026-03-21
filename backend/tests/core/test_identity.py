@@ -1,9 +1,10 @@
-from typing import Dict, Any
-import pytest
+import json
+import os
 import subprocess
 import time
-import os
-import json
+from typing import Any, Dict
+
+import pytest
 
 WORKSPACE_DIR = os.path.join(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))),

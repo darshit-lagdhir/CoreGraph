@@ -1,8 +1,9 @@
+from typing import Any
+
+import httpx
 import pytest
 import respx
-import httpx
-from typing import Any
-from clients.ecosystems import EcosystemFactory, PyPIClient, GoClient
+from clients.ecosystems import EcosystemFactory, GoClient, PyPIClient
 
 
 @pytest.mark.asyncio

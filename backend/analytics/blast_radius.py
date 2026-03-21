@@ -1,6 +1,7 @@
-import networkx as nx
-from typing import Set, Dict
 from collections import deque
+from typing import Dict, Set
+
+import networkx as nx
 
 
 class BlastRadiusCalculator:

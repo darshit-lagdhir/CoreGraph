@@ -1,6 +1,7 @@
 import asyncio
-import websockets
 import sys
+
+import websockets
 
 
 async def execution_handshakes():

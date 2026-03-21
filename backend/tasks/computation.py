@@ -1,10 +1,11 @@
 import asyncio
-from worker import celery_app
-from analytics.graph_builder import build_acyclic_graph
-from analytics.centrality import calculate_pagerank
+
 from analytics.blast_radius import calculate_blast_radius
+from analytics.centrality import calculate_pagerank
 from analytics.cvi_calculator import evaluate_cvi
+from analytics.graph_builder import build_acyclic_graph
 from analytics.serializer import serialize_and_cache
+from worker import celery_app
 
 
 @celery_app.task(name="compute_ecosystem_metrics")

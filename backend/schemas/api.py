@@ -1,9 +1,8 @@
 import uuid
-from pydantic import BaseModel, Field, ConfigDict, SecretStr
 from datetime import datetime
+from typing import Any, Dict
 
-
-from typing import Dict, Any
+from pydantic import BaseModel, ConfigDict, Field, SecretStr
 
 
 def _inject_nested_descriptions(schema: Dict[str, Any]) -> None:

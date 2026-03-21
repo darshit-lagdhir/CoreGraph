@@ -1,10 +1,11 @@
-import networkx as nx
-import numpy as np
-from scipy import sparse
-from community import community_louvain
 import hashlib
 from datetime import datetime
-from typing import Dict, List, Any
+from typing import Any, Dict, List
+
+import networkx as nx
+import numpy as np
+from community import community_louvain
+from scipy import sparse
 
 
 class CommunityDetector:

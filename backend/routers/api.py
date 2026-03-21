@@ -1,14 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+import json
+
+from core.config import settings
 from database import AsyncSessionLocal
+from fastapi import APIRouter, Depends, HTTPException, status
 from models import Package
-from schemas import PackageSchema, IngestRequestSchema, IngestResponseSchema
+from redis.asyncio import Redis
+from schemas import IngestRequestSchema, IngestResponseSchema, PackageSchema
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from tasks.ingestion import ingest_ecosystem_structure
 from worker import celery_app
-from redis.asyncio import Redis
-from core.config import settings
-import json
 
 api_router = APIRouter()
 

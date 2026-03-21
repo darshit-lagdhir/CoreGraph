@@ -1,7 +1,8 @@
-import json
 import gzip
+import json
+from typing import Any, Dict
+
 import networkx as nx
-from typing import Dict, Any
 
 
 class GraphSerializer:

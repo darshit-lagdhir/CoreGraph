@@ -1,15 +1,15 @@
-import time
-import psutil
 import logging
+import time
 from datetime import datetime
-from fastapi import APIRouter, HTTPException, status
-from sqlalchemy import text
-from sqlalchemy.ext.asyncio import AsyncSession
-from redis.asyncio import Redis
-from sqlalchemy.ext.asyncio import create_async_engine
+
+import psutil
 from core.config import settings
 from database import engine
-from schemas.health import HealthResponse, HealthCheckDetail, HardwareTelemetry
+from fastapi import APIRouter, HTTPException, status
+from redis.asyncio import Redis
+from schemas.health import HardwareTelemetry, HealthCheckDetail, HealthResponse
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
 router = APIRouter(prefix="/health", tags=["Diagnostic Probes"])
 START_TIME = time.time()

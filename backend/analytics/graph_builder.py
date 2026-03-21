@@ -1,8 +1,9 @@
-import networkx as nx
-from sqlalchemy import select
-from models import Package, DependencyEdge
-from database import AsyncSessionLocal
 import asyncio
+
+import networkx as nx
+from database import AsyncSessionLocal
+from models import DependencyEdge, Package
+from sqlalchemy import select
 
 
 class GraphBuilder:

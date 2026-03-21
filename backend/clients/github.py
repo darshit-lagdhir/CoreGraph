@@ -1,12 +1,12 @@
-import uuid
 import datetime
-from typing import List, Dict, Any
-from sqlalchemy.dialects.postgresql import insert
+import uuid
+from typing import Any, Dict, List
 
+from clients.base import ResilientClient
 from core.config import settings
 from database import AsyncSessionLocal
 from models import MaintainerHealth
-from clients.base import ResilientClient
+from sqlalchemy.dialects.postgresql import insert
 
 
 class GitHubGraphQLClient:

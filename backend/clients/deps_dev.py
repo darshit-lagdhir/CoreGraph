@@ -1,10 +1,10 @@
 import uuid
-from typing import List, Dict, Any
-from sqlalchemy.dialects.postgresql import insert
+from typing import Any, Dict, List
 
-from database import AsyncSessionLocal
-from models import Package, DependencyEdge
 from clients.base import ResilientClient
+from database import AsyncSessionLocal
+from models import DependencyEdge, Package
+from sqlalchemy.dialects.postgresql import insert
 
 
 class DepsDevClient:
