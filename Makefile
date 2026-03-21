@@ -121,6 +121,14 @@ clean-test-logs:
 	@echo "Neutralizing diagnostic traces from the logging vault..."
 	powershell -Command "Remove-Item -Path backend/logs/*.log -Force -ErrorAction SilentlyContinue"
 
+flush-cluster-cache:
+	@echo "Purging topological segment maps from the Redis broker..."
+	docker exec coregraph-redis redis-cli FLUSHALL
+
+clean-sparse-matrices:
+	@echo "Neutralizing SciPy intermediate state..."
+	powershell -Command "Get-ChildItem -Path backend -Filter '*.npz' -Recurse | Remove-Item -Force"
+
 install-deps:
 	@echo "Executing synchronized dependency matrix across environments..."
 	cd frontend && npm install

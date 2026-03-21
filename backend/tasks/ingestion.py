@@ -10,6 +10,7 @@ from typing import List, Optional, Dict, Any
 from analytics.graph_builder import GraphBuilder
 from analytics.blast_radius import BlastRadiusCalculator
 from analytics.cvi_calculator import CVICalculator
+from analytics.clustering import CommunityDetector
 from analytics.serializer import GraphSerializer
 from config import settings
 from clients.ecosystems import EcosystemFactory
@@ -106,7 +107,11 @@ def finalize_ingestion(
         cvi_calc = CVICalculator(graph)
         graph = cvi_calc.calculate()
 
-        # 4. Serialization: Binary gzipped payload generated for Redis caching
+        # 4. Topological Segmentation: Community Detection (Louvain/Leiden)
+        cluster_engine = CommunityDetector(graph, ecosystem)
+        graph = cluster_engine.calculate()
+
+        # 5. Serialization: Binary gzipped payload generated for Redis caching
         serializer = GraphSerializer(graph)
         compressed_payload = serializer.serialize()
 
