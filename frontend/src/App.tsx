@@ -27,7 +27,7 @@ function App() {
           <Activity className="text-emerald-500" size={24} />
           <h1 className="text-xl font-bold tracking-tight text-white">COREGRAPH_OSINT</h1>
         </div>
-        
+
         <div className="flex flex-col gap-4 flex-grow">
           {isLoading ? (
             <div className="flex flex-col gap-2 p-4 rounded bg-slate-800/50 border border-slate-700 animate-pulse">
@@ -38,13 +38,13 @@ function App() {
             <div className="flex flex-col gap-2 p-4 rounded bg-slate-800/50 border border-slate-700">
               <span className="text-xs text-slate-400 uppercase tracking-widest font-mono">Matrix Nodes</span>
               <span className="text-2xl text-white font-mono">{nodes.length.toLocaleString()}</span>
-              
+
               <span className="text-xs text-slate-400 uppercase tracking-widest font-mono mt-2">Matrix Edges</span>
               <span className="text-xl text-white font-mono">{links.length.toLocaleString()}</span>
             </div>
           )}
         </div>
-        
+
         <div className="mt-auto border-t border-slate-800 pt-4">
           <div className="flex items-center gap-2 text-xs text-slate-500 font-mono">
             <Cpu size={14} />

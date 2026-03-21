@@ -26,16 +26,22 @@ app.add_middleware(
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=["localhost", "127.0.0.1"])
 
+
 @app.middleware("http")
 async def limit_payload_size(request: Request, call_next):
     # Strict 10MB payload limit enforcing hypervisor memory boundaries
     if request.headers.get("content-length"):
         if int(request.headers.get("content-length")) > 10 * 1024 * 1024:
-            raise HTTPException(status_code=413, detail="Payload dimension actively threatens memory hypervisor bounds.")
+            raise HTTPException(
+                status_code=413,
+                detail="Payload dimension actively threatens memory hypervisor bounds.",
+            )
     return await call_next(request)
+
 
 app.include_router(api_router, prefix="/api/v1")
 app.include_router(websocket_router)
+
 
 @app.get("/health", status_code=status.HTTP_200_OK)
 async def health_check():
@@ -44,7 +50,7 @@ async def health_check():
         "status": "healthy",
         "database_latency_ms": 0,
         "redis_latency_ms": 0,
-        "celery_serializer_secure": False
+        "celery_serializer_secure": False,
     }
 
     start_db = time.perf_counter()
@@ -54,7 +60,7 @@ async def health_check():
     except Exception as e:
         return JSONResponse(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            content={"status": "error", "component": "database", "detail": str(e)}
+            content={"status": "error", "component": "database", "detail": str(e)},
         )
     response_data["database_latency_ms"] = round((time.perf_counter() - start_db) * 1000, 2)
 
@@ -66,18 +72,24 @@ async def health_check():
     except Exception as e:
         return JSONResponse(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            content={"status": "error", "component": "redis", "detail": str(e)}
+            content={"status": "error", "component": "redis", "detail": str(e)},
         )
     response_data["redis_latency_ms"] = round((time.perf_counter() - start_redis) * 1000, 2)
 
-    if (celery_app.conf.task_serializer == "json" and 
-        celery_app.conf.result_serializer == "json" and 
-        "json" in celery_app.conf.accept_content):
+    if (
+        celery_app.conf.task_serializer == "json"
+        and celery_app.conf.result_serializer == "json"
+        and "json" in celery_app.conf.accept_content
+    ):
         response_data["celery_serializer_secure"] = True
     else:
-         return JSONResponse(
+        return JSONResponse(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            content={"status": "error", "component": "celery", "detail": "Insecure serialization configured."}
+            content={
+                "status": "error",
+                "component": "celery",
+                "detail": "Insecure serialization configured.",
+            },
         )
 
     return response_data

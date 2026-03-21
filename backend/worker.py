@@ -15,14 +15,14 @@ celery_app.conf.update(
     result_serializer="json",
     accept_content=["json"],
     task_queues=(
-        Queue('default'),
-        Queue('ingestion'),
-        Queue('analytics'),
+        Queue("default"),
+        Queue("ingestion"),
+        Queue("analytics"),
     ),
-    task_default_queue='default',
+    task_default_queue="default",
     task_routes={
-        'tasks.ingestion.*': {'queue': 'ingestion'},
-        'tasks.computation.*': {'queue': 'analytics'},
+        "tasks.ingestion.*": {"queue": "ingestion"},
+        "tasks.computation.*": {"queue": "analytics"},
     },
     worker_concurrency=16,
     worker_prefetch_multiplier=1,
@@ -30,11 +30,13 @@ celery_app.conf.update(
     worker_max_memory_per_child=512000,
     result_expires=3600,
     task_track_started=True,
-    broker_connection_retry_on_startup=True
+    broker_connection_retry_on_startup=True,
 )
+
 
 class CoreGraphTask(celery_app.Task):
     abstract = True
+
     def on_success(self, retval, task_id, args, kwargs):
         try:
             client = redis.from_url(settings.REDIS_URL)

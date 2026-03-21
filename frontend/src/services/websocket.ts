@@ -40,13 +40,13 @@ export class TelemetryPipeline {
         if (event.data instanceof ArrayBuffer) {
             try {
                 // Determine ping vs direct structural arrays
-                const isPing = event.data.byteLength === 4; 
-                if (isPing) return; 
+                const isPing = event.data.byteLength === 4;
+                if (isPing) return;
 
                 // Decompressing utilizing 64KB ArrayBuffer vectors directly
                 const inflatedString = pako.inflate(new Uint8Array(event.data), { to: 'string' });
                 const graphJson = JSON.parse(inflatedString);
-                
+
                 useGraphStore.getState().setGraphData(graphJson);
             } catch (error) {
                 console.error('[TELEMETRY_FAULT] Binary parsing sequence halted:', error);
@@ -70,16 +70,16 @@ export class TelemetryPipeline {
         }
 
         const exponentialDelay = Math.min(
-            this.config.maxDelayMs, 
+            this.config.maxDelayMs,
             this.config.baseDelayMs * Math.pow(2, this.attempts)
         );
-        
+
         // Include mathematical Jitter neutralizing systemic race conditions
         const jitterMatrix = exponentialDelay + (Math.random() * 1000);
 
         this.attempts++;
         useGraphStore.getState().resetGraph();
-        
+
         setTimeout(() => {
             console.log(`[TELEMETRY] Evaluating pipeline matrix: attempt ${this.attempts}`);
             this.connect();

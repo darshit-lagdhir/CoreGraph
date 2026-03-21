@@ -6,31 +6,34 @@ import zlib
 
 websocket_router = APIRouter()
 
+
 @websocket_router.websocket("/ws/telemetry")
 async def websocket_telemetry_endpoint(websocket: WebSocket):
     await websocket.accept()
     redis_client = Redis.from_url(settings.REDIS_URL)
-    
+
     # Mathematical Pub/Sub loop isolating WebSockets within binary chunk streams
     pubsub = redis_client.pubsub()
     await pubsub.subscribe("coregraph:telemetry")
-    
+
     try:
         while True:
             # Heartbeat ping timeouts implemented resolving dead external sockets
-            message = await asyncio.wait_for(pubsub.get_message(ignore_subscribe_messages=True), timeout=30.0)
-            
-            if message and message['type'] == 'message':
+            message = await asyncio.wait_for(
+                pubsub.get_message(ignore_subscribe_messages=True), timeout=30.0
+            )
+
+            if message and message["type"] == "message":
                 # Utilizing raw binary frame delivery mimicking WebGL engine limits
-                binary_frame = zlib.compress(message['data'])
+                binary_frame = zlib.compress(message["data"])
                 # Chunk sending algorithm simulated utilizing 64KB arrays limits
                 chunk_size = 65536
                 for i in range(0, len(binary_frame), chunk_size):
-                    await websocket.send_bytes(binary_frame[i:i + chunk_size])
-                    
+                    await websocket.send_bytes(binary_frame[i : i + chunk_size])
+
             else:
-                await websocket.send_bytes(b'ping')
-                
+                await websocket.send_bytes(b"ping")
+
     except asyncio.TimeoutError:
         # Client dropped socket outside 30s envelope threshold
         pass

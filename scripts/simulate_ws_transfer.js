@@ -22,7 +22,7 @@ zlib.deflate(stringified, (err, buffer) => {
         console.error("Deflation algorithm failed bounds parameters.");
         process.exit(1);
     }
-    
+
     console.log(`Payload string compressed perfectly: ${buffer.byteLength} bytes.`);
     console.log(`Simulated mathematical chunking algorithm verifying telemetry pipeline parameters active.`);
     process.exit(0);

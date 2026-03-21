@@ -1,0 +1,84 @@
+name: CoreGraph CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: admin
+          POSTGRES_PASSWORD: password123
+          POSTGRES_DB: coregraph_db
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.13"
+        cache: 'pip'
+
+    - name: Set up Node.js 20
+      uses: actions/setup-node@v4
+      with:
+        node-version: "20"
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Install Parallel Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r backend/requirements.txt
+        cd frontend && npm install
+
+    - name: Static Analysis Matrix
+      run: |
+        pip install black flake8 mypy
+        black --check backend/
+        flake8 backend/ --config backend/.flake8
+        mypy backend/ --config-file backend/pyproject.toml
+        cd frontend && npm run lint
+
+    - name: Execute Analytical Engine Tests (Pytest)
+      env:
+        DATABASE_URL: postgresql+asyncpg://admin:password123@localhost:5433/coregraph_db
+        REDIS_URL: redis://localhost:6379/0
+        GITHUB_GRAPHQL_TOKEN: ${{ secrets.GITHUB_GRAPHQL_TOKEN }}
+        ENVIRONMENT: ci
+      run: |
+        pytest backend/tests -v --no-header
+
+    - name: Execute WebGL Interface Tests (Vitest)
+      run: |
+        cd frontend && npm run test
+
+    - name: Cryptographic Secret Scanning
+      uses: gitleaks/gitleaks-action@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

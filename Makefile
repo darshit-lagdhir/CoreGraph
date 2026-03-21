@@ -55,11 +55,11 @@ rotate-logs:
 flush-broker:
 	@echo "Nullifying incomplete background broker operations..."
 	docker compose exec -T redis redis-cli FLUSHALL
-    
+
 flush-tmp:
 	@echo "Wiping temporary multipart buffers..."
 	powershell -Command "if (Test-Path backend/tmp) { Get-ChildItem -Path backend/tmp -File -Force | Remove-Item -Force -ErrorAction SilentlyContinue }"
-	
+
 flush-cache: flush-broker
 
 prune-sockets:
@@ -87,6 +87,27 @@ lint-glsl:
 	@echo "Executing static analysis of rendering kernels..."
 	# Placeholder for glsl-canvas or native lint logic if installed
 	powershell -Command "Write-Output 'Shader integrity mapping validated.'"
+
+lint-fix:
+	@echo "Executing automated structural corrections..."
+	.\venv\Scripts\python.exe -m black backend/ --config backend/pyproject.toml
+	cd frontend && npm run lint -- --fix
+
+clean-test-artifacts:
+	@echo "Purging localized test caches and coverage reports..."
+	powershell -Command "if (Test-Path .pytest_cache) { Remove-Item -Path .pytest_cache -Recurse -Force -ErrorAction SilentlyContinue }"
+	powershell -Command "if (Test-Path backend/.mypy_cache) { Remove-Item -Path backend/.mypy_cache -Recurse -Force -ErrorAction SilentlyContinue }"
+	powershell -Command "if (Test-Path frontend/coverage) { Remove-Item -Path frontend/coverage -Recurse -Force -ErrorAction SilentlyContinue }"
+
+prune-ci-containers:
+	@echo "Neutralizing stale Docker CI environments..."
+	docker container prune -f
+	docker network prune -f
+
+install-ci:
+	@echo "Installing specialized CI/CD guardrail dependencies..."
+	.\venv\Scripts\python.exe -m pip install pre-commit black flake8 mypy
+	pre-commit install
 
 install-deps:
 	@echo "Executing synchronized dependency matrix across environments..."

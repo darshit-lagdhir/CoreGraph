@@ -20,9 +20,11 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 import os
 import sys
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from config import settings
 from models import Base
+
 target_metadata = Base.metadata
 
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)

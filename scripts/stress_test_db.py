@@ -21,7 +21,7 @@ async def stress_test():
     print("Initiating 50 concurrent asynchronous connections mapped to primary pool arrays...")
     tasks = [execute_query(i) for i in range(50)]
     results = await asyncio.gather(*tasks, return_exceptions=True)
-    
+
     success_count = sum(1 for r in results if r is True)
     if success_count == 50:
         print("Success: Overflow handling actively neutralizes connection latency constraints.")

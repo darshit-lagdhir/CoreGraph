@@ -4,6 +4,7 @@ from models import Package, DependencyEdge
 from database import AsyncSessionLocal
 import asyncio
 
+
 class GraphBuilder:
     def __init__(self, ecosystem: str):
         self.ecosystem = ecosystem
@@ -22,7 +23,7 @@ class GraphBuilder:
                 select(Package).where(Package.ecosystem == self.ecosystem)
             )
             packages = pkg_result.scalars().all()
-            
+
             for pkg in packages:
                 self.graph.add_node(
                     str(pkg.id),
@@ -32,12 +33,13 @@ class GraphBuilder:
                     # Base telemetry fields before analytical fusion
                     cvi=0,
                     pagerank=0.0,
-                    blast_radius=0
+                    blast_radius=0,
                 )
 
             # 2. Map directed edges representing "Flow of Risk" boundaries
             dep_result = await db_session.execute(
-                select(DependencyEdge).join(Package, DependencyEdge.source_package_id == Package.id)
+                select(DependencyEdge)
+                .join(Package, DependencyEdge.source_package_id == Package.id)
                 .where(Package.ecosystem == self.ecosystem)
             )
             dependencies = dep_result.scalars().all()

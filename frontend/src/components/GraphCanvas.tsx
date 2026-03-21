@@ -5,6 +5,7 @@ import { useGraphStore } from '../store/useGraphStore';
 import type { GraphNode } from '../store/useGraphStore';
 
 const GraphCanvas = () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const fgRef = useRef<any>(null);
   const { nodes, links } = useGraphStore();
 
@@ -28,12 +29,13 @@ const GraphCanvas = () => {
 
   const nodeObject = useMemo(() => {
     // Custom shader-based rendering strategy (simplified representation here)
-    // Instanced rendering would typically require low-level THREE.InstancedMesh access, 
+    // Instanced rendering would typically require low-level THREE.InstancedMesh access,
     // which react-force-graph-3d supports via nodeThreeObject.
-    return (node: any) => {
-      const radius = getLogarithmicRadius(node as GraphNode);
-      const color = getNodeColor(node as GraphNode);
-      
+    return (node: object) => {
+      const gNode = node as GraphNode;
+      const radius = getLogarithmicRadius(gNode);
+      const color = getNodeColor(gNode);
+
       const geometry = new THREE.SphereGeometry(radius, 16, 16);
       const material = new THREE.MeshPhongMaterial({
         color: new THREE.Color(color),
@@ -60,9 +62,10 @@ const GraphCanvas = () => {
         linkDirectionalParticles={2}
         linkDirectionalParticleSpeed={0.01}
         linkDirectionalParticleWidth={1.5}
-        onNodeClick={(node: any) => {
+        onNodeClick={(node: object) => {
+          const gNode = node as GraphNode;
           // Raycasted intersection handling mapped directly back to HUD
-          console.log('[SPATIAL_SELECTION] Focus acquired:', node.name);
+          console.log('[SPATIAL_SELECTION] Focus acquired:', gNode.name);
           // Future: setSelectedNode in store
         }}
         cooldownTicks={100}

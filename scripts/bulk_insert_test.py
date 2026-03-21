@@ -19,7 +19,7 @@ async def bulk_insert_packages(batch_size: int = 1000):
                 "ecosystem": "test_net",
                 "name": f"test-matrix-{u_id}",
             })
-        
+
         stmt = insert(Package).values(records).on_conflict_do_nothing()
         await session.execute(stmt)
         await session.commit()

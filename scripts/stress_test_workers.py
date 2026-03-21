@@ -8,10 +8,10 @@ from worker import celery_app
 def execute_load_matrix():
     print("Initiating 1,000 parallel ingestion seeds testing Redis broker constraints...")
     tasks = []
-    
+
     for i in range(1000):
         res = celery_app.send_task(
-            'tasks.ingestion.enrich_node_telemetry', 
+            'tasks.ingestion.enrich_node_telemetry',
             args=["npm", [i]],
             queue="ingestion"
         )

@@ -70,7 +70,7 @@ services:
       - redis
       - api
 
-# This tells Docker to save our data permanently on your hard drive, 
+# This tells Docker to save our data permanently on your hard drive,
 # so if the container restarts, we don't lose everything!
 volumes:
   postgres_data:
