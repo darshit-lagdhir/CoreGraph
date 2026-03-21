@@ -141,6 +141,18 @@ audit-path-integrity:
 	@echo "Executing topological integrity audit: SQL vs Redis BFS..."
 	.\venv\Scripts\python.exe backend/scripts/audit_path_integrity.py
 
+rotate-logs:
+	@echo "Manually triggering log rotation and archival..."
+	powershell -Command "foreach ($file in Get-ChildItem logs/*.jsonl) { $file.MoveTo($file.FullName + '.' + (Get-Date -Format 'yyyyMMdd-HHmmss')) }"
+
+prune-logs:
+	@echo "Neutralizing diagnostic artifacts older than 7 days..."
+	powershell -Command "Get-ChildItem logs/*.jsonl.* | Where-Object { $_.LastWriteTime -lt (Get-Date).AddDays(-7) } | Remove-Item -Force"
+
+tail-traces:
+	@echo "Streaming high-priority JSON diagnostic traces..."
+	powershell -Command "Get-Content -Path logs/coregraph.jsonl -Wait -Tail 10"
+
 install-deps:
 	@echo "Executing synchronized dependency matrix across environments..."
 	cd frontend && npm install

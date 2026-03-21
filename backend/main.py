@@ -12,8 +12,16 @@ from redis.asyncio import Redis
 from config import settings
 from database import engine
 from worker import celery_app
+from core.logging_config import setup_observability
+from middleware.trace_middleware import TraceMiddleware
+
+
+# Non-blocking distributed telemetry initialization
+setup_observability()
 
 app = FastAPI(title="CoreGraph API Engine")
+
+app.add_middleware(TraceMiddleware)
 
 app.add_middleware(
     CORSMiddleware,

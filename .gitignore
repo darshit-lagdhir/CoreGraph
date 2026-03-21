@@ -11,6 +11,9 @@ Thumbs.db
 .env
 .env
 .env.example
+logs/
+*.log
+*.jsonl
 
 # Internal Workspaces and Context Trackers
 .workspace/
