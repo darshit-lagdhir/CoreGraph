@@ -14,6 +14,7 @@ from database import engine
 from worker import celery_app
 from core.logging_config import setup_observability
 from middleware.trace_middleware import TraceMiddleware
+from routers import health
 
 
 # Non-blocking distributed telemetry initialization
@@ -51,53 +52,4 @@ app.include_router(api_router, prefix="/api/v1")
 app.include_router(websocket_router)
 
 
-@app.get("/health", status_code=status.HTTP_200_OK)
-async def health_check():
-    """Execute raw system ping against isolated infrastructure."""
-    response_data = {
-        "status": "healthy",
-        "database_latency_ms": 0,
-        "redis_latency_ms": 0,
-        "celery_serializer_secure": False,
-    }
-
-    start_db = time.perf_counter()
-    try:
-        async with engine.begin() as conn:
-            await conn.execute(text("SELECT 1"))
-    except Exception as e:
-        return JSONResponse(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            content={"status": "error", "component": "database", "detail": str(e)},
-        )
-    response_data["database_latency_ms"] = round((time.perf_counter() - start_db) * 1000, 2)
-
-    start_redis = time.perf_counter()
-    try:
-        redis_client = Redis.from_url(settings.REDIS_URL)
-        await redis_client.ping()
-        await redis_client.aclose()
-    except Exception as e:
-        return JSONResponse(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            content={"status": "error", "component": "redis", "detail": str(e)},
-        )
-    response_data["redis_latency_ms"] = round((time.perf_counter() - start_redis) * 1000, 2)
-
-    if (
-        celery_app.conf.task_serializer == "json"
-        and celery_app.conf.result_serializer == "json"
-        and "json" in celery_app.conf.accept_content
-    ):
-        response_data["celery_serializer_secure"] = True
-    else:
-        return JSONResponse(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            content={
-                "status": "error",
-                "component": "celery",
-                "detail": "Insecure serialization configured.",
-            },
-        )
-
-    return response_data
+app.include_router(health.router)

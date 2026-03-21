@@ -190,6 +190,22 @@ prune-orphans:
 	@echo "Executing surgical removal of untracked migration artifacts..."
 	powershell -Command "gci backend/migrations/versions -Filter *.py | ? { (gc $_.FullName) -match 'REVISES: None' -and $_.Name -ne (gci backend/migrations/versions -Filter *.py | sort LastWriteTime | select -Last 1).Name } | ri -Force"
 
+check-liveness:
+	@echo "Interrogating the distributed event loop for process cardiac rhythm..."
+	powershell -Command "Invoke-RestMethod -Uri http://localhost:8000/health/live"
+
+check-readiness:
+	@echo "Executing deep diagnostic audit of relational and broker dependencies..."
+	powershell -Command "Invoke-RestMethod -Uri http://localhost:8000/health/ready"
+
+prune-heartbeats:
+	@echo "Neutralizing the heartbeat telemetry ledger in Redis..."
+	powershell -Command "docker exec coregraph-redis redis-cli DEL coregraph:heartbeat"
+
+tail-heartbeat-logs:
+	@echo "Streaming systemic heartbeat traces from the structured log matrix..."
+	powershell -Command "Get-Content logs/backend.log -Wait | Where-Object { $_ -match 'SYSTEMIC_TELEMETRY_PULSE' }"
+
 install-deps:
 	@echo "Executing synchronized dependency matrix across environments..."
 	cd frontend && npm install
