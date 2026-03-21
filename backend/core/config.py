@@ -3,6 +3,7 @@ from enum import Enum
 from functools import lru_cache
 from pathlib import Path
 from typing import Optional
+from urllib.parse import quote_plus
 
 from pydantic import (
     AliasChoices,
@@ -37,11 +38,20 @@ class Settings(BaseSettings):
     DB_PORT: int = 5432
     DB_NAME: str = "coregraph"
 
+    # Explicit URL Override (Prioritized from .env)
+    RAW_DATABASE_URL: Optional[str] = Field(default=None, validation_alias="DATABASE_URL")
+
     @computed_field
     @property
     def DATABASE_URL(self) -> str:
         """Dynamically synthesized PostgresDsn ensuring absolute relational integrity."""
-        return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+        if self.RAW_DATABASE_URL:
+            return self.RAW_DATABASE_URL
+
+        # Sanitizing credentials to handle special characters (@, #, etc.) in the .env matrix
+        user = quote_plus(self.DB_USER)
+        password = quote_plus(self.DB_PASSWORD)
+        return f"postgresql+asyncpg://{user}:{password}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
     # 3. Message Broker Parameters
     REDIS_URL: RedisDsn = Field(

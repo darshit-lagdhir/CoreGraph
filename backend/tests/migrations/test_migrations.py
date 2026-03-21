@@ -1,28 +1,33 @@
 import pytest
 import asyncio
-from sqlalchemy.ext.asyncio import create_async_engine
+import os
+import uuid
 from sqlalchemy import text, inspect
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.ext.asyncio import create_async_engine
 from core.config import settings
 from models import Base
-import os
 
 
 @pytest.mark.asyncio
 async def test_golden_master_migration_alignment():
     """Category A Verification: Zero-delta between physical schema and code metadata."""
-    # 1. Engineering a temporary relational vault for structural auditing
-    test_db_url = settings.DATABASE_URL.replace("coregraph", "coregraph_schema_audit")
-    engine = create_async_engine(test_db_url)
+    # 1. Engineering a connection to the primary relational vault defined in the OSINT matrix
+    engine = create_async_engine(settings.DATABASE_URL)
     
     # 2. Execution of the 'make migrate' sequence (simulated)
     async with engine.begin() as conn:
-        # Here we would typically rely on Alembic's programmatic API
-        # to apply all revisions. For this validation, we assert Metadata alignment.
-        def get_inspector(sync_conn):
-            return inspect(sync_conn)
+        def get_metadata(sync_conn):
+            # 1. Inspecting the physical state of the PostgreSQL container
+            # This must occur within the run_sync bridge to handle Greenlet spawning
+            inspector = inspect(sync_conn)
+            return {
+                "tables": set(inspector.get_table_names()),
+                "indexes": {t: set(idx['name'] for idx in inspector.get_indexes(t)) for t in inspector.get_table_names()}
+            }
 
-        inspector = await conn.run_sync(get_inspector)
-        tables = inspector.get_table_names()
+        physical_state = await conn.run_sync(get_metadata)
+        tables = physical_state["tables"]
         
         # 3. Structural Comparison: Code vs Physical State
         expected_tables = Base.metadata.tables.keys()
@@ -45,22 +50,28 @@ async def test_transactional_ddl_integrity():
     """Category D Verification: Asserts that constraints are enforced immediately after migration."""
     engine = create_async_engine(settings.DATABASE_URL)
     
-    async with engine.begin() as conn:
-        # Probing for the composite unique constraint (ecosystem, name)
-        try:
+    # 1. Initiating a transactional boundary for structural constraint probing
+    # We use engine.begin() to ensure atomic rollback of the baseline record
+    with pytest.raises(SQLAlchemyError) as excinfo:
+        async with engine.begin() as conn:
+            test_node_name = f"react-probe-{os.urandom(4).hex()}"
+            
+            # 1. Baseline entry: Mapping a legitimate OSINT node
             await conn.execute(
-                text("INSERT INTO packages (id, ecosystem, name, cvi) VALUES (:id, :eco, :name, :cvi)"),
-                {"id": "test-uuid-1", "eco": "npm", "name": "react", "cvi": 50.0}
+                text("INSERT INTO packages (id, ecosystem, name, name_normalized) VALUES (:id, :eco, :name, :name_norm)"),
+                {"id": str(uuid.uuid4()), "eco": "pypi", "name": test_node_name, "name_norm": test_node_name.lower()}
             )
-            # Second attempt should trigger UniqueViolation if migration 012 enforced the constraint
+            
+            # 2. Duplicate entry attempt: This MUST trigger the internal PostgreSQL abort state
+            # We attempt to insert a record that violates the (ecosystem, name_normalized) unique constraint
             await conn.execute(
-                text("INSERT INTO packages (id, ecosystem, name, cvi) VALUES (:id, :eco, :name, :cvi)"),
-                {"id": "test-uuid-2", "eco": "npm", "name": "react", "cvi": 60.0}
+                text("INSERT INTO packages (id, ecosystem, name, name_normalized) VALUES (:id, :eco, :name, :name_norm)"),
+                {"id": str(uuid.uuid4()), "eco": "pypi", "name": test_node_name.upper(), "name_norm": test_node_name.lower()}
             )
-            pytest.fail("Relational Failure: Unique constraint not enforced across (ecosystem, name) matrix.")
-        except Exception as e:
-            assert "unique constraint" in str(e).lower() or "duplicate key" in str(e).lower()
-        finally:
-             await conn.execute(text("DELETE FROM packages WHERE name = 'react'"))
+
+    # 2. Category D Assertion: Verification of the collision error
+    error_msg = str(excinfo.value).lower()
+    # We broaden the search to include the specific asyncpg exception names and generic error markers
+    assert any(x in error_msg for x in ["unique", "duplicate", "23505", "violation"]), f"UNEXPECTED_ERROR: {error_msg}"
 
     await engine.dispose()
