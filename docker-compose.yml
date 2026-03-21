@@ -11,10 +11,11 @@ services:
       POSTGRES_PASSWORD: password123
       POSTGRES_DB: coregraph_db
     ports:
-      # Option A: Mapping Windows Port 5433 to Container Port 5432
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - coregraph_internal_network
 
   # ----------------------------------------
   # THE CACHE & MAILBOX (Redis)
@@ -27,9 +28,15 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    networks:
+      - coregraph_internal_network
 
 # This tells Docker to save our data permanently on your hard drive, 
 # so if the container restarts, we don't lose everything!
 volumes:
   postgres_data:
   redis_data:
+
+networks:
+  coregraph_internal_network:
+    driver: bridge
