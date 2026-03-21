@@ -14,3 +14,9 @@ run-api:
 
 run-worker:
 	cd backend && celery -A core.celery_app worker --loglevel=info
+
+makemigrations:
+	cd backend && alembic revision --autogenerate -m "$(message)"
+
+migrate:
+	cd backend && alembic upgrade head
