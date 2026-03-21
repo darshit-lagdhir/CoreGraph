@@ -73,6 +73,9 @@ class PackageVersion(Base):
     # Relationships for ORM traversal
     package = relationship("Package", back_populates="versions")
     previous_version = relationship("PackageVersion", remote_side=[id])
+    dependencies = relationship(
+        "DependencyEdge", back_populates="parent_version", cascade="all, delete-orphan"
+    )
 
     __table_args__ = (
         # Composite Uniqueness and Version Integrity (Section 2.B)

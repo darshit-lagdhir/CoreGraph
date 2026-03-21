@@ -25,9 +25,15 @@ class Package(Base):
         doc="Primary 128-bit identifier for the package entity.",
     )
 
-    # Relationships (Section 2.A)
+    # Relationships (Section 2.A & Task 003)
     versions = relationship(
         "PackageVersion", back_populates="package", cascade="all, delete-orphan"
+    )
+    dependents = relationship(
+        "DependencyEdge", back_populates="child_package", cascade="all, delete-orphan"
+    )
+    maintainer_metrics: Mapped[list["MaintainerMetrics"]] = relationship(
+        "MaintainerMetrics", back_populates="package", cascade="all, delete-orphan"
     )
 
     # Memory-Aligned String Constraints (Section 3.C)
