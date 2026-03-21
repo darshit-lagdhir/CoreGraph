@@ -31,6 +31,44 @@ services:
     networks:
       - coregraph_internal_network
 
+  # ----------------------------------------
+  # THE APPLICATION SERVER (FastAPI)
+  # ----------------------------------------
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: coregraph_api
+    restart: always
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    networks:
+      - coregraph_internal_network
+    depends_on:
+      - db
+      - redis
+
+  # ----------------------------------------
+  # THE DISTRIBUTED QUEUE (Celery)
+  # ----------------------------------------
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: coregraph_worker
+    restart: always
+    command: ["celery", "-A", "worker", "worker", "--loglevel=info"]
+    env_file:
+      - .env
+    networks:
+      - coregraph_internal_network
+    depends_on:
+      - db
+      - redis
+      - api
+
 # This tells Docker to save our data permanently on your hard drive, 
 # so if the container restarts, we don't lose everything!
 volumes:
