@@ -1,42 +1,36 @@
 import { create } from 'zustand';
 
-export interface NodeData {
+export interface GraphNode {
   id: string;
   name: string;
-  ecosystem: string;
+  cvi: number;
   pagerank: number;
   blast_radius: number;
-  cvi: number;
-  budget: number;
-  maintainers: number;
-  val?: number;
-  color?: string;
+  budget_usd: number;
+  is_commercially_backed: boolean;
 }
 
-export interface LinkData {
+export interface GraphLink {
   source: string;
   target: string;
 }
 
-export interface GraphPayload {
-  nodes: NodeData[];
-  links: LinkData[];
-}
-
-interface GraphStore {
-  graphData: GraphPayload;
+export interface GraphState {
+  nodes: GraphNode[];
+  links: GraphLink[];
   isLoading: boolean;
-  selectedNode: NodeData | null;
-  setGraphData: (data: GraphPayload) => void;
-  setIsLoading: (loading: boolean) => void;
-  setSelectedNode: (node: NodeData | null) => void;
+  setGraphData: (data: { nodes: GraphNode[], links: GraphLink[] }) => void;
+  resetGraph: () => void;
 }
 
-export const useGraphStore = create<GraphStore>((set) => ({
-  graphData: { nodes: [], links: [] },
+export const useGraphStore = create<GraphState>((set) => ({
+  nodes: [],
+  links: [],
   isLoading: true,
-  selectedNode: null,
-  setGraphData: (data) => set({ graphData: data }),
-  setIsLoading: (loading) => set({ isLoading: loading }),
-  setSelectedNode: (node) => set({ selectedNode: node }),
+  setGraphData: (data) => set(() => {
+    // Diff-and-Merge limits reducing arbitrary DOM memory instantiation overhead
+    // For direct binary parsing, complete object replacement ensures absolute consistency initially
+    return { nodes: data.nodes, links: data.links, isLoading: false };
+  }),
+  resetGraph: () => set({ nodes: [], links: [], isLoading: true }),
 }));

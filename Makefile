@@ -70,11 +70,25 @@ prune-sessions:
 	@echo "Disengaging stalled WebSocket tracking boundaries..."
 	docker compose exec -T api bash -c "echo 'ZOMBIE CLEARANCE ACQUIRED'" || echo "Operation successful."
 
+clean-frontend:
+	@echo "Purging frontend caches and minified payloads..."
+	powershell -Command "if (Test-Path frontend/dist) { Remove-Item -Path frontend/dist -Recurse -Force -ErrorAction SilentlyContinue }"
+	powershell -Command "if (Test-Path frontend/node_modules/.vite) { Remove-Item -Path frontend/node_modules/.vite -Recurse -Force -ErrorAction SilentlyContinue }"
+
+install-deps:
+	@echo "Executing synchronized dependency matrix across environments..."
+	cd frontend && npm install
+	.\venv\Scripts\python.exe -m pip install -r backend\requirements.txt
+
+build-prod:
+	@echo "Compiling optimized binary distributions..."
+	cd frontend && npm run build
+
 wipe-db-data:
 	@echo "Executing destructive persistence reset..."
 	docker compose down -v
 	docker compose up -d db
 	@echo "Internal storage volumes zeroed. 'make migrate' must be executed."
 
-cleanup: clean-pycache clean-logs clean-migrations prune-sockets prune-sessions flush-tmp
+cleanup: clean-pycache clean-logs clean-migrations prune-sockets prune-sessions flush-tmp clean-frontend
 	docker system prune -a --volumes -f
