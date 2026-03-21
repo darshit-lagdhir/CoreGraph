@@ -15,7 +15,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
-class Base(DeclarativeBase):
+class Base(DeclarativeBase):  # type: ignore
     pass
 
 
@@ -25,6 +25,7 @@ class Package(Base):
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4, index=True)
     ecosystem: Mapped[str] = mapped_column(String, nullable=False)
     name: Mapped[str] = mapped_column(String, nullable=False)
+    name_normalized: Mapped[str] = mapped_column(String, nullable=False, index=True)
     latest_version: Mapped[str | None] = mapped_column(String, nullable=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     license: Mapped[str | None] = mapped_column(String, nullable=True)
@@ -33,7 +34,9 @@ class Package(Base):
         DateTime(timezone=True), default=func.now(), onupdate=func.now()
     )
 
-    __table_args__ = (UniqueConstraint("ecosystem", "name", name="uix_ecosystem_name"),)
+    __table_args__ = (
+        UniqueConstraint("ecosystem", "name_normalized", name="uix_ecosystem_name_norm"),
+    )
 
 
 class DependencyEdge(Base):

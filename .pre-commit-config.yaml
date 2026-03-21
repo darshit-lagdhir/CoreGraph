@@ -19,6 +19,7 @@ repos:
   - id: mypy
     files: ^backend/
     args: [--config-file, backend/pyproject.toml]
+    additional_dependencies: [pydantic, sqlalchemy, httpx, respx, types-redis, types-requests]
 
 - repo: https://github.com/gitleaks/gitleaks
   rev: v8.18.1

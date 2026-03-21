@@ -109,6 +109,18 @@ install-ci:
 	.\venv\Scripts\python.exe -m pip install pre-commit black flake8 mypy
 	pre-commit install
 
+flush-api-cache:
+	@echo "Purging temporary registry metadata from the Redis broker..."
+	docker exec coregraph-redis redis-cli FLUSHDB
+
+prune-orphan-packages:
+	@echo "Executing structural cleanup of mock relational datasets..."
+	.\scripts\cleanup_orphans.ps1
+
+clean-test-logs:
+	@echo "Neutralizing diagnostic traces from the logging vault..."
+	powershell -Command "Remove-Item -Path backend/logs/*.log -Force -ErrorAction SilentlyContinue"
+
 install-deps:
 	@echo "Executing synchronized dependency matrix across environments..."
 	cd frontend && npm install
