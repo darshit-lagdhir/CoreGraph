@@ -2,6 +2,7 @@ import uuid
 from typing import Dict, Any, Optional, List
 from dal.models.graph import Package, PackageVersion
 
+
 class ShadowNodeManager:
     """The Memory Mirror: Handling Ephemeral OSINT Queries (Task 010 Engine)."""
 

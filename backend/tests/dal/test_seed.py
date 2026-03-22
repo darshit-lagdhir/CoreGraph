@@ -4,6 +4,7 @@ from infra.database import db_manager
 from dal.seed import seed_osint_specimens
 from dal.models.graph import Package
 
+
 @pytest.mark.asyncio
 async def test_seed_density(session):
     """

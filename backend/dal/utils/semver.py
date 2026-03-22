@@ -12,7 +12,10 @@ SEMVER_REGEX = re.compile(
     r"(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$"
 )
 
-def calculate_semver_components(version_str: str) -> Tuple[int, int, int, Optional[str], Optional[str], str]:
+
+def calculate_semver_components(
+    version_str: str,
+) -> Tuple[int, int, int, Optional[str], Optional[str], str]:
     """Decomposes a version string into B-Tree indexable sort keys (Task 009 Engine)."""
     match = SEMVER_REGEX.match(version_str)
     if not match:
@@ -32,7 +35,10 @@ def calculate_semver_components(version_str: str) -> Tuple[int, int, int, Option
     sort_key = f"{ma:05d}.{mi:05d}.{pa:05d}"
     return (ma, mi, pa, pre, build, sort_key)
 
-async def resolve_best_candidate(session, package_id: str, range_specifier: str) -> Optional[PackageVersion]:
+
+async def resolve_best_candidate(
+    session, package_id: str, range_specifier: str
+) -> Optional[PackageVersion]:
     """
     The High-Velocity Resolution Kernel (Task 009).
     Translates ranges (^1.2.0, ~0.5.1) into the highest compliant B-Tree candidate.
@@ -40,28 +46,29 @@ async def resolve_best_candidate(session, package_id: str, range_specifier: str)
     # Simple Caret/Tilde logic for competition MVP:
     # ^1.2.0 -> [1.2.0, 2.0.0)
     # ~1.2.0 -> [1.2.0, 1.3.0)
-    
+
     clean_range = range_specifier.lstrip("^~")
     ma, mi, pa, _, _, _ = calculate_semver_components(clean_range)
-    
+
     query = select(PackageVersion).where(
-        and_(
-            PackageVersion.package_id == package_id,
-            PackageVersion.is_stable == True
-        )
+        and_(PackageVersion.package_id == package_id, PackageVersion.is_stable == True)
     )
-    
+
     if range_specifier.startswith("^"):
         # Major must match if > 0, otherwise major match 0 and minor match
         if ma > 0:
             query = query.where(PackageVersion.version_major == ma)
         else:
-            query = query.where(and_(PackageVersion.version_major == 0, PackageVersion.version_minor == mi))
+            query = query.where(
+                and_(PackageVersion.version_major == 0, PackageVersion.version_minor == mi)
+            )
     elif range_specifier.startswith("~"):
-        query = query.where(and_(PackageVersion.version_major == ma, PackageVersion.version_minor == mi))
-    
+        query = query.where(
+            and_(PackageVersion.version_major == ma, PackageVersion.version_minor == mi)
+        )
+
     # Sort by sort_key DESC to find the HIGHEST resolution (Task 009 Protocol)
     query = query.order_by(PackageVersion.sort_key.desc()).limit(1)
-    
+
     result = await session.execute(query)
     return result.scalars().first()

@@ -11,6 +11,7 @@ def setup_db():
     """Override centralized setup_db to allow Alembic to manage the lifecycle."""
     pass
 
+
 def test_schema_migration_continuity():
     """
     The 'Time Machine' Audit for Task 006.
@@ -20,7 +21,7 @@ def test_schema_migration_continuity():
     import subprocess
     import sys
     import os
-    
+
     def purge_vault():
         # High-Velocity Purge: Direct SQL injection into the containerized vault
         # Ensures zero residual artifacts from parallel test sessions (CoreGraph Protocol)
@@ -33,10 +34,21 @@ def test_schema_migration_continuity():
             "DROP TABLE IF EXISTS author_profiles CASCADE; "
             "DROP MATERIALIZED VIEW IF EXISTS mv_package_risk_summary CASCADE;"
         )
-        subprocess.run([
-            "docker", "exec", "coregraph_postgres", 
-            "psql", "-U", "admin", "-d", "coregraph_db", "-c", sql
-        ], capture_output=True)
+        subprocess.run(
+            [
+                "docker",
+                "exec",
+                "coregraph_postgres",
+                "psql",
+                "-U",
+                "admin",
+                "-d",
+                "coregraph_db",
+                "-c",
+                sql,
+            ],
+            capture_output=True,
+        )
 
     def run_alembic(args):
         env = os.environ.copy()

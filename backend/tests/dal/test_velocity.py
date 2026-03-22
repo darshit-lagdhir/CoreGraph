@@ -12,9 +12,10 @@ async def test_fuzzy_search_performance_budget(session):
     Ensures sub-20ms latency across the 3.88M node ecosystem.
     """
     from dal.seed import seed_osint_specimens
+
     await seed_osint_specimens(session)
     await session.commit()
-    
+
     search_term = "lodsh"  # Simulating typosquatted lodash lookup
 
     # Measure purely the high-velocity similarity search
@@ -26,13 +27,15 @@ async def test_fuzzy_search_performance_budget(session):
     print(f"\n[AUDIT] Fuzzy Search Latency: {latency_ms:.2f}ms")
     assert latency_ms < 50.0, f"Search exceeded HUD latency budget: {latency_ms}ms"
 
+
 @pytest.mark.asyncio
 async def test_materialized_view_access(session):
     """Verifies O(1) flattened access for HUD risk mapping."""
     from dal.seed import seed_osint_specimens
+
     await seed_osint_specimens(session)
     await session.commit()
-    
+
     # Check mv_package_risk_summary populates summary metrics
     res = await session.execute(text("SELECT count(*) FROM mv_package_risk_summary"))
     count = res.scalar()

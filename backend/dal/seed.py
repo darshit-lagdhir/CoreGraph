@@ -97,5 +97,6 @@ async def seed_osint_specimens(session: AsyncSession):
     # 6. REFRESH ANALYTICAL ENGINE (Module 2 Materialized View)
     # This ensures the HUD's O(1) flattened map is consistent with the latest Ground Truth
     from sqlalchemy import text
+
     await session.execute(text("REFRESH MATERIALIZED VIEW CONCURRENTLY mv_package_risk_summary;"))
     # Note: CONCURRENTLY requires a unique index, which we added in migration (CoreGraph Protocol)

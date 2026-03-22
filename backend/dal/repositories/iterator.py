@@ -12,12 +12,14 @@ class GraphWalkIterator:
 
     async def get_direct_dependents(self, package_id: uuid.UUID) -> List[uuid.UUID]:
         """Atomically fetches the first layer of the consumer chain."""
-        sql = text("""
+        sql = text(
+            """
             SELECT DISTINCT v.package_id
             FROM dependency_edges de
             JOIN package_versions v ON de.parent_version_id = v.id
             WHERE de.child_package_id = :pkg_id
-        """)
+        """
+        )
         result = await self.session.execute(sql, {"pkg_id": package_id})
         return [row[0] for row in result]
 
