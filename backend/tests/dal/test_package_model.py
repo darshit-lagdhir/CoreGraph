@@ -6,7 +6,7 @@ from typing import AsyncGenerator
 import pytest
 from core.config import settings
 from dal.base import Base
-from dal.models.package import Package
+from dal.models.graph import Package
 from sqlalchemy import func, select, text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import (
@@ -18,34 +18,8 @@ from sqlalchemy.ext.asyncio import (
 
 
 @pytest.fixture
-async def engine() -> AsyncGenerator[AsyncEngine, None]:
-    engine = create_async_engine(settings.DATABASE_URL)
-    yield engine
-    await engine.dispose()
-
-
-@pytest.fixture
 def async_session_factory(engine):
     return async_sessionmaker(engine, expire_on_commit=False)
-
-
-@pytest.fixture(autouse=True)
-async def setup_db(engine):
-    """Create isolated PostgreSQL environment for architectural verification."""
-    async with engine.begin() as conn:
-        # Deep Engineering Resolution: Handle dependent objects from Module 1
-        await conn.execute(text("DROP TABLE IF EXISTS dependencies CASCADE;"))
-        await conn.execute(text("DROP TABLE IF EXISTS maintainer_health CASCADE;"))
-        await conn.execute(text("DROP TABLE IF EXISTS financial_health CASCADE;"))
-        await conn.execute(text("DROP TABLE IF EXISTS packages CASCADE;"))
-        await conn.execute(text("DROP TABLE IF EXISTS alembic_version CASCADE;"))
-
-        # Enable pg_trgm for GIN Index
-        await conn.execute(text("CREATE EXTENSION IF NOT EXISTS pg_trgm;"))
-
-        # Create new foundational schema
-        await conn.run_sync(Base.metadata.create_all)
-    return
 
 
 @pytest.fixture

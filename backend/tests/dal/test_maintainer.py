@@ -4,38 +4,14 @@ from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from typing import AsyncGenerator
 from dal.base import Base
-from dal.models.package import Package
-from dal.models.version import PackageVersion
+from dal.models.graph import Package, PackageVersion, DependencyEdge
 from dal.models.maintainer import AuthorProfile, MaintainerMetrics
-from dal.models.dependency import DependencyEdge
 from core.config import settings
-
-
-@pytest.fixture
-async def engine():
-    engine = create_async_engine(settings.DATABASE_URL)
-    yield engine
-    await engine.dispose()
 
 
 @pytest.fixture
 def async_session_factory(engine):
     return async_sessionmaker(engine, expire_on_commit=False)
-
-
-@pytest.fixture(autouse=True)
-async def setup_db(engine):
-    """Create isolated PostgreSQL environment for identity and behavioral audits."""
-    async with engine.begin() as conn:
-        await conn.execute(text("DROP TABLE IF EXISTS maintainer_metrics CASCADE;"))
-        await conn.execute(text("DROP TABLE IF EXISTS author_profiles CASCADE;"))
-        await conn.execute(text("DROP TABLE IF EXISTS packages CASCADE;"))
-
-        # Ensure GIN support for metadata queries
-        await conn.execute(text("CREATE EXTENSION IF NOT EXISTS pg_trgm;"))
-
-        await conn.run_sync(Base.metadata.create_all)
-    return
 
 
 @pytest.fixture

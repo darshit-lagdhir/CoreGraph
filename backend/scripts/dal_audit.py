@@ -4,7 +4,7 @@ from dal.base import Base
 from dal.connection import engine
 
 # Import models to ensure they are registered in Base.metadata
-from dal.models.package import Package
+from dal.models.graph import Package
 from sqlalchemy import inspect, text
 
 

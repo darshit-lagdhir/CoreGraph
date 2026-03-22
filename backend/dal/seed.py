@@ -2,9 +2,7 @@
 import uuid
 from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
-from dal.models.package import Package
-from dal.models.version import PackageVersion
-from dal.models.dependency import DependencyEdge
+from dal.models.graph import Package, PackageVersion, DependencyEdge
 from dal.models.maintainer import AuthorProfile, MaintainerMetrics
 
 
@@ -96,3 +94,8 @@ async def seed_osint_specimens(session: AsyncSession):
 
     await session.commit()
     print("[SUCCESS] Judge-Mode specimens successfully persisted to the CoreGraph vault.")
+    # 6. REFRESH ANALYTICAL ENGINE (Module 2 Materialized View)
+    # This ensures the HUD's O(1) flattened map is consistent with the latest Ground Truth
+    from sqlalchemy import text
+    await session.execute(text("REFRESH MATERIALIZED VIEW CONCURRENTLY mv_package_risk_summary;"))
+    # Note: CONCURRENTLY requires a unique index, which we added in migration (CoreGraph Protocol)

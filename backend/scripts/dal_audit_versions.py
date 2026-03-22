@@ -1,8 +1,7 @@
 import asyncio
 
 from dal.connection import engine
-from dal.models.package import Package
-from dal.models.version import PackageVersion
+from dal.models.graph import Package, PackageVersion
 from sqlalchemy import func, select, text
 
 

@@ -12,9 +12,7 @@ sys.path.append(os.path.join(os.getcwd(), "backend"))
 
 # COREGRAPH IMPORT PATHS - Ensuring Metadata Registry is populated
 from dal.base import Base
-from dal.models.package import Package
-from dal.models.version import PackageVersion
-from dal.models.dependency import DependencyEdge
+from dal.models.graph import Package, PackageVersion, DependencyEdge
 from dal.models.maintainer import AuthorProfile, MaintainerMetrics
 from infra.database import db_manager
 

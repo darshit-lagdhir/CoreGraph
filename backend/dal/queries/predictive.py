@@ -1,9 +1,7 @@
 import asyncio
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
-from dal.models.dependency import DependencyEdge
-from dal.models.version import PackageVersion
-from dal.models.package import Package
+from dal.models.graph import Package, PackageVersion, DependencyEdge
 
 
 async def prefetch_graph_neighborhood(session: AsyncSession, package_id: str, depth: int = 1):
