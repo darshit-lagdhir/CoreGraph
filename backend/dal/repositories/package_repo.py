@@ -1,98 +1,86 @@
-from typing import Dict, Any
+import uuid
+import logging
+from typing import Dict, Any, Optional, List
+from sqlalchemy import select, text
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from dal.models.graph import Package, PackageVersion
-import logging
+from dal.utils.semver import calculate_semver_components
+from infra.graph_cache import cache_manager
 
-
-async def upsert_package_node(session: AsyncSession, package_data: Dict[str, Any]):
+class PackageRepository:
     """
-    Idempotent insertion of a package node.
-    The Mathematical Sink: f(f(E)) = f(E).
-    Ensures that multiple ingestion signals do not create duplicate nodes.
+    CoreGraph Package Identity Module.
+    Manages idempotent node resolution and SemVer-aware version chains.
     """
-    # Using PostgreSQL specific 'ON CONFLICT' to ensure atomicity
-    stmt = (
-        insert(Package)
-        .values(
-            name=package_data["name"],
-            ecosystem=package_data["ecosystem"],
-            version_latest=package_data.get("version"),
+    def __init__(self, session: AsyncSession):
+        self.session = session
+
+    async def get_by_id_or_name(self, identifier: str) -> Optional[Package]:
+        """Resolves a package node by UUID or Ecosystem/Name string."""
+        try:
+            # Check if identifier is a UUID
+            node_id = uuid.UUID(identifier)
+            stmt = select(Package).where(Package.id == node_id)
+        except ValueError:
+            # Format: ecosystem:name
+            if ":" in identifier:
+                eco, name = identifier.split(":", 1)
+                stmt = select(Package).where(Package.ecosystem == eco, Package.name == name)
+            else:
+                stmt = select(Package).where(Package.name == identifier)
+        
+        res = await self.session.execute(stmt)
+        return res.scalars().first()
+
+    async def upsert_package(self, package_data: Dict[str, Any]) -> uuid.UUID:
+        """Idempotent sync for 3.88M node discovery."""
+        stmt = (
+            insert(Package)
+            .values(
+                name=package_data["name"],
+                ecosystem=package_data["ecosystem"],
+                version_latest=package_data.get("version"),
+            )
+            .on_conflict_do_update(
+                index_elements=["ecosystem", "name"],
+                set_={"version_latest": package_data.get("version")},
+            )
+            .returning(Package.id)
         )
-        .on_conflict_do_update(
-            index_elements=["ecosystem", "name"],
-            set_={"version_latest": package_data.get("version")},
-        )
-    )
+        res = await self.session.execute(stmt)
+        return res.scalar()
 
-    await session.execute(stmt)
-    # The session should be committed by the caller (the Consumer Loop)
-    logging.info(f"[PACKAGE_REPO] Idempotent Sync for {package_data['name']}")
-
-
-async def upsert_version_node(session: AsyncSession, version_data: Dict[str, Any]):
-    """Idempotent Versioning Sink."""
-    # Find the package first
-    from sqlalchemy import select
-
-    package_res = await session.execute(
-        select(Package.id).where(
-            Package.name == version_data["name"], Package.ecosystem == version_data["ecosystem"]
-        )
-    )
-    package_id = package_res.scalar()
-
-    if not package_id:
-        # Should we auto-create the package? Yes, for deep satellite discovery.
-        await upsert_package_node(session, version_data)
-        package_res = await session.execute(
-            select(Package.id).where(
-                Package.name == version_data["name"], Package.ecosystem == version_data["ecosystem"]
+    async def upsert_version(self, version_data: Dict[str, Any]):
+        """Mathematical resolution of SemVer components and node-level invalidation."""
+        package_id = await self.upsert_package(version_data)
+        
+        ma, mi, pa, pre, build, sk = calculate_semver_components(version_data["version"])
+        
+        stmt = (
+            insert(PackageVersion)
+            .values(
+                package_id=package_id,
+                version_string=version_data["version"],
+                version_major=ma,
+                version_minor=mi,
+                version_patch=pa,
+                version_prerelease=pre,
+                version_build=build,
+                sort_key=sk,
+                is_stable=(pre is None or pre == "" or pre == "legacy"),
+            )
+            .on_conflict_do_update(
+                index_elements=["package_id", "version_string"],
+                set_={
+                    "version_major": ma,
+                    "version_minor": mi,
+                    "version_patch": pa,
+                    "sort_key": sk,
+                },
             )
         )
-        package_id = package_res.scalar()
-
-    # Calculate SemVer Components (Task 009: Mathematical Resolution)
-    from dal.utils.semver import calculate_semver_components
-
-    ma, mi, pa, pre, build, sk = calculate_semver_components(version_data["version"])
-
-    # Now Upsert the Version with componentized fields for high-velocity range queries
-    stmt = (
-        insert(PackageVersion)
-        .values(
-            package_id=package_id,
-            version_string=version_data["version"],
-            version_major=ma,
-            version_minor=mi,
-            version_patch=pa,
-            version_prerelease=pre,
-            version_build=build,
-            sort_key=sk,
-            release_date=version_data.get("release_date"),
-            metadata_extra=version_data.get("metadata", {}),
-            is_stable=(pre is None or pre == "" or pre == "legacy"),
-        )
-        .on_conflict_do_update(
-            index_elements=["package_id", "version_string"],
-            set_={
-                "version_major": ma,
-                "version_minor": mi,
-                "version_patch": pa,
-                "sort_key": sk,
-                "is_stable": (pre is None or pre == "" or pre == "legacy"),
-            },
-        )
-    )
-
-    await session.execute(stmt)
-
-    # PULSE TRIGGER (Task 010: Node-Level Invalidation)
-    # Surgical purging of the memory mirror to prevent OSINT staleness.
-    from backend.infra.graph_cache import cache_manager
-
-    await cache_manager.invalidate_node(str(package_id))
-
-    logging.info(
-        f"[VERSION_REPO] Idempotent Resolution Sync for {version_data['name']}@{version_data['version']}"
-    )
+        await self.session.execute(stmt)
+        # Flush to memory mirror
+        await cache_manager.invalidate_node(str(package_id))
+        logging.info(f"[PACKAGE_REPO] Resolved {version_data['name']}@{version_data['version']}")

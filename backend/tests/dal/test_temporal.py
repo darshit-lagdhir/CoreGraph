@@ -1,12 +1,9 @@
 import pytest
 import uuid
-import sqlalchemy as sa
 from datetime import datetime, timedelta, timezone
-from sqlalchemy import select
 from dal.models.graph import Package
 from dal.models.temporal import NodeDelta
 from dal.repositories.temporal_repo import TemporalRepository
-
 
 @pytest.mark.asyncio
 async def test_temporal_existence_range(session):
@@ -19,25 +16,25 @@ async def test_temporal_existence_range(session):
     session.add(pkg)
     await session.commit()
 
-    repo = TemporalRepository()
-    res = await repo.get_package_at_time(session, pkg_name, t_base)
+    repo = TemporalRepository(session)
+    res = await repo.get_package_at_time(pkg_name, t_base)
     assert res is not None
 
-    res_future = await repo.get_package_at_time(session, pkg_name, t_base + timedelta(hours=5))
+    res_future = await repo.get_package_at_time(pkg_name, t_base + timedelta(hours=5))
     assert res_future is None
-
 
 @pytest.mark.asyncio
 async def test_delta_persistence(session):
-    repo = TemporalRepository()
-    snap = await repo.create_snapshot(session, f"snap-{uuid.uuid4().hex[:4]}")
+    repo = TemporalRepository(session)
+    snap = await repo.create_snapshot(f"snap-{uuid.uuid4().hex[:4]}")
 
     id_pkg = uuid.uuid4()
     await repo.record_node_delta(
-        session, snap.id, id_pkg, "UPDATED", {"risk_score": {"old": 0.1, "new": 0.9}}
+        snap.id, id_pkg, "UPDATED", {"risk_score": {"old": 0.1, "new": 0.9}}
     )
     await session.commit()
-
+    
+    from sqlalchemy import select
     res = await session.execute(select(NodeDelta).where(NodeDelta.snapshot_id == snap.id))
     delta = res.scalars().first()
     assert delta is not None

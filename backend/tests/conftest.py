@@ -17,6 +17,9 @@ from dal.models.telemetry import NodeTelemetry, HealthAnomaly
 from dal.models.spatial import PackageSpatialIndex
 from dal.models.annotation import Workspace, GraphTag, ForensicNote
 from dal.models.risk_scoring import RiskScoringIndex, HeatMapGrid
+from dal.models.alerting import AlertEvent
+from dal.models.export import ExportJob, ExportArtifact
+from dal.models.backup import BackupLedger
 
 
 @pytest.fixture
@@ -52,6 +55,16 @@ async def setup_db(engine):
         await conn.execute(text("DROP TABLE IF EXISTS workspaces CASCADE;"))
         await conn.execute(text("DROP TABLE IF EXISTS heatmap_grid CASCADE;"))
         await conn.execute(text("DROP TABLE IF EXISTS risk_scoring_index CASCADE;"))
+        await conn.execute(text("DROP TABLE IF EXISTS alert_events CASCADE;"))
+        await conn.execute(text("DROP TABLE IF EXISTS export_artifacts CASCADE;"))
+        await conn.execute(text("DROP TABLE IF EXISTS export_jobs CASCADE;"))
+        await conn.execute(text("DROP TABLE IF EXISTS backup_ledger CASCADE;"))
+        # Drop types (Enums)
+        await conn.execute(text("DROP TYPE IF EXISTS alert_severity_type CASCADE;"))
+        await conn.execute(text("DROP TYPE IF EXISTS export_format_type CASCADE;"))
+        await conn.execute(text("DROP TYPE IF EXISTS export_status_type CASCADE;"))
+        await conn.execute(text("DROP TYPE IF EXISTS backup_type_enum CASCADE;"))
+        await conn.execute(text("DROP TYPE IF EXISTS backup_status_enum CASCADE;"))
         await conn.execute(
             text("DROP MATERIALIZED VIEW IF EXISTS mv_package_risk_summary CASCADE;")
         )
