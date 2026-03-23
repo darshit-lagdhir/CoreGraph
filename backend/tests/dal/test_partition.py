@@ -18,7 +18,7 @@ async def test_community_cohesion_and_modularity(session):
     session.add(react)
     await session.commit()
     await session.refresh(react)
-    
+
     v_react = PackageVersion(package_id=react.id, version_string="18.2.0")
     session.add(v_react)
     await session.commit()
@@ -30,15 +30,17 @@ async def test_community_cohesion_and_modularity(session):
         session.add(leaf)
         await session.commit()
         await session.refresh(leaf)
-        
+
         v_leaf = PackageVersion(package_id=leaf.id, version_string="1.0.0")
         session.add(v_leaf)
         await session.commit()
         await session.refresh(v_leaf)
-        
-        edge = DependencyEdge(parent_version_id=v_leaf.id, child_package_id=react.id, specifier="^18.2.0")
+
+        edge = DependencyEdge(
+            parent_version_id=v_leaf.id, child_package_id=react.id, specifier="^18.2.0"
+        )
         session.add(edge)
-        
+
     await session.commit()
 
     # Silo 2: The Angular Authority
@@ -46,7 +48,7 @@ async def test_community_cohesion_and_modularity(session):
     session.add(angular)
     await session.commit()
     await session.refresh(angular)
-    
+
     v_ang = PackageVersion(package_id=angular.id, version_string="15.0.0")
     session.add(v_ang)
     await session.commit()
@@ -57,39 +59,37 @@ async def test_community_cohesion_and_modularity(session):
         session.add(leaf)
         await session.commit()
         await session.refresh(leaf)
-        
+
         v_leaf = PackageVersion(package_id=leaf.id, version_string="1.0.0")
         session.add(v_leaf)
         await session.commit()
         await session.refresh(v_leaf)
-        
-        edge = DependencyEdge(parent_version_id=v_leaf.id, child_package_id=angular.id, specifier="^15.0.0")
+
+        edge = DependencyEdge(
+            parent_version_id=v_leaf.id, child_package_id=angular.id, specifier="^15.0.0"
+        )
         session.add(edge)
-        
+
     await session.commit()
 
     # 2. Trigger Louvain Kernel
     q_final = await compute_louvain_communities(session)
-    
+
     # Validation: Modularity is a scalar [0..1]
     assert q_final > 0.0
-    
+
     # 3. Check for Cohesion (All react-related in the same community)
     result = await session.execute(
-        select(CommunityMembership.community_id)
-        .join(Package)
-        .where(Package.name == "react")
+        select(CommunityMembership.community_id).join(Package).where(Package.name == "react")
     )
     react_comm_id = result.scalar()
     assert react_comm_id is not None
-    
+
     leaf_res = await session.execute(
-        select(CommunityMembership.community_id)
-        .join(Package)
-        .where(Package.name == "react-dom")
+        select(CommunityMembership.community_id).join(Package).where(Package.name == "react-dom")
     )
     dom_comm_id = leaf_res.scalar()
-    
+
     # In a small tight-knit sample, they should share a community (Topological Cohesion)
     assert react_comm_id == dom_comm_id
 
@@ -109,23 +109,23 @@ async def test_sda_isolation_protocol(session):
     await session.commit()
     await session.refresh(pkg_a)
     await session.refresh(pkg_b)
-    
+
     # Assignments
     mem_a = CommunityMembership(package_id=pkg_a.id, community_id=comm_a.id)
     mem_b = CommunityMembership(package_id=pkg_b.id, community_id=comm_b.id)
     session.add_all([mem_a, mem_b])
     await session.commit()
-    
+
     # 2. SDA Access: Session A
     sda = SegmentedDataAccess(community_id=comm_a.id)
-    
+
     # 3. Query Execution: Attempt to find package-b while in Session A
     query = sda.apply_segmentation(select(Package).where(Package.name == "package-b"))
     res = await session.execute(query)
-    
+
     # Assertion: Segmented access must return zero results for external nodes.
     assert len(res.all()) == 0
-    
+
     # Success: Attempt to find package-a
     query_a = sda.apply_segmentation(select(Package).where(Package.name == "package-a"))
     res_a = await session.execute(query_a)

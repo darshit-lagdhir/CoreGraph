@@ -21,7 +21,7 @@ async def rebuild_hierarchical_visualization(session: AsyncSession, resolution: 
         select(Package.id, CriticalityScore.c_idx).join(CriticalityScore)
     )
     nodes = pkg_res.all()
-    
+
     if not nodes:
         return
 
@@ -33,12 +33,17 @@ async def rebuild_hierarchical_visualization(session: AsyncSession, resolution: 
     for node_id, criticality in nodes:
         # Simulations: Generate pseudo-spatial coordinates
         import random
+
         random.seed(str(node_id))
-        x, y, z = random.uniform(-1000, 1000), random.uniform(-1000, 1000), random.uniform(-1000, 1000)
-        
+        x, y, z = (
+            random.uniform(-1000, 1000),
+            random.uniform(-1000, 1000),
+            random.uniform(-1000, 1000),
+        )
+
         # Risk score simulation (using c_idx scaling)
         risk = 0.5 * criticality + 0.5 * random.random()
-        
+
         root.insert(x, y, z, node_id, criticality, risk)
 
     # 4. Persistence: Synchronize vaults
@@ -47,23 +52,23 @@ async def rebuild_hierarchical_visualization(session: AsyncSession, resolution: 
 
     # Recursive traversal to generate SummaryNodes and VisualizationTiles
     await _persist_octree_branch(session, root, level=0)
-    
+
     await session.flush()
 
 
 async def _persist_octree_branch(session: AsyncSession, node: OctreeNode, level: int):
     """Hierarchical recursion providing O(log N) persistence."""
     metrics = node.get_summary_metrics()
-    
-    if level < 2: # Limit hierarchy for MVP
+
+    if level < 2:  # Limit hierarchy for MVP
         summary = SummaryNode(
             lod_level=level,
-            pos_x=metrics['x'],
-            pos_y=metrics['y'],
-            pos_z=metrics['z'],
-            total_nodes_contained=metrics['count'],
-            aggregate_criticality=metrics['w'],
-            representative_risk_score=metrics['r']
+            pos_x=metrics["x"],
+            pos_y=metrics["y"],
+            pos_z=metrics["z"],
+            total_nodes_contained=metrics["count"],
+            aggregate_criticality=metrics["w"],
+            representative_risk_score=metrics["r"],
         )
         session.add(summary)
 
@@ -71,10 +76,13 @@ async def _persist_octree_branch(session: AsyncSession, node: OctreeNode, level:
     tile = VisualizationTile(
         tile_index=f"{level}-{id(node)}",
         zoom_level=level,
-        min_x=node.boundary.min_x, max_x=node.boundary.max_x,
-        min_y=node.boundary.min_y, max_y=node.boundary.max_y,
-        min_z=node.boundary.min_z, max_z=node.boundary.max_z,
-        tile_data=node.serialize_tile()
+        min_x=node.boundary.min_x,
+        max_x=node.boundary.max_x,
+        min_y=node.boundary.min_y,
+        max_y=node.boundary.max_y,
+        min_z=node.boundary.min_z,
+        max_z=node.boundary.max_z,
+        tile_data=node.serialize_tile(),
     )
     session.add(tile)
 

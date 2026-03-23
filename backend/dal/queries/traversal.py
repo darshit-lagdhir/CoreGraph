@@ -12,8 +12,7 @@ async def get_blast_radius(
 
     Optimized for the i9-13980hx parallel execution model.
     """
-    query = text(
-        """
+    query = text("""
         WITH RECURSIVE blast_radius AS (
             -- BASE CASE: Find immediate parents of the compromised child
             SELECT
@@ -44,8 +43,7 @@ async def get_blast_radius(
         JOIN package_versions pv ON br.parent_version_id = pv.id
         JOIN packages p ON pv.package_id = p.id
         ORDER BY br.depth ASC;
-    """
-    )
+    """)
 
     result = await session.execute(query, {"target_id": target_id, "limit": max_depth})
     return [dict(row) for row in result.mappings().all()]

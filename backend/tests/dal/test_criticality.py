@@ -11,7 +11,7 @@ from dal.queries.criticality import compute_global_criticality, get_top_critical
 @pytest.mark.asyncio
 async def test_criticality_ranking_accuracy(session):
     """
-    Verifies that the $C_{idx}$ engine correctly ranks 
+    Verifies that the $C_{idx}$ engine correctly ranks
     known foundations (Authorities) higher than leaf nodes.
     """
     # 1. Setup a mini graph (Authority: Lodash, Consumers: 5 leaf nodes)
@@ -33,16 +33,18 @@ async def test_criticality_ranking_accuracy(session):
         session.add(leaf)
         await session.commit()
         await session.refresh(leaf)
-        
+
         v_leaf = PackageVersion(package_id=leaf.id, version_string="1.0.0")
         session.add(v_leaf)
         await session.commit()
         await session.refresh(v_leaf)
-        
+
         # Edge: leaf depends on lodash
-        edge = DependencyEdge(parent_version_id=v_leaf.id, child_package_id=lodash.id, specifier="^4.17.21")
+        edge = DependencyEdge(
+            parent_version_id=v_leaf.id, child_package_id=lodash.id, specifier="^4.17.21"
+        )
         session.add(edge)
-        
+
     await session.commit()
 
     # 2. Add an obscure package (No dependents)
@@ -53,18 +55,18 @@ async def test_criticality_ranking_accuracy(session):
 
     # 3. Trigger the Power Iteration Kernel
     await compute_global_criticality(session)
-    
+
     # 4. Fetch the scores
     res_lodash = await session.execute(
         select(CriticalityScore).where(CriticalityScore.package_id == lodash.id)
     )
     score_lodash = res_lodash.scalars().first()
-    
+
     res_obscure = await session.execute(
         select(CriticalityScore).where(CriticalityScore.package_id == obscure.id)
     )
     score_obscure = res_obscure.scalars().first()
-    
+
     # 5. Validation: Foundational packages MUST have higher scores
     # C_idx includes topological (Eigenvector) + reach (Blast Radius) + velocity (Social)
     assert score_lodash is not None
@@ -86,30 +88,30 @@ async def test_velocity_impact_on_criticality(session):
     await session.commit()
     await session.refresh(pkg)
     await session.refresh(author)
-    
+
     # Stable velocity at start
     metrics = MaintainerMetrics(author_id=author.id, package_id=pkg.id, current_velocity=1.0)
     session.add(metrics)
     await session.commit()
-    
+
     # Initial Re-compute
     await compute_global_criticality(session)
     res_v1 = await session.execute(
         select(CriticalityScore).where(CriticalityScore.package_id == pkg.id)
     )
     c1 = res_v1.scalars().first().c_idx
-    
+
     # 2. Inject 50x velocity spike
     metrics.current_velocity = 50.0
     session.add(metrics)
     await session.commit()
-    
+
     # 3. Re-compute
     await compute_global_criticality(session)
     res_v2 = await session.execute(
         select(CriticalityScore).where(CriticalityScore.package_id == pkg.id)
     )
     c2 = res_v2.scalars().first().c_idx
-    
+
     # Assertion: c_idx should increase
     assert c2 > c1

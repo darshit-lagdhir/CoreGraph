@@ -10,7 +10,9 @@ from dal.models.partition import GraphCommunity, CommunityMembership
 from dal.models.criticality import CriticalityScore
 
 
-async def compute_louvain_communities(session: AsyncSession, resolution: float = 1.0, sample_size: Optional[int] = None) -> float:
+async def compute_louvain_communities(
+    session: AsyncSession, resolution: float = 1.0, sample_size: Optional[int] = None
+) -> float:
     """
     Topological Segmentation Kernel.
     Implements modularity-optimizing clustering for 4M nodes.
@@ -20,12 +22,12 @@ async def compute_louvain_communities(session: AsyncSession, resolution: float =
     pkg_query = select(Package.id)
     if sample_size:
         pkg_query = pkg_query.limit(sample_size)
-    
+
     res = await session.execute(pkg_query)
     pkg_ids = [row[0] for row in res.all()]
     id_map = {pkg_id: i for i, pkg_id in enumerate(pkg_ids)}
     n = len(pkg_ids)
-    
+
     if n == 0:
         return 0.0
 
@@ -33,7 +35,7 @@ async def compute_louvain_communities(session: AsyncSession, resolution: float =
     # Using the P-core optimized networkx implementation
     G = nx.Graph()
     G.add_nodes_from(range(n))
-    
+
     edge_sql = text("""
         SELECT v.package_id as parent_pkg_id, de.child_package_id
         FROM dependency_edges de
@@ -51,35 +53,32 @@ async def compute_louvain_communities(session: AsyncSession, resolution: float =
     # 4. Persistence: Synchronize vaults
     await session.execute(delete(CommunityMembership))
     await session.execute(delete(GraphCommunity))
-    
+
     # Pre-fetch criticality for aggregates
     crit_res = await session.execute(select(CriticalityScore.package_id, CriticalityScore.c_idx))
     crit_map = {row[0]: row[1] for row in crit_res.all()}
 
     for comm_set in communities:
         comm_id = uuid.uuid4()
-        
+
         # Calculate aggregates
         nodes_in_comm = [pkg_ids[i] for i in comm_set]
         avg_crit = sum(crit_map.get(pid, 0.0) for pid in nodes_in_comm) / len(nodes_in_comm)
-        
+
         # Create Anchor
         community_anchor = GraphCommunity(
             id=comm_id,
             node_count=len(comm_set),
             avg_criticality=float(avg_crit),
-            modularity_contribution=float(q_final / len(communities))
+            modularity_contribution=float(q_final / len(communities)),
         )
         session.add(community_anchor)
         await session.flush()
-        
+
         # Assign members
         for node_idx in comm_set:
-            membership = CommunityMembership(
-                package_id=pkg_ids[node_idx],
-                community_id=comm_id
-            )
+            membership = CommunityMembership(package_id=pkg_ids[node_idx], community_id=comm_id)
             session.add(membership)
-            
+
     await session.commit()
     return float(q_final)
