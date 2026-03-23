@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from dal.models.graph import Package, PackageVersion, DependencyEdge
 from dal.models.maintainer import AuthorProfile, MaintainerMetrics
 from dal.models.temporal import GraphSnapshot, NodeDelta, EdgeDelta
+from dal.models.criticality import CriticalityScore
 
 
 @pytest.fixture
@@ -29,6 +30,7 @@ async def setup_db(engine):
         await conn.execute(text("DROP TABLE IF EXISTS packages CASCADE;"))
         await conn.execute(text("DROP TABLE IF EXISTS maintainer_metrics CASCADE;"))
         await conn.execute(text("DROP TABLE IF EXISTS author_profiles CASCADE;"))
+        await conn.execute(text("DROP TABLE IF EXISTS criticality_scores CASCADE;"))
         await conn.execute(
             text("DROP MATERIALIZED VIEW IF EXISTS mv_package_risk_summary CASCADE;")
         )
