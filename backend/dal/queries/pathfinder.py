@@ -36,8 +36,7 @@ async def walk_upstream(
     # This CTE starts with children (dependents) and moves up to parents
     # Actually, if we've been walking 'upstream', it means finding consumers of this pkg.
 
-    sql = text(
-        """
+    sql = text("""
         WITH RECURSIVE consumer_tree AS (
             -- Seed: The direct dependents of the target package versions
             SELECT
@@ -67,8 +66,7 @@ async def walk_upstream(
             WHERE ct.depth < :max_depth
         )
         SELECT DISTINCT name, ecosystem, depth FROM consumer_tree;
-    """
-    )
+    """)
 
     result = await session.execute(sql, {"pkg_id": package_id, "max_depth": max_depth})
     return [dict(row._mapping) for row in result]

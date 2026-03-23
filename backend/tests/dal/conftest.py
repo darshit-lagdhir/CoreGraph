@@ -15,6 +15,8 @@ from dal.models.tiling import SummaryNode, VisualizationTile
 from dal.models.integrity import MerkleNode, AuditBlock
 from dal.models.telemetry import NodeTelemetry, HealthAnomaly
 from dal.models.spatial import PackageSpatialIndex
+from dal.models.annotation import Workspace, GraphTag, ForensicNote
+from dal.models.risk_scoring import RiskScoringIndex, HeatMapGrid
 
 
 @pytest.fixture
@@ -45,6 +47,11 @@ async def setup_db(engine):
         await conn.execute(text("DROP TABLE IF EXISTS node_telemetry CASCADE;"))
         await conn.execute(text("DROP TABLE IF EXISTS health_anomalies CASCADE;"))
         await conn.execute(text("DROP TABLE IF EXISTS package_spatial_index CASCADE;"))
+        await conn.execute(text("DROP TABLE IF EXISTS forensic_notes CASCADE;"))
+        await conn.execute(text("DROP TABLE IF EXISTS graph_tags CASCADE;"))
+        await conn.execute(text("DROP TABLE IF EXISTS workspaces CASCADE;"))
+        await conn.execute(text("DROP TABLE IF EXISTS heatmap_grid CASCADE;"))
+        await conn.execute(text("DROP TABLE IF EXISTS risk_scoring_index CASCADE;"))
         await conn.execute(
             text("DROP MATERIALIZED VIEW IF EXISTS mv_package_risk_summary CASCADE;")
         )
@@ -61,9 +68,7 @@ async def setup_db(engine):
         await conn.run_sync(Base.metadata.create_all)
 
         # Restore Analytical Engine (Materialized Views)
-        await conn.execute(
-            text(
-                """
+        await conn.execute(text("""
             CREATE MATERIALIZED VIEW mv_package_risk_summary AS
             SELECT
                 p.id AS package_id,
@@ -75,9 +80,7 @@ async def setup_db(engine):
             LEFT JOIN package_versions v ON p.id = v.package_id
             LEFT JOIN maintainer_metrics m ON p.id = m.package_id
             GROUP BY p.id, p.name, p.ecosystem;
-        """
-            )
-        )
+        """))
         await conn.execute(
             text(
                 "CREATE UNIQUE INDEX idx_mv_package_risk_pkg_id ON mv_package_risk_summary (package_id);"

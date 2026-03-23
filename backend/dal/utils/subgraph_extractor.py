@@ -23,13 +23,11 @@ class SubgraphExtractor:
         """
         # Example query: risk_vector @> '(0.8, 0.5, 0.99)'
         # Or box intersection: risk_vector && cube( '...', '...' )
-        stmt = text(
-            """
+        stmt = text("""
             SELECT package_id FROM package_spatial_index
             WHERE risk_vector && CAST(:box AS public.cube)
             LIMIT 50000
-        """
-        )
+        """)
         res = await self.session.execute(stmt, {"box": box_str})
         return [row[0] for row in res.all()]
 
@@ -43,15 +41,13 @@ class SubgraphExtractor:
         if not node_ids:
             return []
 
-        stmt = text(
-            """
+        stmt = text("""
             SELECT de.parent_version_id, de.child_package_id
             FROM dependency_edges de
             JOIN package_versions pv ON de.parent_version_id = pv.id
             WHERE pv.package_id = ANY(:ids)
             AND de.child_package_id = ANY(:ids)
-        """
-        )
+        """)
         res = await self.session.execute(stmt, {"ids": node_ids})
         return [(row[0], row[1]) for row in res.all()]
 

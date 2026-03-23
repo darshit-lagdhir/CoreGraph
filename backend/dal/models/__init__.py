@@ -7,3 +7,5 @@ from dal.models.tiling import SummaryNode, VisualizationTile
 from dal.models.integrity import MerkleNode, AuditBlock
 from dal.models.telemetry import NodeTelemetry, HealthAnomaly
 from dal.models.spatial import PackageSpatialIndex
+from dal.models.annotation import Workspace, GraphTag, ForensicNote
+from dal.models.risk_scoring import RiskScoringIndex, HeatMapGrid

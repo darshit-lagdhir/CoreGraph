@@ -25,12 +25,10 @@ async def test_spatial_query_precision(session):
 
     # Insert spatial vector using raw SQL 'cube' type
     await session.execute(
-        text(
-            """
+        text("""
         INSERT INTO package_spatial_index (id, package_id, risk_vector)
         VALUES (:id, :p_id, cube(array[0.9, 0.8, 0.95]))
-    """
-        ),
+    """),
         {"id": uuid.uuid4(), "p_id": pkg.id},
     )
     await session.commit()
@@ -63,24 +61,18 @@ async def test_geo_jurisdictional_isolation(session):
 
     # Insert point (52.5, 13.4) - Berlin
     await session.execute(
-        text(
-            """
+        text("""
         INSERT INTO package_spatial_index (id, package_id, risk_vector, origin_location)
         VALUES (:id, :p_id, cube(array[0.1, 0.1, 0.1]), point(52.5, 13.4))
-    """
-        ),
+    """),
         {"id": uuid.uuid4(), "p_id": pkg.id},
     )
     await session.commit()
 
     # Query Berlin circle (point @> circle) or box
-    res = await session.execute(
-        text(
-            """
+    res = await session.execute(text("""
         SELECT package_id FROM package_spatial_index
         WHERE origin_location <@ box(point(52, 13), point(53, 14))
-    """
-        )
-    )
+    """))
     ids = [row[0] for row in res.all()]
     assert pkg.id in ids
