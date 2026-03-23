@@ -6,6 +6,7 @@ from dal.models.annotation import Workspace, GraphTag, ForensicNote
 from dal.repositories.mutation_repo import MutationRepository
 from dal.utils.diff_engine import calculate_note_delta, apply_note_delta
 
+
 @pytest.mark.asyncio
 async def test_crdt_tag_convergence(session):
     """
@@ -23,9 +24,7 @@ async def test_crdt_tag_convergence(session):
     for i in range(50):
         # Even: Add (is_deleted=False), Odd: Remove (is_deleted=True)
         is_del = i % 2 != 0
-        await repo.apply_tag_crdt(
-            ws.id, pkg.id, "PACKAGE", "MALICIOUS", user_id, is_del, lamport=i
-        )
+        await repo.apply_tag_crdt(ws.id, pkg.id, "PACKAGE", "MALICIOUS", user_id, is_del, lamport=i)
     await session.commit()
 
     # 2. Validation: The final state must match the event with the highest timestamp
@@ -40,6 +39,7 @@ async def test_crdt_tag_convergence(session):
     assert final_tag.is_deleted is True
     assert final_tag.lamport_timestamp == 49
     print("[AUDIT] CRDT Tag Convergence Verified.")
+
 
 @pytest.mark.asyncio
 async def test_note_history_delta_reconstruction(session):

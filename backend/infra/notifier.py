@@ -8,11 +8,13 @@ from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from dal.models.alerting import AlertEvent, AlertSeverity
 
+
 class AlertSentinel:
     """
     CoreGraph Proactive Notification Kernel.
     Dispatches high-priority security alarms to the 144Hz HUD with 50ms latency.
     """
+
     def __init__(self, redis_url: str):
         self.redis_url = redis_url
         self._client: Optional[redis.Redis] = None
@@ -38,13 +40,13 @@ class AlertSentinel:
         print(f"[SENTINEL] Dispatched security alarm: {alert_payload.get('package_id')}")
 
     async def trigger_and_persist(
-        self, 
+        self,
         session: AsyncSession,
         package_id: uuid.UUID,
         severity: AlertSeverity,
         risk: float,
         criticality: float,
-        payload: Dict[str, Any]
+        payload: Dict[str, Any],
     ) -> Optional[AlertEvent]:
         """
         Executes threshold suppression and transactional persistence.
@@ -54,7 +56,7 @@ class AlertSentinel:
         stmt = select(func.count(AlertEvent.id)).where(
             AlertEvent.package_id == package_id,
             AlertEvent.severity == severity,
-            AlertEvent.is_acknowledged == False
+            AlertEvent.is_acknowledged == False,
         )
         res = await session.execute(stmt)
         if res.scalar() > 0:
@@ -66,23 +68,26 @@ class AlertSentinel:
             severity=severity,
             risk_snapshot=risk,
             criticality_snapshot=criticality,
-            trigger_payload=payload
+            trigger_payload=payload,
         )
         session.add(event)
-        
+
         # 3. Synchronous Scream for Critical Breaches
         if severity in [AlertSeverity.CRITICAL, AlertSeverity.EMERGENCY]:
-            await self.scream({
-                "type": "SECURITY_ALERT",
-                "id": str(event.id),
-                "package_id": str(package_id),
-                "severity": severity,
-                "risk": risk,
-                "criticality": criticality,
-                "context": payload
-            })
-            
+            await self.scream(
+                {
+                    "type": "SECURITY_ALERT",
+                    "id": str(event.id),
+                    "package_id": str(package_id),
+                    "severity": severity,
+                    "risk": risk,
+                    "criticality": criticality,
+                    "context": payload,
+                }
+            )
+
         return event
+
 
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 sentinel = AlertSentinel(REDIS_URL)

@@ -15,13 +15,15 @@ from dal.repositories.alert_repo import AlertRepository
 from dal.repositories.export_repo import ExportRepository
 from dal.repositories.backup_repo import BackupRepository
 
+
 class CoreGraphEngine:
     """
     The Global Persistence Finalization Kernel.
-    Consolidates 25 tasks of architectural work into a single 
+    Consolidates 25 tasks of architectural work into a single
     AI-ready 'Intelligence Interface' (I_Omega).
     (CoreGraph Protocol).
     """
+
     def __init__(self, session: AsyncSession):
         self.session = session
         # Unified Module Consolidation: Unified Persistence Engine (Task 025.1)
@@ -40,7 +42,7 @@ class CoreGraphEngine:
     async def get_intelligence_object(self, identifier: str) -> Optional[Dict[str, Any]]:
         """
         The Unified Handoff Hook (I_Omega Assembly).
-        Saturates 16 P-cores via parallel fetching of topological, behavioral, 
+        Saturates 16 P-cores via parallel fetching of topological, behavioral,
         and strategic forensic data.
         """
         node = await self.packages.get_by_id_or_name(identifier)
@@ -52,16 +54,16 @@ class CoreGraphEngine:
             self.graph.get_local_neighborhood(node.id),
             self.people.get_maintainer_behavior(node.id),
             self.risk.get_quantized_scores(node.id),
-            self.forensics.generate_merkle_proof(node.id)
+            self.forensics.generate_merkle_proof(node.id),
         ]
         results = await asyncio.gather(*tasks)
-        
+
         return {
             "node_metadata": {
                 "id": str(node.id),
                 "name": node.name,
                 "ecosystem": node.ecosystem,
-                "version_latest": node.version_latest
+                "version_latest": node.version_latest,
             },
             "topology": results[0],
             "behavior": results[1],
@@ -69,8 +71,8 @@ class CoreGraphEngine:
             "forensic_seal": results[3],
             "checkpoint": {
                 "timestamp": datetime.datetime.utcnow().isoformat(),
-                "merkle_version": "2.1.0"
-            }
+                "merkle_version": "2.1.0",
+            },
         }
 
     async def semantic_serialize(self, i_omega: Dict[str, Any]) -> str:
@@ -79,4 +81,5 @@ class CoreGraphEngine:
         Transforms raw data into narrative intelligence summaries. (Task 025.4).
         """
         import json
+
         return json.dumps(i_omega, indent=2)

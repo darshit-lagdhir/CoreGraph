@@ -5,12 +5,14 @@ from dal.models.graph import Package
 from dal.models.partition import CommunityMembership
 from sqlalchemy.ext.asyncio import AsyncSession
 
+
 class PartitionRepository:
     """
     Sub-Graph Isolation Module.
     Managing high-fidelity risk silos and multi-tenant workspace segregation.
     (CoreGraph Protocol).
     """
+
     def __init__(self, session: AsyncSession):
         self.session = session
 

@@ -7,6 +7,7 @@ from dal.models.integrity import AuditBlock, MerkleNode
 from dal.queries.integrity import sign_global_graph_state, verify_global_integrity
 from dal.repositories.integrity_repo import IntegrityRepository
 
+
 @pytest.mark.asyncio
 async def test_merkle_tamper_detection(session):
     """
@@ -42,6 +43,7 @@ async def test_merkle_tamper_detection(session):
 
     # Assertion: Forensic detection of supply chain mutation
     assert is_valid_after_name_tamper is False
+
 
 @pytest.mark.asyncio
 async def test_merkle_proof_verification(session):

@@ -5,6 +5,7 @@ from backend.api.v1.ingestion import hook_package_discovered
 from sqlalchemy import text
 from dal.repositories.package_repo import PackageRepository
 
+
 @pytest.mark.asyncio
 async def test_satellite_ingestion_throughput():
     """
@@ -12,7 +13,7 @@ async def test_satellite_ingestion_throughput():
     Verifies that the API hooks and Event Bus can handle sustained high-velocity ingestion.
     """
     tasks = []
-    for i in range(100): # Reduced from 1000 to speed up audit
+    for i in range(100):  # Reduced from 1000 to speed up audit
         payload = {"name": f"stress-pkg-{i}", "ecosystem": "npm", "version": "1.0.0"}
         tasks.append(hook_package_discovered(payload, authorized=True))
 
@@ -22,7 +23,8 @@ async def test_satellite_ingestion_throughput():
 
     avg_latency = (end_time - start_time) / 100 * 1000
     print(f"\n[AUDIT] Ingestion Throughput: 100 events in {end_time - start_time:.4f}s")
-    assert avg_latency < 20.0 # Adjusted budget for local CI
+    assert avg_latency < 20.0  # Adjusted budget for local CI
+
 
 @pytest.mark.asyncio
 async def test_idempotent_consumer_integrity(session):

@@ -5,17 +5,19 @@ import logging
 import uuid
 from typing import Dict, Any, Optional
 
+
 class CloneEngine:
     """
     CoreGraph High-Velocity Backup Engine.
     Saturates Gen5 NVMe bandwidth to create physical replicas of the 3.88M node graph.
     Utilizes 16 P-cores for parallel Zstd/LZ4 stream compression.
     """
+
     def __init__(self, db_config: Dict[str, Any]):
-        self.host = db_config.get('host', 'localhost')
-        self.port = db_config.get('port', 5432)
-        self.user = db_config.get('user', 'admin')
-        self.password = db_config.get('password', 'password')
+        self.host = db_config.get("host", "localhost")
+        self.port = db_config.get("port", 5432)
+        self.user = db_config.get("user", "admin")
+        self.password = db_config.get("password", "password")
         self.backup_dir = os.environ.get("BACKUP_ROOT_DIR", "C:/CoreGraph/Backups")
 
     async def execute_full_clone(self, label: str) -> bool:
@@ -25,21 +27,26 @@ class CloneEngine:
         """
         # Ensure backup directory exists
         os.makedirs(os.path.join(self.backup_dir, label), exist_ok=True)
-        
+
         # pg_basebackup command targeting high-concurrency P-cores
         # Note: In a Windows dev environment, we use the local installation
         cmd = [
             "pg_basebackup",
-            "-h", self.host,
-            "-p", str(self.port),
-            "-U", self.user,
-            "-D", os.path.join(self.backup_dir, label),
-            "-F", "t", # Tar format for metadata encapsulation
-            "-z",      # Gzip (or Zstd if configured in postgres.conf)
-            "-P",      # Progress reporting
-            "--wal-method=stream"
+            "-h",
+            self.host,
+            "-p",
+            str(self.port),
+            "-U",
+            self.user,
+            "-D",
+            os.path.join(self.backup_dir, label),
+            "-F",
+            "t",  # Tar format for metadata encapsulation
+            "-z",  # Gzip (or Zstd if configured in postgres.conf)
+            "-P",  # Progress reporting
+            "--wal-method=stream",
         ]
-        
+
         # Environment for password-less auth during the job
         env = os.environ.copy()
         env["PGPASSWORD"] = self.password
@@ -48,20 +55,17 @@ class CloneEngine:
         try:
             # Task 024.2: Asynchronous subprocess execution to keep 144Hz HUD responsive
             process = await asyncio.create_subprocess_exec(
-                *cmd,
-                env=env,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
+                *cmd, env=env, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
             )
             stdout, stderr = await process.communicate()
-            
+
             if process.returncode == 0:
                 logging.info(f"[CLONE_ENGINE] Physical clone {label} crystallized on Gen5 NVMe.")
                 return True
             else:
                 logging.error(f"[CLONE_ENGINE] Clone failed: {stderr.decode()}")
                 return False
-                
+
         except Exception as e:
             logging.error(f"[CLONE_ENGINE] Execution Error: {str(e)}")
             return False

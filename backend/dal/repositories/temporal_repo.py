@@ -6,8 +6,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from dal.models.graph import Package, PackageVersion
 from dal.models.temporal import GraphSnapshot, NodeDelta
 
+
 class TemporalRepository:
     """The Persistence Engine for Task 012 Snapshots."""
+
     def __init__(self, session: AsyncSession):
         self.session = session
 
@@ -30,9 +32,7 @@ class TemporalRepository:
         self.session.add(delta)
         return delta
 
-    async def get_package_at_time(
-        self, name: str, timestamp: datetime
-    ) -> Optional[Package]:
+    async def get_package_at_time(self, name: str, timestamp: datetime) -> Optional[Package]:
         """The 'Time Machine' lookup for OSINT historical audits."""
         query = select(Package).where(
             and_(
@@ -44,8 +44,10 @@ class TemporalRepository:
         result = await self.session.execute(query)
         return result.scalars().first()
 
+
 class DiffEngine:
     """The Algebraic Engine for Graph Delta Calculations."""
+
     def calculate_temporal_delta(
         self, snap_a: Dict[str, Any], snap_b: Dict[str, Any]
     ) -> List[Dict[str, Any]]:

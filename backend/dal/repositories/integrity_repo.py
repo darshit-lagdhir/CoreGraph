@@ -6,11 +6,13 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from dal.models.integrity import MerkleNode
 
+
 class IntegrityRepository:
     """
     CoreGraph Forensic Module.
     Enforces cryptographic trust via Merkle-tree inclusion proofs.
     """
+
     def __init__(self, session: AsyncSession):
         self.session = session
 

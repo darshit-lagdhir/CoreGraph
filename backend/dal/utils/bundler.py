@@ -8,19 +8,21 @@ import uuid
 import datetime
 from typing import List, Dict, Any, Optional
 
+
 class ForensicBundler:
     """
     The Evidence Packager (.CGBUNDLE).
     Utilizes 16 Performance Cores and Gen5 NVMe Direct-I/O for parallelized
     compression and Ed25519 cryptographic signing. (CoreGraph Protocol).
     """
+
     def __init__(self, private_key: Optional[bytes] = None):
         if private_key:
             self.signing_key = nacl.signing.SigningKey(private_key)
         else:
             self.signing_key = nacl.signing.SigningKey.generate()
-        
-        self.compressor = zstd.ZstdCompressor(level=12) # Archival intensity
+
+        self.compressor = zstd.ZstdCompressor(level=12)  # Archival intensity
 
     def sign_payload(self, payload: bytes) -> bytes:
         """
@@ -41,33 +43,32 @@ class ForensicBundler:
             "version": "1.0",
             "timestamp": datetime.datetime.utcnow().isoformat(),
             "bundle_id": str(uuid.uuid4()),
-            "files": []
+            "files": [],
         }
-        
+
         # Collect file hashes
         for root, _, files in os.walk(folder_path):
             for file in files:
                 filepath = os.path.join(root, file)
                 # SHA-NI simulation
-                manifest["files"].append({
-                    "path": f"./{file}",
-                    "sha256": "0"*64 # Hash of the file
-                })
-        
+                manifest["files"].append(
+                    {"path": f"./{file}", "sha256": "0" * 64}  # Hash of the file
+                )
+
         # 2. Sign Manifest
-        manifest_bytes = json.dumps(manifest).encode('utf-8')
+        manifest_bytes = json.dumps(manifest).encode("utf-8")
         signature = self.sign_payload(manifest_bytes)
-        
+
         # 3. Compress to .cgbundle (Parallel Zstd simulation)
         # In a real tool, it would be a tar stream with zstd compression
         with open(output_path, "wb") as f:
             f.write(self.compressor.compress(manifest_bytes))
-            
+
         return {
             "bundle_id": manifest["bundle_id"],
             "signature": signature,
             "public_key": self.signing_key.verify_key.encode(),
-            "manifest": manifest
+            "manifest": manifest,
         }
 
     async def verify_bundle(self, bundle_bytes: bytes, signature: bytes, public_key: bytes) -> bool:

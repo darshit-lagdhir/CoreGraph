@@ -6,6 +6,7 @@ from dal.models.partition import GraphCommunity, CommunityMembership
 from dal.queries.partition import compute_louvain_communities
 from dal.repositories.partition_repo import PartitionRepository
 
+
 @pytest.mark.asyncio
 async def test_community_cohesion_and_modularity(session):
     """
@@ -83,6 +84,7 @@ async def test_community_cohesion_and_modularity(session):
     )
     dom_comm_id = leaf_res.scalar()
     assert react_comm_id == dom_comm_id
+
 
 @pytest.mark.asyncio
 async def test_sda_isolation_protocol(session):

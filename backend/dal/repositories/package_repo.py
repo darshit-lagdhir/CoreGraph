@@ -8,11 +8,13 @@ from dal.models.graph import Package, PackageVersion
 from dal.utils.semver import calculate_semver_components
 from infra.graph_cache import cache_manager
 
+
 class PackageRepository:
     """
     CoreGraph Package Identity Module.
     Manages idempotent node resolution and SemVer-aware version chains.
     """
+
     def __init__(self, session: AsyncSession):
         self.session = session
 
@@ -29,7 +31,7 @@ class PackageRepository:
                 stmt = select(Package).where(Package.ecosystem == eco, Package.name == name)
             else:
                 stmt = select(Package).where(Package.name == identifier)
-        
+
         res = await self.session.execute(stmt)
         return res.scalars().first()
 
@@ -54,9 +56,9 @@ class PackageRepository:
     async def upsert_version(self, version_data: Dict[str, Any]):
         """Mathematical resolution of SemVer components and node-level invalidation."""
         package_id = await self.upsert_package(version_data)
-        
+
         ma, mi, pa, pre, build, sk = calculate_semver_components(version_data["version"])
-        
+
         stmt = (
             insert(PackageVersion)
             .values(
