@@ -365,3 +365,15 @@ purge:
 verify-purity:
 	@echo "Auditing the Sterile State of the CoreGraph foundation..."
 	$env:PYTHONPATH="backend"; .\venv\Scripts\python.exe -m pytest backend/tests/core/test_pruning.py -v
+
+db-recluster:
+	@echo 'Triggering hierarchical Louvain multi-pass on the 3.88M node graph...'
+	powershell -Command '$\backend=''backend''; .\\venv\\Scripts\\python.exe -c ''import asyncio; from dal.queries.partition import compute_louvain_communities; from infra.database import db_manager; async def run(): async with db_manager.session_factory() as session: await compute_louvain_communities(session); asyncio.run(run())'''
+
+db-community-report:
+	@echo 'Generating topological risk summary: Identifying the Top 50 Silos...'
+	powershell -Command '$\backend=''backend''; .\\venv\\Scripts\\python.exe -c ''import asyncio; from sqlalchemy import select; from dal.models.partition import GraphCommunity; from infra.database import db_manager; async def run(): async with db_manager.session_factory() as session: res = await session.execute(select(GraphCommunity).order_by(GraphCommunity.node_count.desc()).limit(50)); print([r[0].id for r in res.all()]); asyncio.run(run())'''
+
+db-optimize-partitions:
+	@echo 'Executing NVMe-optimized physical clustering on community index...'
+	docker exec coregraph_db psql -U admin -d coregraph_db -c 'CLUSTER community_membership USING ix_membership_community_package;'
