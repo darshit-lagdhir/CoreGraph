@@ -377,3 +377,15 @@ db-community-report:
 db-optimize-partitions:
 	@echo 'Executing NVMe-optimized physical clustering on community index...'
 	docker exec coregraph_db psql -U admin -d coregraph_db -c 'CLUSTER community_membership USING ix_membership_community_package;'
+
+db-rebuild-tiles:
+	@echo 'Re-calculating all Octree subdivisions and regenerates the VisualizationTile payloads...'
+	powershell -Command '$\backend=''backend''; .\\venv\\Scripts\\python.exe -c ''import asyncio; from dal.queries.tiling import rebuild_hierarchical_visualization; from infra.database import db_manager; async def run(): async with db_manager.session_factory() as session: await rebuild_hierarchical_visualization(session); asyncio.run(run())'''
+
+db-lod-audit:
+	@echo 'Scanning the summary_nodes table to ensure no orphaned summaries exist...'
+	powershell -Command '$\backend=''backend''; .\\venv\\Scripts\\python.exe -c ''import asyncio; from sqlalchemy import select; from dal.models.tiling import SummaryNode; from infra.database import db_manager; async def run(): async with db_manager.session_factory() as session: res = await session.execute(select(SummaryNode).limit(10)); print([r[0].id for r in res.all()]); asyncio.run(run())'''
+
+db-visual-bench:
+	@echo 'Executing high-velocity zoom-and-pan performance p99 latency audit...'
+	powershell -Command '$\backend=''backend''; .\\venv\\Scripts\\python.exe -m pytest backend/tests/dal/test_tiling.py::test_tile_streaming_latency --tb=short'
