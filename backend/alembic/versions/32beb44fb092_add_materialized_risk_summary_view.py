@@ -19,7 +19,8 @@ depends_on = None
 def upgrade() -> None:
     # 1. CREATE MATERIALIZED VIEW for HUD Risk Mapping (Task 006)
     # Optimized for O(1) latency across the 3.88M node ecosystem
-    op.execute("""
+    op.execute(
+        """
         CREATE MATERIALIZED VIEW mv_package_risk_summary AS
         SELECT
             p.id AS package_id,
@@ -31,7 +32,8 @@ def upgrade() -> None:
         LEFT JOIN package_versions v ON p.id = v.package_id
         LEFT JOIN maintainer_metrics m ON p.id = m.package_id
         GROUP BY p.id, p.name, p.ecosystem;
-    """)
+    """
+    )
 
     # 2. Add Unique Index for CONCURRENT refresh (CoreGraph Protocol)
     op.execute(

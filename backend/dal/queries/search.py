@@ -13,23 +13,27 @@ async def perform_fuzzy_search(session: AsyncSession, term: str):
     if COREGRAPH_MODE == "BEAST":
         # Professional-grade Similarity Search via pg_trgm
         # Calculates Jaccard Distance over 3.8M node name shingles in sub-20ms
-        query = text("""
+        query = text(
+            """
             SELECT *, similarity(name, :t) AS score
             FROM packages
             WHERE name % :t
             ORDER BY score DESC
             LIMIT 20
-        """)
+        """
+        )
     else:
         # Resource-efficient Full-Text Search for Lite/Judge hardware
         # Avoids GIN index bloat while maintaining search reliability
-        query = text("""
+        query = text(
+            """
             SELECT *, ts_rank(to_tsvector('english', name), plainto_tsquery('english', :t)) AS score
             FROM packages
             WHERE to_tsvector('english', name) @@ plainto_tsquery('english', :t)
             ORDER BY score DESC
             LIMIT 20
-        """)
+        """
+        )
 
     result = await session.execute(query, {"t": term})
     return result.mappings().all()

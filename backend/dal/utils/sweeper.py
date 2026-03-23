@@ -23,11 +23,13 @@ class ConsistencySweeper:
         anomalies_found = 0
 
         # 1. Metadata Void Detection: Packages with missing version_latest pointers
-        void_query = text("""
+        void_query = text(
+            """
             SELECT id FROM packages p
             WHERE p.version_latest IS NULL
             AND p.ecosystem != 'incomplete'
-        """)
+        """
+        )
         res_void = await self.session.execute(void_query)
         for row in res_void.all():
             anomaly = HealthAnomaly(
@@ -40,11 +42,13 @@ class ConsistencySweeper:
             anomalies_found += 1
 
         # 2. Ghost Version Detection: Versions missing from the version chain
-        ghost_query = text("""
+        ghost_query = text(
+            """
             SELECT pv.id, pv.package_id
             FROM package_versions pv
             WHERE NOT EXISTS (SELECT 1 FROM packages p WHERE p.id = pv.package_id)
-        """)
+        """
+        )
         res_ghost = await self.session.execute(ghost_query)
         for row in res_ghost.all():
             anomaly = HealthAnomaly(

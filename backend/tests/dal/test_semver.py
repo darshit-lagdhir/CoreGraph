@@ -48,9 +48,11 @@ async def test_high_velocity_range_resolution(session):
 
     for vstr, ma, mi, pa, sk, stable in versions:
         await session.execute(
-            sa.text("""INSERT INTO package_versions
+            sa.text(
+                """INSERT INTO package_versions
                  (id, package_id, version_string, version_major, version_minor, version_patch, sort_key, is_stable)
-                 VALUES (gen_random_uuid(), :pid, :vs, :ma, :mi, :pa, :sk, :st)"""),
+                 VALUES (gen_random_uuid(), :pid, :vs, :ma, :mi, :pa, :sk, :st)"""
+            ),
             {"pid": pkg_id, "vs": vstr, "ma": ma, "mi": mi, "pa": pa, "sk": sk, "st": stable},
         )
     await session.commit()

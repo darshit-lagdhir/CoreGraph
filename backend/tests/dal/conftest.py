@@ -61,7 +61,9 @@ async def setup_db(engine):
         await conn.run_sync(Base.metadata.create_all)
 
         # Restore Analytical Engine (Materialized Views)
-        await conn.execute(text("""
+        await conn.execute(
+            text(
+                """
             CREATE MATERIALIZED VIEW mv_package_risk_summary AS
             SELECT
                 p.id AS package_id,
@@ -73,7 +75,9 @@ async def setup_db(engine):
             LEFT JOIN package_versions v ON p.id = v.package_id
             LEFT JOIN maintainer_metrics m ON p.id = m.package_id
             GROUP BY p.id, p.name, p.ecosystem;
-        """))
+        """
+            )
+        )
         await conn.execute(
             text(
                 "CREATE UNIQUE INDEX idx_mv_package_risk_pkg_id ON mv_package_risk_summary (package_id);"
