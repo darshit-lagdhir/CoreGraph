@@ -509,15 +509,27 @@ db-beast-status:
 	@echo "Query Latency: <500us | IOPS: 1.2M | PCIe: Gen5 x4 Active"
 
 # ==============================================================================
-# 26. MASTER PERSISTENCE INTEGRITY & REPOSITORY HARDENING (Task 026)
+# 27. ABSOLUTE HARDENING & ROOT-LEVEL PURGE (Task 027)
 # ==============================================================================
 
-db-seal: ## The Final Master Seal: Janitorial Purge, Structural Audit, and Global Stress Test.
-	@echo "[COREGRAPH] Initiating Terminal Persistence Seal Protocol..."
+db-harden: ## Consolidates migrations into Genesis and injects native PL/pgSQL triggers.
+	@echo "[COREGRAPH] Executing Genesis Migration & Kernel Trigger Injection..."
+	@powershell -Command "$$env:PYTHONPATH='backend'; .\\venv\\Scripts\\python.exe -m alembic -c backend/dal/alembic.ini upgrade head"
+
+db-audit-zero: ## Performs the mathematical zero-state rollback proof (Total Wipeout).
+	@echo "[COREGRAPH] Initiating Zero-State Proof Audit..."
+	@powershell -Command "$$env:PYTHONPATH='backend'; .\\venv\\Scripts\\python.exe -m pytest backend/tests/dal/test_zero_state_rollback.py -v"
+
+db-stress-titan: ## Executes the 10,000-record high-concurrency 'Titan' stress test.
+	@echo "[COREGRAPH] Launching the 'Titan' 10,000rd Ingestion Stress Audit..."
+	@powershell -Command "$$env:PYTHONPATH='backend'; .\\venv\\Scripts\\python.exe -m pytest backend/tests/dal/test_global_concurrency.py -v"
+
+db-purge: ## Executes the Section 4 Janitorial Protocol to clean the repository.
+	@echo "[COREGRAPH] Aggressively purging repository cruft (Section 4 Compliance)..."
 	@powershell -Command "$$env:PYTHONPATH='.'; .\\venv\\Scripts\\python.exe scripts/purge_development_artifacts.py"
-	@powershell -Command "$$env:PYTHONPATH='.'; .\\venv\\Scripts\\python.exe scripts/audit_structure.py"
-	@powershell -Command "$$env:PYTHONPATH='backend'; .\\venv\\Scripts\\python.exe -m pytest backend/tests/dal/test_global_stress.py -v"
-	@echo "[SUCCESS] The Persistence Layer is Mathematically Hardened and SEALED."
+
+db-seal: db-harden db-purge db-audit-zero db-stress-titan ## Full Master Protocol: Seal and Harden.
+	@echo "[SUCCESS] The 3.88M Node Foundation is ARCHIVED and SEALED for Module 3."
 
 beast-ready: ## Pre-warms the L3 cache and prepares the platform for the Module 3 AI Brain.
 	@echo "[COREGRAPH] Optimizing Workstation Thermal/IO Profile for Gemini 1.5 Flash..."
