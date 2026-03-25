@@ -1,0 +1,37 @@
+openapi: 3.0.0
+info:
+  title: Google deps.dev OSINT API
+  version: 1.0.0
+paths:
+  /v1alpha/packages/{system}/{name}:
+    get:
+      summary: Retrieves package version ocean for a S.U.S.E. target.
+      parameters:
+        - name: system
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [npm, pypi, cargo, go]
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Standardized OSINT response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  versions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        version:
+                          type: string
+                        isDefault:
+                          type: boolean

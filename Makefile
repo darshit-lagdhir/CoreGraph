@@ -867,3 +867,15 @@ system-cleanse: ## The Final Janitor: Purging prototyping artifacts and clearing
 audit-pagination: ## Executes the 'Paging Marathon': Verifying 100-trip recursive ingestion.
 	@echo "[COREGRAPH] Auditing Cursor Pagination: Slicing 10,000 Commits..."
 	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;tooling/simulation_server/core;.'; .\\venv\\Scripts\\python.exe tooling/simulation_server/core/resolver.py"
+
+# ==============================================================================
+# 48. SIMULATOR META-VALIDATION & SCHEMA COMPLIANCE (Task 022)
+# ==============================================================================
+
+audit-schema-rest: ## Executes the 'Truth Oracle' audit: Verifying OpenAI compliance for deps.dev mocks.
+	@echo "[COREGRAPH] Auditing REST Mocks: OpenAPI Structural Compliance..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;tooling/simulation_server/tests;.'; .\\venv\\Scripts\\python.exe tooling/simulation_server/tests/meta_validator.py"
+
+audit-schema-gql: ## Executes the 'AST Interceptor' audit: Verifying GraphQL introspection compliance.
+	@echo "[COREGRAPH] Auditing GraphQL Mocks: Introspection Consistency..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;tooling/simulation_server/tests;.'; .\\venv\\Scripts\\python.exe tooling/simulation_server/tests/meta_validator.py"

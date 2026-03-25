@@ -1,27 +1,17 @@
 {
-    "__schema": {
-        "queryType": { "name": "Query" },
-        "mutationType": { "name": "Mutation" },
-        "subscriptionType": null,
-        "types": [
-            {
-                "kind": "OBJECT",
-                "name": "Query",
-                "description": "The root query type for GitHub v4 (S.U.S.E. Masquerade).",
-                "fields": [
-                    { "name": "repository", "type": { "kind": "OBJECT", "name": "Repository" } }
-                ]
-            },
-            {
-                "kind": "OBJECT",
-                "name": "Repository",
-                "description": "A GitHub repository (Task 003).",
-                "fields": [
-                    { "name": "name", "type": { "kind": "SCALAR", "name": "String" } },
-                    { "name": "stargazerCount", "type": { "kind": "SCALAR", "name": "Int" } }
-                ]
-            }
-        ],
-        "directives": []
-    }
+  "__schema": {
+    "queryType": { "name": "Query" },
+    "mutationType": { "name": "Mutation" },
+    "types": [
+      {
+        "kind": "OBJECT",
+        "name": "Repository",
+        "fields": [
+          { "name": "id", "type": { "kind": "SCALAR", "name": "ID" } },
+          { "name": "name", "type": { "kind": "SCALAR", "name": "String" } },
+          { "name": "owner", "type": { "kind": "OBJECT", "name": "RepositoryOwner" } }
+        ]
+      }
+    ]
+  }
 }
