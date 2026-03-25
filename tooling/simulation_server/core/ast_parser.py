@@ -27,13 +27,18 @@ class OSINTQueryAnalyzer(Visitor):
         if alias:
             self.field_aliases[name] = alias
 
-        if name == "repository":
+        if name in ["repository", "commits", "pullRequests", "stargazers"]:
             args = {}
             if node.arguments:
                 for arg in node.arguments:
-                    args[arg.name.value] = getattr(arg.value, 'value', None)
+                    val = getattr(arg.value, 'value', None)
+                    args[arg.name.value] = val
+                    
+            # STRICT ENFORCEMENT: GitHub v4 limits 'first' to 100 nodes.
+            if "first" in args and args["first"] > 100:
+                 raise ValueError("GraphQL Error: first must be <= 100")
 
-            args['target_alias'] = alias or "repository"
+            args['target_alias'] = alias or name
             self.package_targets.append(args)
 
         self.requested_fields.append(alias or name)

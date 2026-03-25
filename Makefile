@@ -859,3 +859,11 @@ system-cleanse: ## The Final Janitor: Purging prototyping artifacts and clearing
 	@echo "[COREGRAPH] Initiating Final Janitorial Sweep: Purging Crash Artifacts..."
 	@docker-compose down -v
 	@powershell -Command "Remove-Item -Path 'test_tmp.py', 'docker-compose.bak' -ErrorAction SilentlyContinue"
+
+# ==============================================================================
+# 47. CURSOR-BASED PAGINATION & STATEFUL SLICING (Task 021)
+# ==============================================================================
+
+audit-pagination: ## Executes the 'Paging Marathon': Verifying 100-trip recursive ingestion.
+	@echo "[COREGRAPH] Auditing Cursor Pagination: Slicing 10,000 Commits..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;tooling/simulation_server/core;.'; .\\venv\\Scripts\\python.exe tooling/simulation_server/core/resolver.py"
