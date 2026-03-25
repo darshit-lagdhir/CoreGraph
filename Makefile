@@ -741,4 +741,16 @@ sim-delta: ## Triggers the 'Evolution' Protocol: Generating temporal mutations a
 
 audit-updates: ## Performs the high-velocity 'Sync Rhythm' audit: Verifying settling time for topological drift.
 	@echo "[COREGRAPH] Auditing Temporal Agility: Sub-second Blast-Radius Recalculation..."
-	@powershell -Command "$$env:PYTHONPATH='backend/ingestion/hooks;.'; .\\venv\\Scripts\\python.exe backend/ingestion/hooks/sync_hook.py"
+	@powershell -Command "$$env:PYTHONPATH='backend/ingestion/hooks;.'; .\\venv\Scripts\\python.exe backend/ingestion/hooks/sync_hook.py"
+
+# ==============================================================================
+# 38. HISTORICAL RECORDING & POINT-IN-TIME RECOVERY (Task 012)
+# ==============================================================================
+
+sim-snapshot: ## Triggers the 'Global Graph Freeze': Freezing the software ocean for audit.
+	@echo "[COREGRAPH] Triggering Global Snapshot: Merkle-Tree Sealing..."
+	@powershell -Command "$$env:PYTHONPATH='backend/ingestion/hooks;.'; .\\venv\\Scripts\\python.exe backend/ingestion/hooks/historical_kernel.py"
+
+audit-history: ## Executes the 'Eternal Ledger' audit: Verifying forensic integrity and Merkle-roots.
+	@echo "[COREGRAPH] Auditing Forensic Integrity: Re-calculating SHA-256 Roots..."
+	@powershell -Command "$$env:PYTHONPATH='backend/ingestion/hooks;.'; .\\venv\\Scripts\\python.exe backend/ingestion/hooks/historical_kernel.py"
