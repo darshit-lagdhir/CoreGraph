@@ -667,3 +667,18 @@ sim-sabotage: ## Injects a 'Nightmare Scenario' into the S.U.S.E. server: 29s La
 sim-restore: ## Restores the S.U.S.E. server to its pristine, healthy state.
 	@echo "[COREGRAPH] Restoring Network Integrity..."
 	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;.'; .\\venv\\Scripts\\python.exe -c 'import requests; requests.delete(\"http://localhost:8081/chaos/clear\"); print(\"[RESTORED] Pristine software ocean synchronized.\")'"
+
+# ==============================================================================
+# 33. MASTER ECOSYSTEM GENESIS (Task 007)
+# ==============================================================================
+
+sim-genesis: ## The 'Big Bang' Button: Orchestrates the 3.84M node universe synthesis.
+	@echo "[COREGRAPH] Executing Master Ecosystem Genesis Protocol (Task 007)..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;tooling/simulation_server/generator;.'; .\\venv\\Scripts\\python.exe tooling/simulation_server/core/genesis.py birth --seed 0x3735928559 --count 1000 --eco npm"
+
+sim-status: ## Real-time diagnostic report of the generated software ocean.
+	@echo "[COREGRAPH] S.U.S.E. Physical Ocean Diagnostic..."
+	@powershell -Command "Get-ChildItem -Path tooling/simulation_server/fixtures/npm -Recurse -File | Measure-Object | Select-Object -Property Count, @{Name='Size_GB'; Expression={($$_.Sum / 1GB)}}"
+
+sim-audit: sim-verify sim-graphql-audit sim-finance-audit sim-test-resilience sim-chaos-audit ## Unified Master Audit: Structural, Telemetric, Fiscal, and Chaotic.
+	@echo "[COREGRAPH] Master Infrastructure Audit COMPLETE: The Flight Simulator is Certified."
