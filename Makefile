@@ -651,3 +651,19 @@ sim-test-resilience: ## Executes the structural resilience audit: Cycle-Detectio
 
 sim-beast-chaos: sim-poison sim-test-resilience ## Full Master Protocol: Poison and Audit.
 	@echo "[COREGRAPH] Structural Resilience SEALED: The Beast is now Indestructible."
+
+# ==============================================================================
+# 32. NETWORK CHAOS INJECTION (Task 006)
+# ==============================================================================
+
+sim-chaos-audit: ## Executes the network-level chaos audit: Latency, 429s, and 502s.
+	@echo "[COREGRAPH] Auditing Network Adversary: Latency Spikes & Status Degradation..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;.'; .\\venv\\Scripts\\python.exe -m pytest tooling/tests/test_chaos.py -v"
+
+sim-sabotage: ## Injects a 'Nightmare Scenario' into the S.U.S.E. server: 29s Latency & 502 Errors.
+	@echo "[COREGRAPH] Sabotaging the Network Layer (Task 006)..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;.'; .\\venv\\Scripts\\python.exe -c 'import requests; payload = {\"target\": \"global\", \"rule\": {\"latency_ms\": 5000, \"status_code\": 502}}; requests.put(\"http://localhost:8081/chaos/configure\", json=payload); print(\"[SABOTAGE] S.U.S.E. server now transitioning to Adversarial State.\")'"
+
+sim-restore: ## Restores the S.U.S.E. server to its pristine, healthy state.
+	@echo "[COREGRAPH] Restoring Network Integrity..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;.'; .\\venv\\Scripts\\python.exe -c 'import requests; requests.delete(\"http://localhost:8081/chaos/clear\"); print(\"[RESTORED] Pristine software ocean synchronized.\")'"
