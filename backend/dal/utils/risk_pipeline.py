@@ -66,7 +66,8 @@ class RiskScoringPipeline:
         """
         # Optimized Postgres Math (O(N) update on the flattened surface)
         # Utilizes POWER() and EXP(SUM(LN)) for weighted geometric mean.
-        stmt = text("""
+        stmt = text(
+            """
             UPDATE risk_scoring_index
             SET r_idx = LEAST(1.0, GREATEST(0.0, (
                 EXP((
@@ -77,6 +78,7 @@ class RiskScoringPipeline:
                     0.5 * LN(GREATEST(v_tel, 1e-9))
                 ) / 4.5) * manual_risk_multiplier
             )))
-        """)
+        """
+        )
         await session.execute(stmt)
         await session.commit()

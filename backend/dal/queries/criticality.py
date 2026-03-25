@@ -39,11 +39,13 @@ async def compute_global_criticality(
 
     # We'll use child_package_id as the 'target' and parent_version package_id as 'source'.
     # Wait! DependencyEdge has parent_version_id. We need the package_id of that version.
-    edge_sql = text("""
+    edge_sql = text(
+        """
         SELECT v.package_id as parent_pkg_id, de.child_package_id
         FROM dependency_edges de
         JOIN package_versions v ON de.parent_version_id = v.id
-    """)
+    """
+    )
     edge_res = await session.execute(edge_sql)
     edges = edge_res.all()
 
@@ -131,12 +133,14 @@ async def compute_global_criticality(
         # Instruction says: ln(1 + Br(v)).
         # We'll fetch it using high-speed count for this specimen
         br_res = await session.execute(
-            text("""
+            text(
+                """
             SELECT COUNT(DISTINCT v.package_id)
             FROM dependency_edges de
             JOIN package_versions v ON de.parent_version_id = v.id
             WHERE de.child_package_id = :pkg_id
-        """),
+        """
+            ),
             {"pkg_id": pkg_id},
         )
         br_count = br_res.scalar() or 0

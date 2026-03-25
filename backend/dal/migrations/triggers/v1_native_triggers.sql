@@ -3,7 +3,7 @@
 -- ==============================================================================
 -- 1. THE MASTER METADATA HEARTBEAT
 -- ==============================================================================
--- This function is designed to be highly efficient, minimizing CPU cycles 
+-- This function is designed to be highly efficient, minimizing CPU cycles
 -- by utilizing the internal CLOCK_TIMESTAMP() of the PG kernel.
 
 CREATE OR REPLACE FUNCTION fn_update_last_modified()
@@ -40,7 +40,7 @@ BEGIN
     -- Only trigger if the new risk score exceeds the critical threshold
     -- and the previous score was below it. This prevents 'Notification Storms'.
     IF (NEW.risk_score >= 0.9 AND (OLD.risk_score < 0.9 OR OLD.risk_score IS NULL)) THEN
-        PERFORM pg_notify('risk_threshold_breach', 
+        PERFORM pg_notify('risk_threshold_breach',
             json_build_object(
                 'package_id', NEW.package_id,
                 'r_idx', NEW.risk_score,

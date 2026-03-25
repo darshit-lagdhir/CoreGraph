@@ -24,3 +24,7 @@ task-matrix.json
 .gnupg/
 
 .mypy_cache/
+
+# Module 3 S.U.S.E. Simulation Environment
+tooling/simulation_server/fixtures/*
+tooling/simulation_server/fixtures

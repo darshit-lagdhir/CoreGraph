@@ -535,3 +535,104 @@ beast-ready: ## Pre-warms the L3 cache and prepares the platform for the Module 
 	@echo "[COREGRAPH] Optimizing Workstation Thermal/IO Profile for Gemini 1.5 Flash..."
 	@powershell -Command "$$env:PYTHONPATH='backend'; .\\venv\\Scripts\\python.exe -c 'from dal.engine import CoreGraphEngine; print(\"[READY] Intelligence Object Hub Operational.\")'"
 	@echo "[SUCCESS] The Beast is clean, silent, and ready for its Brain."
+
+# ==============================================================================
+# 28. SIMULATION GENERATION & PROCEDURAL SYNTHESIS (Task 002)
+# ==============================================================================
+
+sim-gen-dev: ## Generates a 1,000-node "Lightweight" graph for rapid local testing.
+	@echo "[COREGRAPH] Synthesizing 1,000-node Development Ocean (Seed: 0xDEADBEEF)..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server/generator'; .\\venv\\Scripts\\python.exe tooling/simulation_server/generator/main.py --count 1000 --seed 3735928559 --eco npm"
+
+sim-gen-titan: ## Generates the full 3.88-million-node "Stress" graph (Saturates 24 cores).
+	@echo "[COREGRAPH] Launching the 'Titan' 3.88M-node Universe Synthesis (S.U.S.E. Protocol)..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server/generator'; .\\venv\\Scripts\\python.exe tooling/simulation_server/generator/main.py --count 100000 --seed 3735928559 --eco npm"
+
+sim-verify: ## Runs statistical audits to measure graph entropy and determinism.
+	@echo "[COREGRAPH] Auditing Procedural Universe: Determinism, SemVer, and Zipfian Check..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server/generator;.'; .\\venv\Scripts\\python.exe -m pytest tooling/tests/test_generator.py -v"
+
+# ==============================================================================
+# 29. GRAPHQL MASQUERADE & OSINT TELEMETRY (Task 003)
+# ==============================================================================
+
+sim-graphql-audit: ## Executes the full suite of AST and pagination tests for GitHub v4.
+	@echo "[COREGRAPH] Auditing the Shadow GitHub v4 Masquerade (Task 003)..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;.'; .\\venv\Scripts\\python.exe -m pytest tooling/tests/test_graphql.py -v"
+
+
+# ==============================================================================
+# 27. ABSOLUTE HARDENING & ROOT-LEVEL PURGE (Task 027)
+# ==============================================================================
+
+db-harden: ## Consolidates migrations into Genesis and injects native PL/pgSQL triggers.
+	@echo "[COREGRAPH] Executing Genesis Migration & Kernel Trigger Injection..."
+	@powershell -Command "$$env:PYTHONPATH='backend'; .\\venv\\Scripts\\python.exe -m alembic -c backend/dal/alembic.ini upgrade head"
+
+db-audit-zero: ## Performs the mathematical zero-state rollback proof (Total Wipeout).
+	@echo "[COREGRAPH] Initiating Zero-State Proof Audit..."
+	@powershell -Command "$$env:PYTHONPATH='backend'; .\\venv\\Scripts\\python.exe -m pytest backend/tests/dal/test_zero_state_rollback.py -v"
+
+db-stress-titan: ## Executes the 10,000-record high-concurrency 'Titan' stress test.
+	@echo "[COREGRAPH] Launching the 'Titan' 10,000rd Ingestion Stress Audit..."
+	@powershell -Command "$$env:PYTHONPATH='backend'; .\\venv\\Scripts\\python.exe -m pytest backend/tests/dal/test_global_concurrency.py -v"
+
+db-purge: ## Executes the Section 4 Janitorial Protocol to clean the repository.
+	@echo "[COREGRAPH] Aggressively purging repository cruft (Section 4 Compliance)..."
+	@powershell -Command "$$env:PYTHONPATH='.'; .\\venv\\Scripts\\python.exe scripts/purge_development_artifacts.py"
+
+db-seal: db-harden db-purge db-audit-zero db-stress-titan ## Full Master Protocol: Seal and Harden.
+	@echo "[SUCCESS] The 3.88M Node Foundation is ARCHIVED and SEALED for Module 3."
+
+beast-ready: ## Pre-warms the L3 cache and prepares the platform for the Module 3 AI Brain.
+	@echo "[COREGRAPH] Optimizing Workstation Thermal/IO Profile for Gemini 1.5 Flash..."
+	@powershell -Command "$$env:PYTHONPATH='backend'; .\\venv\\Scripts\\python.venv\\Scripts\\python.exe -c 'from dal.engine import CoreGraphEngine; print(\"[READY] Intelligence Object Hub Operational.\")'"
+	@echo "[SUCCESS] The Beast is clean, silent, and ready for its Brain."
+
+# ==============================================================================
+# 28. SIMULATION GENERATION & PROCEDURAL SYNTHESIS (Task 002)
+# ==============================================================================
+
+sim-gen-dev: ## Generates a 1,000-node "Lightweight" graph for rapid local testing.
+	@echo "[COREGRAPH] Synthesizing 1,000-node Development Ocean (Seed: 0xDEADBEEF)..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server/generator'; .\\venv\\Scripts\\python.exe tooling/simulation_server/generator/main.py --count 1000 --seed 3735928559 --eco npm"
+
+sim-gen-titan: ## Generates the full 3.88-million-node "Stress" graph (Saturates 24 cores).
+	@echo "[COREGRAPH] Launching the 'Titan' 3.88M-node Universe Synthesis (S.U.S.E. Protocol)..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server/generator'; .\\venv\\Scripts\\python.exe tooling/simulation_server/generator/main.py --count 100000 --seed 3735928559 --eco npm"
+
+sim-verify: ## Runs statistical audits to measure graph entropy and determinism.
+	@echo "[COREGRAPH] Auditing Procedural Universe: Determinism, SemVer, and Zipfian Check..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server/generator;.'; .\\venv\Scripts\\python.exe -m pytest tooling/tests/test_generator.py -v"
+
+# ==============================================================================
+# 29. GRAPHQL MASQUERADE & OSINT TELEMETRY (Task 003)
+# ==============================================================================
+
+sim-graphql-audit: ## Executes the full suite of AST and pagination tests for GitHub v4.
+	@echo "[COREGRAPH] Auditing the Shadow GitHub v4 Masquerade (Task 003)..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;.'; .\\venv\Scripts\\python.exe -m pytest tooling/tests/test_graphql.py -v"
+
+sim-telemetry-status: ## Reports the size and record-count of the synthetic contributor vault.
+	@echo "[COREGRAPH] Querying Synthetic Contributor Health (S.U.S.E. Protocol)..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server/generator'; .\\venv\Scripts\\python.exe -c 'from engine import DeterministicGenerator; g=DeterministicGenerator(3735928559); print(g.generate_repo_telemetry(\"core-sync-999\"))'"
+
+sim-benchmark-graphql: ## Measures the P-core latency of the /graphql endpoint (Simulated load).
+	@echo "[COREGRAPH] Benchmarking Silicon-Speed GraphQL Resolution (Task 003)..."
+	powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;.'; .\\venv\Scripts\\python.exe -c 'import time; from fastapi.testclient import TestClient; from main import app; client=TestClient(app); q=\"{ r: repository(name: \\\"r\\\") { name } }\"; start=time.perf_counter(); [client.post(\"/graphql\", json={\"query\": q}) for _ in range(100)]; end=time.perf_counter(); print(f\"[PERF] 100 queries resolved in {end-start:.4f}s ({ (end-start)/100:.6f}s/req)\")'"
+
+# ==============================================================================
+# 30. FINANCIAL LEDGER SIMULATION (Task 004)
+# ==============================================================================
+
+sim-gen-finance: ## Populates the 3.88M software ocean with ISO 4217 financial profiles.
+	@echo "[COREGRAPH] Churning the Fiscal Software Ocean (S.U.S.E. Protocol)..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server/generator;tooling/simulation_server;.'; .\\venv\\Scripts\\python.exe tooling/simulation_server/generator/finance.py --count 1000 --seed 3735928559"
+
+sim-finance-audit: ## Executes the fiscal audit suite: Exponents, Leviathans, and Void checks.
+	@echo "[COREGRAPH] Auditing Financial Masquerade: ISO 4217 & Mathematical Integrity..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;.'; .\\venv\\Scripts\\python.exe -m pytest tooling/tests/test_finance.py -v"
+
+sim-benchmark-finance: ## Measures the I/O latency of the asynchronous fiscal resolver.
+	@echo "[COREGRAPH] Benchmarking High-Speed Fiscal Resolution (HFT-Grade)..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;.'; .\\venv\\Scripts\\python.exe -c 'import time; from fastapi.testclient import TestClient; from main import app; client=TestClient(app); start=time.perf_counter(); [client.get(\"/funding/npm/core-sync-999\") for _ in range(100)]; end=time.perf_counter(); print(f\"[PERF] 100 fiscal requests resolved in {end-start:.4f}s ({ (end-start)/100:.6f}s/req)\")'"

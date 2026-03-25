@@ -31,7 +31,8 @@ class HeatMapAggregator:
 
         # Aggregate RiskSurface -> HeatCells
         # We group risk scores into a virtual 3D grid.
-        stmt = text("""
+        stmt = text(
+            """
             INSERT INTO heatmap_grid (grid_x, grid_y, grid_z, node_density, mean_r_idx, max_r_idx, updated_at)
             SELECT
                 MOD(ABS(HASHTEXT(package_id::text)), :res),
@@ -47,7 +48,8 @@ class HeatMapAggregator:
             SET node_density = heatmap_grid.node_density + EXCLUDED.node_density,
                 mean_r_idx = (heatmap_grid.mean_r_idx + EXCLUDED.mean_r_idx) / 2.0,
                 max_r_idx = GREATEST(heatmap_grid.max_r_idx, EXCLUDED.max_r_idx)
-        """)
+        """
+        )
 
         await self.session.execute(stmt, {"res": grid_res})
         await self.session.commit()

@@ -36,11 +36,13 @@ async def compute_louvain_communities(
     G = nx.Graph()
     G.add_nodes_from(range(n))
 
-    edge_sql = text("""
+    edge_sql = text(
+        """
         SELECT v.package_id as parent_pkg_id, de.child_package_id
         FROM dependency_edges de
         JOIN package_versions v ON de.parent_version_id = v.id
-    """)
+    """
+    )
     edge_res = await session.execute(edge_sql)
     for p1, p2 in edge_res.all():
         if p1 in id_map and p2 in id_map:
