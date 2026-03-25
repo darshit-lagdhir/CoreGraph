@@ -826,3 +826,15 @@ audit-cache: ## Executes the 'Photonic Memory' audit: Verifying sub-millisecond 
 audit-prefetch: ## Executes the 'Predictive HUD' audit: Verifying Markov-Chain navigation lookahead.
 	@echo "[COREGRAPH] Auditing Predictive Prefetch: Topological Anticipation..."
 	@powershell -Command "$$env:PYTHONPATH='backend/persistence/cache;.'; .\\venv\\Scripts\\python.exe backend/persistence/cache/prefetcher.py"
+
+# ==============================================================================
+# 45. GRAPH-TELEMETRY COMPRESSION & SERIALIZATION (Task 019)
+# ==============================================================================
+
+audit-bandwidth: ## Executes the 'Bandwidth Agility' audit: Verifying quantization ratio and zero-copy velocity.
+	@echo "[COREGRAPH] Auditing Compression Kernel: Adjacency-Matrix Quantization..."
+	@powershell -Command "$$env:PYTHONPATH='backend/persistence/serialization;.'; .\\venv\\Scripts\\python.exe backend/persistence/serialization/compression_kernel.py"
+
+audit-throughput: ## Executes the 'Throughput Stress-Test' audit: Verifying 100,000+ nodes/sec streaming.
+	@echo "[COREGRAPH] Auditing Stream Velocity: Block-Level CRC & AVX-2 Simulation..."
+	@powershell -Command "$$env:PYTHONPATH='backend/persistence/serialization;.'; .\\venv\\Scripts\\python.exe backend/persistence/serialization/bandwidth_validator.py"
