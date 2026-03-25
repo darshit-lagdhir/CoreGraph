@@ -895,3 +895,19 @@ audit-fiscal: ## Executes the 'Central-Bank' audit: Verifying multi-currency nor
 audit-corruption: ## Executes the 'Payload Saboteur' audit: Verifying survival against lethal JSON/Byte attacks.
 	@echo "[COREGRAPH] Auditing Ingestion Shield: Injecting Lethal Payload Mutations..."
 	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;tooling/simulation_server/core;backend/ingestion/hooks;.'; .\\venv\\Scripts\\python.exe tooling/simulation_server/core/saboteur.py"
+
+# ==============================================================================
+# 51. CLEAN ROOM JANITORIAL PURGE & FINAL SEAL (Task 025)
+# ==============================================================================
+
+system-handover: ## THE NUCLEAR OPTION: Executing the 'Final Purge', sealing the repository, and resetting the Phalanx.
+	@echo "[COREGRAPH] Initiating Final Handover: Eradication of Entropy..."
+	@powershell -Command "$$env:PYTHONPATH='scripts;.'; .\\venv\\Scripts\\python.exe scripts/purge_development_artifacts.py --execute"
+	@powershell -Command "$$env:PYTHONPATH='scripts;.'; .\\venv\\Scripts\\python.exe scripts/seal_foundation.py"
+	@powershell -Command "docker system prune -f"
+	@make system-genesis
+	@make system-audit
+
+audit-hygiene: ## Executes the 'Clean Room' audit: Verifying zero unauthorized files or scraper residue.
+	@echo "[COREGRAPH] Auditing Repository Hygiene: Entropy Scan (SHA-256 Consistency)..."
+	@powershell -Command "$$env:PYTHONPATH='scripts;.'; .\\venv\\Scripts\\python.exe scripts/seal_foundation.py --check"
