@@ -754,3 +754,15 @@ sim-snapshot: ## Triggers the 'Global Graph Freeze': Freezing the software ocean
 audit-history: ## Executes the 'Eternal Ledger' audit: Verifying forensic integrity and Merkle-roots.
 	@echo "[COREGRAPH] Auditing Forensic Integrity: Re-calculating SHA-256 Roots..."
 	@powershell -Command "$$env:PYTHONPATH='backend/ingestion/hooks;.'; .\\venv\\Scripts\\python.exe backend/ingestion/hooks/historical_kernel.py"
+
+# ==============================================================================
+# 39. MULTI-ECOSYSTEM BRIDGE & IDENTITY RESOLUTION (Task 013)
+# ==============================================================================
+
+sim-syndicate: ## Triggers the 'Syndicate Injection': Populating the software ocean with coordinated actor groups.
+	@echo "[COREGRAPH] Injecting Maintainer Syndicates ( obf: HIGH )..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;tooling/simulation_server/core;.'; .\\venv\\Scripts\\python.exe tooling/simulation_server/core/syndicate_gen.py"
+
+audit-bridge: ## Executes the 'Global Vision' audit: Unmasking coordinated aliases across NPM, PyPI, and GitHub.
+	@echo "[COREGRAPH] Auditing Multi-Ecosystem Correlation: P-Core Bayesian Scoring..."
+	@powershell -Command "$$env:PYTHONPATH='backend/analytics/correlation;.'; .\\venv\\Scripts\\python.exe backend/analytics/correlation/identity_kernel.py"
