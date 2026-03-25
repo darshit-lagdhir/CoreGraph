@@ -730,3 +730,15 @@ system-cleanse: ## Aggressive Post-Synthesis Hygiene: Purging Docker artifacts a
 	@powershell -Command "docker system prune -f --volumes"
 	@rm -rf tooling/simulation_server/fixtures/*.tmp
 	@echo "[PRISTINE] Laboratory Reset COMPLETE."
+
+# ==============================================================================
+# 37. DIFFERENTIAL STATE SYNCHRONIZATION (Task 011)
+# ==============================================================================
+
+sim-delta: ## Triggers the 'Evolution' Protocol: Generating temporal mutations and deltas.
+	@echo "[COREGRAPH] Launching Delta Generator (Temporal Seed: 0x539)..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;tooling/simulation_server/core;.'; .\\venv\\Scripts\\python.exe tooling/simulation_server/core/delta_gen.py"
+
+audit-updates: ## Performs the high-velocity 'Sync Rhythm' audit: Verifying settling time for topological drift.
+	@echo "[COREGRAPH] Auditing Temporal Agility: Sub-second Blast-Radius Recalculation..."
+	@powershell -Command "$$env:PYTHONPATH='backend/ingestion/hooks;.'; .\\venv\\Scripts\\python.exe backend/ingestion/hooks/sync_hook.py"
