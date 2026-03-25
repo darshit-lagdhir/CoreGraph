@@ -1,0 +1,13 @@
+fastapi==0.104.1
+uvicorn==0.24.0
+pydantic==2.4.2
+httpx==0.25.1
+typer==0.9.0
+rich==13.6.0
+aiofiles==23.2.1
+asyncpg==0.29.0
+pytest==7.4.3
+pytest-asyncio==0.21.1
+requests==2.31.0
+strawberry-graphql==0.211.0
+graphql-core==3.2.3

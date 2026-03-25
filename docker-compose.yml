@@ -1,84 +1,89 @@
-﻿services:
-  db:
+version: '3.8'
+
+services:
+  # ==============================================================================
+  # 1. THE PERSISTENCE BEAST (PostgreSQL 15)
+  # ==============================================================================
+  persistence-beast:
     image: postgres:15-alpine
-    container_name: coregraph_postgres
-    hostname: db-vj92.private.coregraph
-    restart: always
+    container_name: coregraph-db-1
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: password123
-      POSTGRES_DB: coregraph_db
-      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=scram-sha-256"
-      POSTGRES_HOST_AUTH_METHOD: "scram-sha-256"
-    command: postgres -c "listen_addresses='*'" -c "hba_file=/etc/postgresql/pg_hba.conf"
+      POSTGRES_USER: postgres
+      POSTGRES_DB: coregraph
+      POSTGRES_HOST_AUTH_METHOD: trust
     ports:
-      - "127.0.0.1:5433:5432"
+      - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./infrastructure/pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+      - persistence_data:/var/lib/postgresql/data
+      - ./backend/database/migrations:/docker-entrypoint-initdb.d
+    deploy:
+      resources:
+        reservations:
+          cpus: '4' # Reserved for low-latency B-Tree writes (P-cores)
+          memory: 8G
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d coregraph"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
-      coregraph_private:
+      - internal-phalanx
 
-  redis:
-    image: redis:7-alpine
-    container_name: coregraph_redis
-    restart: always
-    command: redis-server /usr/local/etc/redis/redis.conf
-    volumes:
-      - redis_data:/data
-      - ./infrastructure/redis.conf:/usr/local/etc/redis/redis.conf:ro
-    networks:
-      coregraph_private:
-
-  api:
+  # ==============================================================================
+  # 2. THE S.U.S.E. MIRROR WORLD (Task 001-007)
+  # ==============================================================================
+  simulation-registry:
     build:
       context: .
-      dockerfile: infrastructure/Dockerfile
-    container_name: coregraph_api
-    restart: always
-    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4", "--loop", "uvloop", "--http", "httptools"]
+      dockerfile: tooling/simulation_server/Dockerfile
+    container_name: coregraph-sim-1
     ports:
-      - "127.0.0.1:8000:8000"
-    env_file:
-      - .env
+      - "8081:8081"
+    volumes:
+      - ./tooling/simulation_server/fixtures:/app/tooling/simulation_server/fixtures:ro # Immutable Ground Truth
+    deploy:
+      resources:
+        limits:
+          cpus: '8' # Pinned to Efficiency Cores for high-volume I/O
+          memory: 8G
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8081/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     networks:
-      coregraph_public:
-      coregraph_private:
-    depends_on:
-      - db
-      - redis
+      - internal-phalanx
 
-  worker:
+  # ==============================================================================
+  # 3. THE INGESTION PHALANX (Task 008-010)
+  # ==============================================================================
+  ingestion-phalanx:
     build:
       context: .
-      dockerfile: infrastructure/Dockerfile
-    container_name: coregraph_worker
-    restart: always
-    command: ["celery", "-A", "worker", "worker", "--loglevel=info"]
-    env_file:
-      - .env
-    networks:
-      coregraph_private:
+      dockerfile: backend/ingestion/Dockerfile
+    container_name: coregraph-ingest-1
     depends_on:
-      - db
-      - redis
-      - api
-
-volumes:
-  postgres_data:
-  redis_data:
+      persistence-beast:
+        condition: service_healthy
+      simulation-registry:
+        condition: service_healthy
+    environment:
+      COREGRAPH_MODE: SIMULATE
+      DATABASE_URL: postgresql://postgres@persistence-beast:5432/coregraph
+      REGISTRY_URL: http://simulation-registry:8081
+    deploy:
+      resources:
+        limits:
+          cpus: '12' # High-compute P-cores for validation & transformation
+          memory: 16G
+    networks:
+      - internal-phalanx
 
 networks:
-  coregraph_public:
+  internal-phalanx:
     driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16
-  coregraph_private:
-    driver: bridge
-    internal: true
-    ipam:
-      config:
-        - subnet: 172.21.0.0/16
-  default:
-    driver: none
+    name: coregraph-internal-phalanx
+
+volumes:
+  persistence_data:
+    name: coregraph_persistence_v1

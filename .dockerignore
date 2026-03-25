@@ -6,5 +6,7 @@
 !requirements.txt
 !infrastructure/
 !infrastructure/**/*
+!tooling/
+!tooling/**/*
 !Makefile
 !.env

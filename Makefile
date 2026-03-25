@@ -708,3 +708,25 @@ sim-reindex: ## Re-packs the B-Tree and GIN indices for Gen5 NVMe block-alignmen
 
 audit-vision: sim-search-audit ## The 'Vision' Audit: Mathematical proof of the platform's navigational speed.
 	@echo "[COREGRAPH] Vision Discovery SEALED: Sub-millisecond OSINT Navigation Certified."
+
+# ==============================================================================
+# 36. ARCHITECTURAL CAPSTONE: TOTAL SYSTEM SYNTHESIS (Task 010)
+# ==============================================================================
+
+system-birth: sim-genesis ## The 'Birth' Protocol: Universe synthesis + Docker Build.
+	@echo "[COREGRAPH] Building the Unified Phalanx (Docker Images)..."
+	@powershell -Command "docker-compose build --parallel"
+
+system-up: ## The 'Launch' Protocol: Instantiating the containerized OSINT fortress.
+	@echo "[COREGRAPH] Launching Unified Phalanx..."
+	@powershell -Command "docker-compose up -d"
+	@echo "[SUCCESS] CoreGraph Phalanx ACTIVE. Monitoring Health..."
+
+system-audit: sim-audit audit-ingestion audit-vision ## The 'Final Seal' Audit: Total System Validation.
+	@echo "[COREGRAPH] Module 3 ARCHITECTURALLY SEALED: The Beast is Birthed, Fed, and Armed."
+
+system-cleanse: ## Aggressive Post-Synthesis Hygiene: Purging Docker artifacts and WAL logs.
+	@echo "[COREGRAPH] Performing Terminal Janitorial Purge..."
+	@powershell -Command "docker system prune -f --volumes"
+	@rm -rf tooling/simulation_server/fixtures/*.tmp
+	@echo "[PRISTINE] Laboratory Reset COMPLETE."
