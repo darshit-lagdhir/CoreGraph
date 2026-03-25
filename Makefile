@@ -838,3 +838,24 @@ audit-bandwidth: ## Executes the 'Bandwidth Agility' audit: Verifying quantizati
 audit-throughput: ## Executes the 'Throughput Stress-Test' audit: Verifying 100,000+ nodes/sec streaming.
 	@echo "[COREGRAPH] Auditing Stream Velocity: Block-Level CRC & AVX-2 Simulation..."
 	@powershell -Command "$$env:PYTHONPATH='backend/persistence/serialization;.'; .\\venv\\Scripts\\python.exe backend/persistence/serialization/bandwidth_validator.py"
+
+# ==============================================================================
+# 46. THE ARCHITECTURAL CAPSTONE (Task 020)
+# ==============================================================================
+
+system-genesis: ## The Big Bang: Births the 3.88M node universe, builds containers, and prepares 'Mirror World'.
+	@echo "[COREGRAPH] Initiating System Genesis: Ecosystem Genesis..."
+	@powershell -Command "$$env:PYTHONPATH='.'; .\\venv\\Scripts\\python.exe master_orchestrator.py"
+
+system-up: ## The Launch: Starts the phalanx, initiates high-velocity ingestion, and activates 'Lazarus' recovery.
+	@echo "[COREGRAPH] Launching CoreGraph: Systemic Ingestion In-Progress..."
+	@docker-compose up -d --build
+
+system-audit: ## The Certification: Runs structural, fiscal, social, and resilience audits.
+	@echo "[COREGRAPH] Executing Final System Audit: Multi-Dimensional Validation..."
+	@powershell -Command "$$env:PYTHONPATH='backend/analytics/audits;.'; .\\venv\\Scripts\\python.exe backend/analytics/audits/final_audit.py"
+
+system-cleanse: ## The Final Janitor: Purging prototyping artifacts and clearing laboratory noise.
+	@echo "[COREGRAPH] Initiating Final Janitorial Sweep: Purging Crash Artifacts..."
+	@docker-compose down -v
+	@powershell -Command "Remove-Item -Path 'test_tmp.py', 'docker-compose.bak' -ErrorAction SilentlyContinue"
