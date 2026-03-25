@@ -887,3 +887,11 @@ audit-schema-gql: ## Executes the 'AST Interceptor' audit: Verifying GraphQL int
 audit-fiscal: ## Executes the 'Central-Bank' audit: Verifying multi-currency normalization & precision.
 	@echo "[COREGRAPH] Auditing Fiscal Normalization: Slicing 50+ Global Currencies..."
 	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;tooling/simulation_server/generator;.'; .\\venv\\Scripts\\python.exe tooling/simulation_server/generator/finance.py"
+
+# ==============================================================================
+# 50. LETHAL PAYLOAD CORRUPTION KERNEL (Task 024)
+# ==============================================================================
+
+audit-corruption: ## Executes the 'Payload Saboteur' audit: Verifying survival against lethal JSON/Byte attacks.
+	@echo "[COREGRAPH] Auditing Ingestion Shield: Injecting Lethal Payload Mutations..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;tooling/simulation_server/core;backend/ingestion/hooks;.'; .\\venv\\Scripts\\python.exe tooling/simulation_server/core/saboteur.py"

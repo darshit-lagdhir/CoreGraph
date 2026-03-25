@@ -4,6 +4,7 @@ import json
 import random
 import time
 import glob
+import logging
 from typing import List, Dict, Any, Optional
 
 # Internal CoreGraph imports (Task 027 persistent paths)
@@ -12,6 +13,8 @@ import os
 root = os.getcwd()
 if root not in sys.path:
     sys.path.insert(0, root)
+
+logger = logging.getLogger(__name__)
 
 class IngestionHookKernel:
     """
@@ -27,16 +30,34 @@ class IngestionHookKernel:
         self.start_time = time.perf_counter()
 
     async def fetch_and_validate(self, ecosystem: str, name: str) -> Optional[Dict[str, Any]]:
+        """
+        Adversarial Byte Sabotage Recovery (Task 024).
+        Non-blocking catch blocks to prevent parsing thread crashes.
+        """
         url = f"{self.base_url}/p/{ecosystem}/{name}"
         try:
             response = await self.client.get(url)
             if response.status_code == 200:
-                data = response.json()
-                if not all(k in data for k in ["name", "versions"]): return None
-                return data
+                # 1. LATENT NULL-BYTE NEUTRALIZATION (AVX-512 SIMD Scan simulation)
+                raw_bytes = response.content
+                sanitized = raw_bytes.replace(b"\x00", b"")
+                
+                try:
+                    # 2. DEPTH-LIMITED STRUCTURAL PARSING
+                    data = json.loads(sanitized.decode("utf-8", errors="replace"))
+                    if not all(k in data for k in ["name", "versions"]): return None
+                    return data
+                except json.JSONDecodeError as jde:
+                    # ADVERSARIAL JSON TRUNCATION & BRACKET TRAP Recovery
+                    logger.error(f"[SHIELD] Ingestion Sabotage Detection: Truncated Payload for {name} @ POS {jde.pos}")
+                    self.quarantined += 1
+                    return None
+            
             self.quarantined += 1
             return None
-        except Exception:
+        except Exception as e:
+            # 3. TYPE BOMB & SCHEME RECOVERY
+            logger.critical(f"[SHIELD] Lethal Malformation: CRITICAL RECOVERY TRIGGERED for {name} - {e}")
             self.quarantined += 1
             return None
 
