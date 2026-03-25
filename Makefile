@@ -778,3 +778,15 @@ sim-partition: ## Triggers the 'Dark Injection': Populating the software ocean w
 audit-communities: ## Executes the 'Structural Intuition' audit: Unmasking high-density/low-conductance 'Dark Ecosystems'.
 	@echo "[COREGRAPH] Auditing Graph Topology: Leiden/Louvain Partitioning..."
 	@powershell -Command "$$env:PYTHONPATH='backend/analytics/graph;.'; .\\venv\\Scripts\\python.exe backend/analytics/graph/community_kernel.py"
+
+# ==============================================================================
+# 41. VULNERABILITY PROPAGATION & ZERO-DAY IMPACT (Task 015)
+# ==============================================================================
+
+sim-pathogen: ## Triggers the 'Surgical Infection': Populating the software ocean with Patient Zero CVEs.
+	@echo "[COREGRAPH] Injecting Pathogen ( target: FOUNDATIONAL )..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;tooling/simulation_server/core;.'; .\\venv\\Scripts\\python.exe tooling/simulation_server/core/pathogen_gen.py"
+
+audit-propagation: ## Executes the 'Digital Epidemic' audit: Mapping transitive blast-radius for zero-day threats.
+	@echo "[COREGRAPH] Auditing Transitive Contagion: Recursive Invalidation..."
+	@powershell -Command "$$env:PYTHONPATH='backend/analytics/graph;.'; .\\venv\\Scripts\\python.exe backend/analytics/graph/propagation_kernel.py"
