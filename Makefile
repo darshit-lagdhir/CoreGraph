@@ -682,3 +682,14 @@ sim-status: ## Real-time diagnostic report of the generated software ocean.
 
 sim-audit: sim-verify sim-graphql-audit sim-finance-audit sim-test-resilience sim-chaos-audit ## Unified Master Audit: Structural, Telemetric, Fiscal, and Chaotic.
 	@echo "[COREGRAPH] Master Infrastructure Audit COMPLETE: The Flight Simulator is Certified."
+
+# ==============================================================================
+# 34. ASYNCHRONOUS INGESTION HOOKS (Task 008)
+# ==============================================================================
+
+audit-ingestion: ## High-Velocity Ingestion Audit: Benchmarking absorption of 10k nodes.
+	@echo "[COREGRAPH] Auditing Ingestion Hooks: Asynchronous Fetching & Stream Validation..."
+	@powershell -Command "$$env:PYTHONPATH='backend/ingestion/hooks;.'; .\\venv\\Scripts\\python.exe backend/ingestion/hooks/core_ingest.py"
+
+ingest-beast: sim-genesis sim-sabotage audit-ingestion sim-restore ## Full Master Protocol: Genesis, Sabotage, Ingest, and Restore.
+	@echo "[COREGRAPH] Full Ecosystem Consumption COMPLETE: The Beast is Satiated."
