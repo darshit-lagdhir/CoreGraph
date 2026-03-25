@@ -879,3 +879,11 @@ audit-schema-rest: ## Executes the 'Truth Oracle' audit: Verifying OpenAI compli
 audit-schema-gql: ## Executes the 'AST Interceptor' audit: Verifying GraphQL introspection compliance.
 	@echo "[COREGRAPH] Auditing GraphQL Mocks: Introspection Consistency..."
 	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;tooling/simulation_server/tests;.'; .\\venv\\Scripts\\python.exe tooling/simulation_server/tests/meta_validator.py"
+
+# ==============================================================================
+# 49. ISO 4217 GLOBAL CURRENCY STRESSOR (Task 023)
+# ==============================================================================
+
+audit-fiscal: ## Executes the 'Central-Bank' audit: Verifying multi-currency normalization & precision.
+	@echo "[COREGRAPH] Auditing Fiscal Normalization: Slicing 50+ Global Currencies..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;tooling/simulation_server/generator;.'; .\\venv\\Scripts\\python.exe tooling/simulation_server/generator/finance.py"
