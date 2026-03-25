@@ -636,3 +636,18 @@ sim-finance-audit: ## Executes the fiscal audit suite: Exponents, Leviathans, an
 sim-benchmark-finance: ## Measures the I/O latency of the asynchronous fiscal resolver.
 	@echo "[COREGRAPH] Benchmarking High-Speed Fiscal Resolution (HFT-Grade)..."
 	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;.'; .\\venv\\Scripts\\python.exe -c 'import time; from fastapi.testclient import TestClient; from main import app; client=TestClient(app); start=time.perf_counter(); [client.get(\"/funding/npm/core-sync-999\") for _ in range(100)]; end=time.perf_counter(); print(f\"[PERF] 100 fiscal requests resolved in {end-start:.4f}s ({ (end-start)/100:.6f}s/req)\")'"
+
+# ==============================================================================
+# 31. CHAOS ENGINEERING & TOPOLOGY POISONING (Task 005)
+# ==============================================================================
+
+sim-poison: ## Injects malicious structural anomalies: Ouroboros, Abyss, and Spiderweb.
+	@echo "[COREGRAPH] Poisoning the Synthetic Software Ocean (Chaos Engineering)..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server/generator;tooling/simulation_server;.'; .\\venv\\Scripts\\python.exe tooling/simulation_server/generator/chaos.py --mode all --intensity 10"
+
+sim-test-resilience: ## Executes the structural resilience audit: Cycle-Detection & Stack-Defense.
+	@echo "[COREGRAPH] Auditing Structural Resilience: Ouroboros, Abyssal Depth, and Spiderweb..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;.'; .\\venv\\Scripts\\python.exe -m pytest tooling/tests/test_resilience.py -v"
+
+sim-beast-chaos: sim-poison sim-test-resilience ## Full Master Protocol: Poison and Audit.
+	@echo "[COREGRAPH] Structural Resilience SEALED: The Beast is now Indestructible."

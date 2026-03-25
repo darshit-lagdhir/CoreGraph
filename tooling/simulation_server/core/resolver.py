@@ -1,5 +1,6 @@
 import json
 import os
+import hashlib
 import aiofiles
 from functools import lru_cache
 from pathlib import Path
@@ -8,7 +9,7 @@ from typing import Optional, Dict
 class SimulationResolver:
     """
     The Dynamic Resolution Kernel for S.U.S.E. (Task 001).
-    Implements Lazy File-Mapped Loading and LRU Caching.
+    Now augmented with Bucketed Directory resolution for industrial-scale oceans.
     """
     def __init__(self, fixtures_path: str):
         self.fixtures_path = Path(fixtures_path)
@@ -17,7 +18,7 @@ class SimulationResolver:
 
     async def resolve_purl(self, ecosystem: str, name: str) -> Optional[dict]:
         """
-        Intercepts PURL requests and resolves from the synthetic software ocean.
+        Intercepts PURL requests and resolves from the bucketed software ocean.
         """
         cache_key = f"{ecosystem}_{name}"
 
@@ -25,21 +26,32 @@ class SimulationResolver:
         if cache_key in self.cache:
             return self.cache[cache_key]
 
-        # 2. Lazy File-Mapped Loading (Gen5 NVMe Optimization)
-        fixture_file = self.fixtures_path / f"{ecosystem}_{name}.json"
+        # 2. Bucketed Path Resolution (Consistency with Generator)
+        bucket = hashlib.md5(name.encode()).hexdigest()[:2]
+        
+        # Priority 1: Bucketed (Modern)
+        fixture_file = self.fixtures_path / ecosystem / bucket / f"{name}.json"
+        
+        # Priority 2: Flat (Legacy Task 001 bootstrap)
+        if not fixture_file.exists():
+            fixture_file = self.fixtures_path / f"{ecosystem}_{name}.json"
 
         if not fixture_file.exists():
             return None
 
-        async with aiofiles.open(fixture_file, mode='r') as f:
-            content = await f.read()
-            data = json.loads(content)
+        try:
+            async with aiofiles.open(fixture_file, mode='r') as f:
+                content = await f.read()
+                data = json.loads(content)
 
-            # Simple LRU eviction logic
-            if len(self.cache) >= self.max_cache_size:
-                # Evict the first key (simplistic)
-                evict_key = next(iter(self.cache))
-                del self.cache[evict_key]
+                # Simple LRU eviction logic
+                if len(self.cache) >= self.max_cache_size:
+                    evict_key = next(iter(self.cache))
+                    del self.cache[evict_key]
 
-            self.cache[cache_key] = data
-            return data
+                self.cache[cache_key] = data
+                return data
+        except Exception as e:
+            # Operational fault in the synthetic ocean
+            print(f"[RESO-FAULT] Corrupt or unreadable fixture: {fixture_file} - {e}")
+            return None
