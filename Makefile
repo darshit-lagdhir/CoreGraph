@@ -766,3 +766,15 @@ sim-syndicate: ## Triggers the 'Syndicate Injection': Populating the software oc
 audit-bridge: ## Executes the 'Global Vision' audit: Unmasking coordinated aliases across NPM, PyPI, and GitHub.
 	@echo "[COREGRAPH] Auditing Multi-Ecosystem Correlation: P-Core Bayesian Scoring..."
 	@powershell -Command "$$env:PYTHONPATH='backend/analytics/correlation;.'; .\\venv\\Scripts\\python.exe backend/analytics/correlation/identity_kernel.py"
+
+# ==============================================================================
+# 40. COMMUNITY DETECTION & ADVERSARIAL PARTITIONING (Task 014)
+# ==============================================================================
+
+sim-partition: ## Triggers the 'Dark Injection': Populating the software ocean with isolated 'Ghost Islands'.
+	@echo "[COREGRAPH] Injecting Adversarial Partitions ( cond: LOW )..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;tooling/simulation_server/core;.'; .\\venv\\Scripts\\python.exe tooling/simulation_server/core/partition_gen.py"
+
+audit-communities: ## Executes the 'Structural Intuition' audit: Unmasking high-density/low-conductance 'Dark Ecosystems'.
+	@echo "[COREGRAPH] Auditing Graph Topology: Leiden/Louvain Partitioning..."
+	@powershell -Command "$$env:PYTHONPATH='backend/analytics/graph;.'; .\\venv\\Scripts\\python.exe backend/analytics/graph/community_kernel.py"
