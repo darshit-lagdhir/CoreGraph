@@ -790,3 +790,15 @@ sim-pathogen: ## Triggers the 'Surgical Infection': Populating the software ocea
 audit-propagation: ## Executes the 'Digital Epidemic' audit: Mapping transitive blast-radius for zero-day threats.
 	@echo "[COREGRAPH] Auditing Transitive Contagion: Recursive Invalidation..."
 	@powershell -Command "$$env:PYTHONPATH='backend/analytics/graph;.'; .\\venv\\Scripts\\python.exe backend/analytics/graph/propagation_kernel.py"
+
+# ==============================================================================
+# 42. CHAOS FAULT-TOLERANCE & SELF-HEALING (Task 016)
+# ==============================================================================
+
+sim-saboteur: ## Triggers the 'Internal Sabotage': Initiating surgical SIGKILLs and memory exhaustion.
+	@echo "[COREGRAPH] Initiating Adversarial Failure Injection ( strike: SIGKILL )..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;tooling/simulation_server/core;.'; .\\venv\\Scripts\\python.exe tooling/simulation_server/core/saboteur.py"
+
+audit-system-failure: ## Executes the 'Lazarus Protocol' audit: Verifying zero-data-loss recovery during sabotage.
+	@echo "[COREGRAPH] Auditing Systemic Resilience: Chaos Supervisor Loop..."
+	@powershell -Command "$$env:PYTHONPATH='backend/resilience;.'; .\\venv\\Scripts\\python.exe backend/resilience/supervisor.py"
