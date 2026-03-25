@@ -693,3 +693,18 @@ audit-ingestion: ## High-Velocity Ingestion Audit: Benchmarking absorption of 10
 
 ingest-beast: sim-genesis sim-sabotage audit-ingestion sim-restore ## Full Master Protocol: Genesis, Sabotage, Ingest, and Restore.
 	@echo "[COREGRAPH] Full Ecosystem Consumption COMPLETE: The Beast is Satiated."
+
+# ==============================================================================
+# 35. GRAPH-STATE PERSISTENCE & SEARCH OPTIMIZATION (Task 009)
+# ==============================================================================
+
+sim-search-audit: ## Executes the search-level performance audit: P99 PURL resolution & Fuzzy Discovery.
+	@echo "[COREGRAPH] Auditing Search Performance: P99 < 0.5ms & Trigram Discovery..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/tests;.'; .\\venv\\Scripts\\python.exe -m pytest tooling/tests/test_search.py -v"
+
+sim-reindex: ## Re-packs the B-Tree and GIN indices for Gen5 NVMe block-alignment.
+	@echo "[COREGRAPH] Re-packing Search Indices (Hardware Hygiene)..."
+	@powershell -Command "docker exec -it coregraph-db-1 psql -U postgres -d coregraph -c 'REINDEX TABLE packages; REINDEX TABLE package_versions;'"
+
+audit-vision: sim-search-audit ## The 'Vision' Audit: Mathematical proof of the platform's navigational speed.
+	@echo "[COREGRAPH] Vision Discovery SEALED: Sub-millisecond OSINT Navigation Certified."
