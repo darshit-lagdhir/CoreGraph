@@ -802,3 +802,15 @@ sim-saboteur: ## Triggers the 'Internal Sabotage': Initiating surgical SIGKILLs 
 audit-system-failure: ## Executes the 'Lazarus Protocol' audit: Verifying zero-data-loss recovery during sabotage.
 	@echo "[COREGRAPH] Auditing Systemic Resilience: Chaos Supervisor Loop..."
 	@powershell -Command "$$env:PYTHONPATH='backend/resilience;.'; .\\venv\\Scripts\\python.exe backend/resilience/supervisor.py"
+
+# ==============================================================================
+# 43. HEALTH SWEEPER & PROACTIVE ROT DETECTION (Task 017)
+# ==============================================================================
+
+sim-rot: ## Triggers the 'Ecosystem Decay': Injecting silent rot and zombie takeovers.
+	@echo "[COREGRAPH] Injecting Ecosystem Decay ( scenario: SILENT_DEATH )..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;tooling/simulation_server/core;.'; .\\venv\\Scripts\\python.exe tooling/simulation_server/core/rot_gen.py"
+
+audit-health: ## Executes the 'Medical Examiner' audit: Unmasking project abandonment and forced vitality.
+	@echo "[COREGRAPH] Auditing Project Vitality: E-Core Background Sweep..."
+	@powershell -Command "$$env:PYTHONPATH='backend/analytics/vitality;.'; .\\venv\\Scripts\\python.exe backend/analytics/vitality/sweeper.py"
