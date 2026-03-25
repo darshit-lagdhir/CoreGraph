@@ -814,3 +814,15 @@ sim-rot: ## Triggers the 'Ecosystem Decay': Injecting silent rot and zombie take
 audit-health: ## Executes the 'Medical Examiner' audit: Unmasking project abandonment and forced vitality.
 	@echo "[COREGRAPH] Auditing Project Vitality: E-Core Background Sweep..."
 	@powershell -Command "$$env:PYTHONPATH='backend/analytics/vitality;.'; .\\venv\\Scripts\\python.exe backend/analytics/vitality/sweeper.py"
+
+# ==============================================================================
+# 44. CACHE ACCELERATOR & 144HZ HUD TUNING (Task 018)
+# ==============================================================================
+
+audit-cache: ## Executes the 'Photonic Memory' audit: Verifying sub-millisecond hot-tier retrieval.
+	@echo "[COREGRAPH] Auditing Memory Cache: Bloom Filter Membership..."
+	@powershell -Command "$$env:PYTHONPATH='backend/persistence/cache;.'; .\\venv\\Scripts\\python.exe backend/persistence/cache/accelerator.py"
+
+audit-prefetch: ## Executes the 'Predictive HUD' audit: Verifying Markov-Chain navigation lookahead.
+	@echo "[COREGRAPH] Auditing Predictive Prefetch: Topological Anticipation..."
+	@powershell -Command "$$env:PYTHONPATH='backend/persistence/cache;.'; .\\venv\\Scripts\\python.exe backend/persistence/cache/prefetcher.py"
