@@ -911,3 +911,15 @@ system-handover: ## THE NUCLEAR OPTION: Executing the 'Final Purge', sealing the
 audit-hygiene: ## Executes the 'Clean Room' audit: Verifying zero unauthorized files or scraper residue.
 	@echo "[COREGRAPH] Auditing Repository Hygiene: Entropy Scan (SHA-256 Consistency)..."
 	@powershell -Command "$$env:PYTHONPATH='scripts;.'; .\\venv\\Scripts\\python.exe scripts/seal_foundation.py --check"
+
+# ==============================================================================
+# 52. ADAPTIVE INGESTOR GOVERNOR (Task 027)
+# ==============================================================================
+
+audit-governor: ## Executes the 'Polite Titan' audit: Verifying real-time resource throttling.
+	@echo "[COREGRAPH] Auditing Adaptive Ingestor: Initiating Redline Trace..."
+	@powershell -Command "$$env:PYTHONPATH='backend/ingestion/hooks;backend/core;src;.'; .\\venv\\Scripts\\python.exe backend/ingestion/hooks/governor.py"
+
+# ==============================================================================
+# 53. ECO-MODE S.U.S.E. SERVER (Task 028)
+# ==============================================================================
