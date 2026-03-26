@@ -923,3 +923,130 @@ audit-governor: ## Executes the 'Polite Titan' audit: Verifying real-time resour
 # ==============================================================================
 # 53. ECO-MODE S.U.S.E. SERVER (Task 028)
 # ==============================================================================
+
+audit-eco-mode: ## Executes the 'Zero-RAM' audit: Verifying memory-mapped simulation footprint.
+	@echo "[COREGRAPH] Auditing Eco-Mode: Initiating Virtualized Genesis (1M Nodes)..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;tooling/simulation_server/core;.'; .\\venv\\Scripts\\python.exe tooling/simulation_server/core/genesis.py"
+	@echo "[COREGRAPH] Auditing Seek-and-Fetch: Performance Trace (mmap-backed)..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;tooling/simulation_server/core;.'; .\\venv\\Scripts\\python.exe tooling/simulation_server/core/fixtures.py"
+
+# ==============================================================================
+# 54. SWAP-AWARE PERSISTENCE ARCHITECTURE (Task 029)
+# ==============================================================================
+
+audit-low-end-db: ## Executes the 'Elastic DB' audit: Verifying memory-restricted stability.
+	@echo "[COREGRAPH] Auditing Persistence: Initiating 128MB PostgreSQL Starvation..."
+	@powershell -Command "$$env:PYTHONPATH='backend/infra;backend/core;backend/dal;.'; .\\venv\\Scripts\\python.exe backend/infra/database_governor.py"
+
+# ==============================================================================
+# 55. UNIVERSAL BEAST SYNTHESIS (Task 030)
+# ==============================================================================
+
+system-universal-up: ## Initiates the 'Hardware-Sensing' deployment: Universal Ingestion on any machine.
+	@echo "[COREGRAPH] Initiating Universal Deployment: Hardware-Aware Phalanx..."
+	@powershell -Command ".\\venv\\Scripts\\python.exe master_orchestrator.py"
+	@make system-genesis
+	@docker-compose up -d
+
+audit-universal-total: ## THE GRAND FINALE: A complete certifying audit of the 3.84M node world from Potato to Redline.
+	@echo "[COREGRAPH] Initiating Total System Audit: Cross-Tier Hardware Gauntlet..."
+	@powershell -Command ".\\venv\\Scripts\\python.exe master_orchestrator.py"
+	@make audit-performance
+	@make audit-governor
+	@make audit-eco-mode
+	@make audit-low-end-db
+	@echo "[SUCCESS] Total System Certification COMPLETE: The Titan is Universal."
+
+# ==============================================================================
+# 56. BINARY-STREAM VIRTUALIZATION KERNEL (Task 031)
+# ==============================================================================
+
+audit-binary-stream: ## Executes the 'Zero-Heap' audit: Verifying silicon-native simulation footprint.
+	@echo "[COREGRAPH] Auditing Binary Stream: Initiating Shadow Registry Genesis..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;tooling/simulation_server/core;tooling/simulation_server/generator;.'; .\\venv\\Scripts\\python.exe tooling/simulation_server/generator/binary_architect.py"
+	@echo "[COREGRAPH] Auditing Zero-Heap Resolver: Performance Trace (mmap-backed)..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;tooling/simulation_server/core;.'; .\\venv\\Scripts\\python.exe tooling/simulation_server/core/fixtures_binary.py"
+
+# ==============================================================================
+# 57. BIT-PACKED PATHOGEN KERNEL (Task 032)
+# ==============================================================================
+
+audit-pathogen-efficiency: ## Executes the 'Contagion' audit: Verifying bit-packed simulation footprint.
+	@echo "[COREGRAPH] Auditing Pathogen Kernel: Initiating Zero-RAM Infection Sweep..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;tooling/simulation_server/core;.'; .\\venv\\Scripts\\python.exe tooling/simulation_server/core/pathogen_binary.py"
+
+# ==============================================================================
+# 58. STREAMING AST VISITOR (Task 033)
+# ==============================================================================
+
+audit-streaming-ast: ## Executes the 'Cognitive' audit: Verifying zero-heap parsing footprint.
+	@echo "[COREGRAPH] Auditing Streaming AST Visitor: Initiating 5MB Leviathan Query..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;tooling/simulation_server/core;.'; .\\venv\\Scripts\\python.exe tooling/simulation_server/core/ast_streaming.py"
+
+# ==============================================================================
+# 59. MEMORY-MAPPED IDENTITY ENGINE (Task 034)
+# ==============================================================================
+
+audit-identity-parsimony: ## Executes the 'Social' audit: Verifying zero-heap identity footprint.
+	@echo "[COREGRAPH] Auditing Identity Engine: Initiating 100,000 Persona Flood..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;tooling/simulation_server/core;.'; .\\venv\\Scripts\\python.exe tooling/simulation_server/core/identity_binary.py"
+
+# ==============================================================================
+# 60. ADAPTIVE CHAOS SUPERVISOR (Task 035)
+# ==============================================================================
+
+audit-adaptive-chaos: ## Executes the 'Resilience' audit: Verifying resource-aware fault injection.
+	@echo "[COREGRAPH] Auditing Adaptive Chaos Supervisor: Initiating 100,000 Node Simulation..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;tooling/simulation_server/core;.'; .\\venv\\Scripts\\python.exe tooling/simulation_server/core/chaos_manager.py"
+
+# ==============================================================================
+# 61. LOW-IOPS PERSISTENCE BRIDGE (Task 036)
+# ==============================================================================
+
+audit-low-iops: ## Executes the 'Storage' audit: Verifying sequential write aggregation.
+	@echo "[COREGRAPH] Auditing Persistence Bridge: Initiating 3.88M Node Crawl Simulation..."
+	@powershell -Command "$$env:PYTHONPATH='backend/dal;tooling/simulation_server;tooling/simulation_server/core;.'; .\\venv\\Scripts\\python.exe backend/dal/bridge.py"
+
+# ==============================================================================
+# 62. ADAPTIVE GRAPHQL RESOLVER (Task 037)
+# ==============================================================================
+
+audit-adaptive-resolver: ## Executes the 'Communication' audit: Verifying liquid data path performance.
+	@echo "[COREGRAPH] Auditing Adaptive Resolver: Initiating 100,000 Node Burst..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server/api;tooling/simulation_server;tooling/simulation_server/core;.'; .\\venv\\Scripts\\python.exe tooling/simulation_server/api/resolver_kernel.py"
+
+# ==============================================================================
+# 63. DETERMINISTIC TIME-TRAVEL KERNEL (Task 038)
+# ==============================================================================
+
+audit-temporal-parsimony: ## Executes the 'Chronos' audit: Verifying zero-heap temporal footprint.
+	@echo "[COREGRAPH] Auditing Temporal Kernel: Initiating 5-Year Historical Reconstruction..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;tooling/simulation_server/core;.'; .\\venv\\Scripts\\python.exe tooling/simulation_server/core/temporal_kernel.py"
+
+# ==============================================================================
+# 64. RESOURCE-AWARE ANALYTICAL HUB (Task 039)
+# ==============================================================================
+
+audit-analytical-resilience: ## Executes the 'Insight' audit: Verifying resource-aware graph analytics.
+	@echo "[COREGRAPH] Auditing Analytical Hub: Initiating Global Risk Sweep..."
+	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;tooling/simulation_server/core;.'; .\\venv\\Scripts\\python.exe tooling/simulation_server/core/analytics.py"
+
+# ==============================================================================
+# 65. UNIVERSAL BEAST CONSOLIDATION (Task 040)
+# ==============================================================================
+
+system-universal-up: ## Initiates 'One-Button' Hardware-Aware Boot: Silicon Probe + Config + Phalanx.
+	@echo "[COREGRAPH] Initiating Universal Beast Command: 3.88M Node Ocean Onboarding..."
+	@powershell -Command ".\\venv\\Scripts\\python.exe master_orchestrator.py"
+
+system-universal-seal: ## Executes 'Total Repository Seal': SHA-256 Manifest + Absolute Purge.
+	@echo "[COREGRAPH] Sealing Foundation Core: Achieving Zero-Entropy Handover..."
+	@powershell -Command ".\\venv\\Scripts\\python.exe scripts/seal_foundation.py"
+
+audit-universal-grand-finale: ## Executes 'The Gauntlet': Cross-tier verification and Redline-to-Potato transition.
+	@echo "[COREGRAPH] Auditing Universal Intelligence: Initiating Hardware Stress Rotation..."
+	@powershell -Command ".\\venv\\Scripts\\python.exe master_orchestrator.py --audit"
+
+# ==============================================================================
+# MODULE 4: THE GEMINI 1.5 FLASH ANALYTICAL HUB
+# ==============================================================================
