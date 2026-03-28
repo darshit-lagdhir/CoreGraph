@@ -89,22 +89,20 @@ class IngestionHookKernel:
         await self.client.aclose()
 
 async def run_benchmark(limit: int = 500):
-    kernel = IngestionHookKernel(batch_size=50)
-    fixture_dir = os.path.join(root, "tooling", "simulation_server", "fixtures", "npm")
+    kernel = IngestionHookKernel(base_url="http://simulation-registry:8081", batch_size=50)
     
-    pattern = os.path.join(fixture_dir, "**", "*.json")
-    all_files = glob.glob(pattern, recursive=True)
-    print(f"[DEBUG] Found {len(all_files)} total fixtures.")
+    # Bypassing JSON globbing to use the 3.88M node binary ocean (Task 028)
+    print(f"[DEBUG] Binary Ocean Detected. Launching Synthetic Ingestion Stream.")
     
     async def purl_gen():
         count = 0
-        for f in all_files:
-            if count >= limit: break
-            name = os.path.basename(f).replace(".json", "")
-            yield f"pkg:npm/{name}"
+        for i in range(limit):
+            # Matches the nomenclature used in StreamingGenesis (Task 028.4)
+            name = f"synthetic-pkg-{i}"
+            yield f"pkg:npm/{name}@1.0.0"
             count += 1
 
-    print(f"[COREGRAPH] Launching Ingestion Benchmark (Real Nodes)...")
+    print(f"[COREGRAPH] Launching Ingestion Benchmark (Redline Simulation)...")
     await kernel.ingest_stream(purl_gen())
     await kernel.close()
 

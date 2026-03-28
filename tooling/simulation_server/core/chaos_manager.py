@@ -2,12 +2,20 @@ import asyncio
 import random
 import time
 import logging
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional, List, Tuple
+from enum import Enum
 
 # CoreGraph Adaptive Chaos Supervisor (Task 035)
 # Resource-Aware Fault Injection: Hardening the Beast without Systemic Collapse.
 
 logger = logging.getLogger(__name__)
+
+class ChaosRule(str, Enum):
+    NONE = "NONE"
+    LATENCY = "LATENCY"
+    ERROR_429 = "429"
+    ERROR_502 = "502"
+    DROP = "DROP"
 
 class AdaptiveChaosManager:
     """
@@ -19,10 +27,21 @@ class AdaptiveChaosManager:
         self.max_concurrent = max_concurrent
         self.active_events = 0
         self.is_active = True
+        self.rules: Dict[str, ChaosRule] = {}
 
-        # Chaos Configuration
+        # Default Chaos Params
         self.failure_rate = 0.1 # Default 10%
         self.latency_ms = 500
+
+    def set_rule(self, target: str, rule: ChaosRule):
+        """Hidden Administrative Entry Point for Sabotage Injection."""
+        self.rules[target] = rule
+        logger.info(f"[CHAOS] Rule configured for {target}: {rule}")
+
+    def clear_rules(self):
+        """Restores the Pristine Mirror State."""
+        self.rules = {}
+        logger.info("[CHAOS] All rules cleared. Pristine state restored.")
 
     def update_resources(self, t_coeff: float):
         """Hardware-Empathic Scaling (Task 035.2)."""
@@ -38,99 +57,64 @@ class AdaptiveChaosManager:
             self.failure_rate = 0.20 # 20%
             self.max_concurrent = 100
 
-    def should_fail(self) -> bool:
-        """Stochastic Failure Mask (Task 035.4)."""
-        if not self.is_active or self.active_events >= self.max_concurrent:
-            return False
-        return random.random() < self.failure_rate
-
-    async def inject_fault(self, request_id: str) -> Optional[Dict[str, Any]]:
+    async def apply_chaos(self, target: str, data: Any = None) -> Tuple[int, Any, Dict[str, str]]:
         """
-        Zero-Block Async Sleep Kernel & Masquerade Registry (Task 035.3 & 035.6).
-        Injects Latency/429/502 without blocking the event loop.
+        The S.U.S.E. Chaos Interceptor: Decides fate based on active rules.
+        Returns: (status_code, modified_data, headers)
         """
-        if not self.should_fail():
-            return None
+        rule = self.rules.get(target, ChaosRule.NONE)
+        
+        # If no explicit rule, apply stochastic background failure if active
+        if rule == ChaosRule.NONE and self.is_active:
+            if random.random() < self.failure_rate:
+                # Stochastic choice
+                rule = random.choice([ChaosRule.LATENCY, ChaosRule.ERROR_429, ChaosRule.ERROR_502])
 
-        self.active_events += 1
-        try:
-            # Deterministic Failure Selection
-            r = random.random()
+        if rule == ChaosRule.NONE:
+            return 200, data, {}
 
-            # 1. LATENCY INJECTION (Zero-Block)
-            if r < 0.4: # 40% of failures are Latency
-                actual_delay = (self.latency_ms / 1000.0) * (2.0 - self.t_coeff) # Scale by pressure
-                await asyncio.sleep(min(actual_delay, 29.0)) # 29s ceiling
-                return None # Continue normally after sleep
+        # 1. LATENCY INJECTION
+        if rule == ChaosRule.LATENCY:
+            actual_delay = (self.latency_ms / 1000.0) * (2.0 - self.t_coeff)
+            await asyncio.sleep(min(actual_delay, 29.0))
+            return 200, data, {}
 
-            # 2. RATE LIMIT MASQUERADE (HTTP 429)
-            elif r < 0.7:
-                return {
-                    "status_code": 429,
-                    "headers": {"Retry-After": str(int(5 * (1.0 - self.t_coeff)))},
-                    "message": "GitHub Rate-Limit Masquerade"
-                }
+        # 2. RATE LIMIT (429)
+        elif rule == ChaosRule.ERROR_429:
+            return 429, None, {"Retry-After": "5", "X-Chaos-Injected": "true"}
 
-            # 3. GATEWAY FLAKINESS (HTTP 502)
-            else:
-                return {
-                    "status_code": 502,
-                    "message": "Deps.dev Gateway Timeout Simulation"
-                }
-        finally:
-            self.active_events -= 1
+        # 3. GATEWAY ERROR (502)
+        elif rule == ChaosRule.ERROR_502:
+            return 502, None, {"X-Chaos-Injected": "true"}
 
-class ChaosSupervisor:
-    """
-    High-Frequency Failure Supervisor (Task 035).
-    Coordinates the tactical degradation of the 3.84M software ocean.
-    """
-    def __init__(self, manager: AdaptiveChaosManager):
-        self.manager = manager
+        # 4. PACKET DROP (DROP)
+        elif rule == ChaosRule.DROP:
+            # Simulate a dropped connection by never returning or a hard error
+            # For ASGI, we can return a 0 status or just close (hard to do here)
+            return 504, None, {"X-Chaos-Injected": "true"}
 
-    async def intercept(self, handler_coro):
-        """Middleware Interceptor for S.U.S.E. requests."""
-        fault = await self.manager.inject_fault("generic_req")
-        if fault:
-            logger.warning(f"[CHAOS] Injecting Fault: {fault['status_code']} - {fault.get('message')}")
-            return fault
-        return await handler_coro
+        return 200, data, {}
+
+# Global instance for the simulation server
+chaos_manager = AdaptiveChaosManager()
 
 if __name__ == "__main__":
     print("──────── ADAPTIVE CHAOS AUDIT ─────────")
-    manager = AdaptiveChaosManager(t_coeff=1.0) # Start in Redline Tier
-
-    async def simulate_handler():
-        return {"status": 200, "data": "clean_ocean"}
-
+    manager = AdaptiveChaosManager(t_coeff=1.0)
+    
     async def run_audit():
-        supervisor = ChaosSupervisor(manager)
-
-        # 1. REDLINE BURST (High-end)
-        print("[AUDIT] Tier: REDLINE (T_coeff=1.0) | Stressing at 20%...")
-        results = []
-        for _ in range(100):
-            res = await supervisor.intercept(simulate_handler())
-            if asyncio.iscoroutine(res):
-                res = await res
-            results.append(res)
-
-        failures = [r for r in results if isinstance(r, dict) and r.get("status_code", 200) != 200]
-        print(f"[NOMINAL] Redline Failure Count: {len(failures)}/100")
-
-        # 2. POTATO ADAPTATION (Low-end)
-        print("\n[AUDIT] Tier: POTATO (T_coeff=0.2) | Scaling down to Eco-Mode...")
-        manager.update_resources(t_coeff=0.2)
-        results = []
-        for _ in range(100):
-            res = await supervisor.intercept(simulate_handler())
-            if asyncio.iscoroutine(res):
-                res = await res
-            results.append(res)
-
-        failures = [r for r in results if isinstance(r, dict) and r.get("status_code", 200) != 200]
-        print(f"[NOMINAL] Potato Failure Count: {len(failures)}/100")
-
-        print("\n[SUCCESS] Adaptive Chaos Supervisor Verified: Elastic Hostility observed.")
+        print("[AUDIT] Setting explicit rule: ERROR_429")
+        manager.set_rule("global", ChaosRule.ERROR_429)
+        status, _, _ = await manager.apply_chaos("global")
+        print(f"[NOMINAL] Result: {status}")
+        
+        print("\n[AUDIT] Testing Latency stochastic falloff...")
+        manager.clear_rules()
+        manager.latency_ms = 100
+        start = time.perf_counter()
+        await manager.apply_chaos("global") # Might sleep
+        print(f"[NOMINAL] Duration: {(time.perf_counter() - start)*1000:.2f}ms")
+        
+        print("\n[SUCCESS] Chaos Manager API Verified.")
 
     asyncio.run(run_audit())

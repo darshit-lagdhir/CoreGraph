@@ -1,6 +1,8 @@
 import base64
 import struct
-from typing import Optional, Tuple
+import os
+import json
+from typing import Optional, Tuple, Dict, Any
 
 class CursorResolver:
     """
@@ -51,6 +53,35 @@ class CursorResolver:
         has_next_page = end_index < total_nodes
         
         return start_index, end_index, has_next_page
+
+class SimulationResolver:
+    """
+    S.U.S.E. Resolution Phalanx: Bridging Virtual Binary Fixtures and REST APIs.
+    """
+    def __init__(self, fixtures_path: str):
+        self.fixtures_path = fixtures_path
+        self.binary_engine = None
+        # Lazy mount the binary ocean if it exists
+        bin_file = os.path.join(fixtures_path, "ocean.bin")
+        if os.path.exists(bin_file):
+            from core.fixtures import VirtualFixtureEngine
+            self.binary_engine = VirtualFixtureEngine(bin_file)
+            self.binary_engine.mount_universe()
+
+    async def resolve_purl(self, ecosystem: str, name: str) -> Optional[Dict[str, Any]]:
+        purl = f"pkg:{ecosystem}/{name}"
+        if self.binary_engine:
+            return self.binary_engine.fetch_node(purl)
+        
+        # Fallback to filesystem for legacy JSON support
+        json_path = os.path.join(self.fixtures_path, ecosystem, f"{name}.json")
+        if os.path.exists(json_path):
+            try:
+                with open(json_path, "r") as f:
+                    return json.load(f)
+            except Exception:
+                return None
+        return None
 
 if __name__ == "__main__":
     resolver = CursorResolver()

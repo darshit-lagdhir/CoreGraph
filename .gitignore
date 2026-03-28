@@ -28,3 +28,4 @@ task-matrix.json
 # Module 3 S.U.S.E. Simulation Environment
 tooling/simulation_server/fixtures/*
 tooling/simulation_server/fixtures
+.env.hardware_profile

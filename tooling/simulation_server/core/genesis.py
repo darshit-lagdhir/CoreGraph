@@ -44,11 +44,11 @@ class StreamingGenesis:
                     # Flags: 0x01 (vulnerable), 0x02 (malicious)
                     flags = 0x01 if is_vulnerable else 0x00
 
-                    # Node Body (Simplified JSON for Task 028 stub)
+                    # Node Body (Matches S.U.S.E. Schema for Task 008)
                     node_body = json.dumps({
                         "name": f"synthetic-pkg-{i}",
-                        "version": "1.0.0",
-                        "dependencies": []
+                        "versions": [{"version": "1.0.0", "dependencies": []}],
+                        "metadata": {"synthetic": True}
                     }).encode('utf-8')
 
                     binary_node = struct.pack("<BB", flags, risk_score) + node_body
@@ -67,18 +67,21 @@ class StreamingGenesis:
                     print(f"[GENESIS] Slab {slab_idx} Flushed | Offset: {self.current_offset / (1024**2):.2f} MB")
 
             # 3. INDEX RE-CONSTITUTION: Prepending the finalized Header (Task 028.4)
-            # Re-offsetting the data nodes based on the Header size
+            # Sorting manifest lexicographically to enable O(log N) Binary Search (Task 031.4)
+            print(f"[GENESIS] Sorting 3.84M Manifest Entries...")
+            self.index_data.sort(key=lambda x: x[0])
+            
             header_size = 8 + (len(self.index_data) * 144)
             print(f"[GENESIS] Re-indexing Header: {len(self.index_data)} nodes | Header Size: {header_size / (1024**2):.2f} MB")
 
-            # Final Pass: Write manifest header to separate file or prepend (prepending is hard in-place)
-            # We'll create the finalized .bin including the manifest
-            self.finalize_binary(header_size)
+        # Call finalize after the file is closed
+        self.finalize_binary(header_size)
 
     def finalize_binary(self, header_size: float):
         """
         Consolidates the B-Tree index into the main file header.
         """
+        print(f"[GENESIS] Finalizing Binary Ocean with {len(self.index_data)} nodes...")
         final_path = self.binary_path + ".final"
         with open(final_path, "wb") as f_out, open(self.binary_path, "rb") as f_in:
             # 1. Write Header
@@ -106,8 +109,10 @@ def shutil_copyfileobj(fsrc, fdst, length=16*1024):
         fdst.write(buf)
 
 if __name__ == "__main__":
-    test_bin = "tooling/simulation_server/fixtures/universe.bin"
+    count = int(os.environ.get("GENESIS_COUNT", 3884112))
+    test_bin = os.path.join("tooling", "simulation_server", "fixtures", "ocean.bin")
     os.makedirs(os.path.dirname(test_bin), exist_ok=True)
 
-    genesis = StreamingGenesis(test_bin, slab_size=100)
-    genesis.generate_universe(total_nodes=1000) # Testing with 1k nodes for dry run
+    print(f"[ORCHESTRATOR] Birthing {count} nodes into {test_bin}...")
+    genesis = StreamingGenesis(test_bin, slab_size=10000)
+    genesis.generate_universe(total_nodes=count)
