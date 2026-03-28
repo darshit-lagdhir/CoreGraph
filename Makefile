@@ -1134,3 +1134,83 @@ audit-persistence-universal: ## Executes the 'Total' audit: Verifying hardware-a
 # ==============================================================================
 # 76. ADAPTIVE RENDERING (Task 051)
 # ==============================================================================
+
+audit-visual-performance: ## Executes the 'HUD' audit: Verifying 60FPS on integrated graphics.
+	@echo "[COREGRAPH] Auditing Visual HUD: Initiating Frame-Rate Challenge..."
+	@powershell -Command "$$env:PYTHONPATH='backend;backend/dal;tooling/simulation_server;tooling/simulation_server/core;tooling;.'; .\\venv\\Scripts\\python.exe tooling/visual_audit.py"
+
+# ==============================================================================
+# 77. BRANCHLESS GLSL KERNEL (Task 052)
+# ==============================================================================
+
+audit-shader-efficiency: ## Executes the 'Warp' audit: Verifying zero warp divergence.
+	@echo "[COREGRAPH] Auditing Shader Core: Initiating Instruction Challenge..."
+	@powershell -Command "$$env:PYTHONPATH='backend;backend/dal;tooling/simulation_server;tooling/simulation_server/core;tooling;.'; .\\venv\\Scripts\\python.exe tooling/shader_audit.py"
+
+# ==============================================================================
+# 78. WEB-WORKER DATA PHALANX (Task 053)
+# ==============================================================================
+
+audit-phalanx-stability: ## Executes the 'Thread' audit: Verifying zero UI latency.
+	@echo "[COREGRAPH] Auditing Data Phalanx: Initiating Data Storm Challenge..."
+	@powershell -Command "$$env:PYTHONPATH='backend;backend/dal;tooling/simulation_server;tooling/simulation_server/core;tooling;.'; .\\venv\\Scripts\\python.exe tooling/phalanx_audit.py"
+
+# ==============================================================================
+# 79. VRAM GOVERNOR (Task 054)
+# ==============================================================================
+
+audit-vram-stability: ## Executes the 'Memory' audit: Verifying zero VRAM overflow.
+	@echo "[COREGRAPH] Auditing Visual Residency: Initiating Capacity Challenge..."
+	@powershell -Command "$$env:PYTHONPATH='backend;backend/dal;tooling/simulation_server;tooling/simulation_server/core;tooling;.'; .\\venv\\Scripts\\python.exe tooling/vram_audit.py"
+
+# ==============================================================================
+# 80. BIT-PACKED HUD INTERFACE (Task 055)
+# ==============================================================================
+
+audit-ui-zero-dom: ## Executes the 'UI' audit: Verifying zero DOM tax.
+	@echo "[COREGRAPH] Auditing HUD Interface: Initiating Label-Scaling Challenge..."
+	@powershell -Command "$$env:PYTHONPATH='backend;backend/dal;tooling/simulation_server;tooling/simulation_server/core;tooling;.'; .\\venv\\Scripts\\python.exe tooling/ui_audit.py"
+
+# ==============================================================================
+# 81. PREDICTIVE-VIEWPORT KERNEL (Task 056)
+# ==============================================================================
+
+audit-predictive-navigation: ## Executes the 'Nav' audit: Verifying zero pop.
+	@echo "[COREGRAPH] Auditing HUD Discovery: Initiating Pan-Velocity Challenge..."
+	@powershell -Command "$$env:PYTHONPATH='backend;backend/dal;tooling/simulation_server;tooling/simulation_server/core;tooling;.'; .\\venv\\Scripts\\python.exe tooling/nav_audit.py"
+
+# ==============================================================================
+# 82. HEURISTIC-HEATMAP ENGINE (Task 057)
+# ==============================================================================
+
+audit-heatmap-fluidity: ## Executes the 'Heatmap' audit: Verifying 60FPS macro-view.
+	@echo "[COREGRAPH] Auditing HUD Macro-View: Initiating Heatmap Challenge..."
+	@powershell -Command "$$env:PYTHONPATH='backend;backend/dal;tooling/simulation_server;tooling/simulation_server/core;tooling;.'; .\\venv\\Scripts\\python.exe tooling/heatmap_audit.py"
+
+# ==============================================================================
+# 83. INSTANCED-EDGE ARCHITECTURE (Task 058)
+# ==============================================================================
+
+audit-edge-fluidity: ## Executes the 'Edge' audit: Verifying 60FPS relational-view.
+	@echo "[COREGRAPH] Auditing HUD Relational-Path: Initiating Edge Challenge..."
+	@powershell -Command "$$env:PYTHONPATH='backend;backend/dal;tooling/simulation_server;tooling/simulation_server/core;tooling;.'; .\\venv\\Scripts\\python.exe tooling/edge_audit.py"
+
+# ==============================================================================
+# 84. TEMPORAL-SCRUBBER INTERFACE (Task 059)
+# ==============================================================================
+
+audit-temporal-fluidity: ## Executes the 'Chrono' audit: Verifying 144Hz scrubbing.
+	@echo "[COREGRAPH] Auditing HUD History: Initiating Chrono Challenge..."
+	@powershell -Command "$$env:PYTHONPATH='backend;backend/dal;tooling/simulation_server;tooling/simulation_server/core;tooling;.'; .\\venv\\Scripts\\python.exe tooling/chrono_audit.py"
+
+# ==============================================================================
+# 85. UNIVERSAL-HUD CONSOLIDATION (Task 060)
+# ==============================================================================
+
+audit-visual-universal: ## Executes the 'Visual' audit: Final cross-tier certification.
+	@echo "[COREGRAPH] Auditing HUD Universal-Spine: Initiating Total System Challenge..."
+	@powershell -Command "$$env:PYTHONPATH='backend;backend/dal;tooling/simulation_server;tooling/simulation_server/core;tooling;.'; .\\venv\\Scripts\\python.exe tooling/visual_audit.py"
+
+# ==============================================================================
+# 86. MODULE 4 BEGINS: GEMINI 1.5 FLASH ANALYTICAL HUB (Task 061)
+# ==============================================================================
