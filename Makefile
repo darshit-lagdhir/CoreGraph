@@ -1050,3 +1050,87 @@ audit-universal-grand-finale: ## Executes 'The Gauntlet': Cross-tier verificatio
 # ==============================================================================
 # MODULE 4: THE GEMINI 1.5 FLASH ANALYTICAL HUB
 # ==============================================================================
+
+# ==============================================================================
+# 66. SILICON-AWARE DATABASE GOVERNOR (Task 041)
+# ==============================================================================
+
+audit-dal-universal: ## Executes the 'Persistence' audit: Verifying database elasticity.
+	@echo "[COREGRAPH] Auditing Database Governor: Initiating 50,000 Node Simulation..."
+	@powershell -Command "$$env:PYTHONPATH='backend;backend/dal;tooling/simulation_server;tooling/simulation_server/core;.'; .\\venv\\Scripts\\python.exe backend/dal/governor.py"
+
+# ==============================================================================
+# 67. SPARSE-INDEX ARCHITECTURE (Task 042)
+# ==============================================================================
+
+audit-sparse-indexing: ## Executes the 'Retrieval' audit: Verifying index minification and JIT speed.
+	@echo "[COREGRAPH] Auditing Sparse-Index Kernel: Initiating Footprint Contrast..."
+	@powershell -Command "$$env:PYTHONPATH='backend;backend/dal;tooling/simulation_server;tooling/simulation_server/core;.'; .\\venv\\Scripts\\python.exe backend/dal/indexing.py"
+
+# ==============================================================================
+# 68. READ-ONLY REPLICATION KERNEL (Task 043)
+# ==============================================================================
+
+audit-dal-replication: ## Executes the 'Synchronization' audit: Verifying mirror latency and ghost data.
+	@echo "[COREGRAPH] Auditing Replication Kernel: Initiating Concurrency Challenge..."
+	@powershell -Command "$$env:PYTHONPATH='backend;backend/dal;tooling/simulation_server;tooling/simulation_server/core;.'; .\\venv\\Scripts\\python.exe backend/dal/replication.py"
+
+# ==============================================================================
+# 69. SPATIAL-PARTITIONING DATA VAULT (Task 044)
+# ==============================================================================
+
+audit-dal-spatial: ## Executes the 'Locality' audit: Verifying quad-tree viewport scaling.
+	@echo "[COREGRAPH] Auditing Spatial Kernel: Initiating Hilbert Linearization Map..."
+	@powershell -Command "$$env:PYTHONPATH='backend;backend/dal;tooling/simulation_server;tooling/simulation_server/core;.'; .\\venv\\Scripts\\python.exe backend/dal/spatial.py"
+
+# ==============================================================================
+# 70. ADAPTIVE-SEARCH REGISTRY (Task 045)
+# ==============================================================================
+
+audit-adaptive-search: ## Executes the 'Correlation' audit: Verifying bit-masked join speed.
+	@echo "[COREGRAPH] Auditing Search Registry: Initiating Join-Penalty Challenge..."
+	@powershell -Command "$$env:PYTHONPATH='backend;backend/dal;tooling/simulation_server;tooling/simulation_server/core;.'; .\\venv\\Scripts\\python.exe backend/dal/search.py"
+
+# ==============================================================================
+# 71. MEMORY-CAPPED WAL ARCHITECTURE (Task 046)
+# ==============================================================================
+
+audit-wal-resilience: ## Executes the 'Integrity' audit: Verifying bit-packed log recovery and I/O wait.
+	@echo "[COREGRAPH] Auditing WAL Kernel: Initiating Crash Recovery Simulation..."
+	@powershell -Command "$$env:PYTHONPATH='backend;backend/dal;tooling/simulation_server;tooling/simulation_server/core;.'; .\\venv\\Scripts\\python.exe backend/dal/wal_kernel.py"
+
+# ==============================================================================
+# 72. ADAPTIVE CONNECTION POOLER (Task 047)
+# ==============================================================================
+
+audit-adaptive-pooler: ## Executes the 'Concurrency' audit: Verifying context-switch minification.
+	@echo "[COREGRAPH] Auditing Pooler Kernel: Initiating Core-Count Challenge..."
+	@powershell -Command "$$env:PYTHONPATH='backend;backend/dal;tooling/simulation_server;tooling/simulation_server/core;.'; .\\venv\\Scripts\\python.exe backend/dal/pooler.py"
+
+# ==============================================================================
+# 73. LEAN-SCHEMA ARCHITECTURE (Task 048)
+# ==============================================================================
+
+audit-lean-schema: ## Executes the 'Density' audit: Verifying 40% storage reduction.
+	@echo "[COREGRAPH] Auditing Lean-Schema: Initiating Bloat-Baseline Challenge..."
+	@powershell -Command "$$env:PYTHONPATH='backend;backend/dal;tooling/simulation_server;tooling/simulation_server/core;.'; .\\venv\\Scripts\\python.exe backend/dal/models/lean_package.py"
+
+# ==============================================================================
+# 74. ASYNCHRONOUS PERSISTENCE HUB (Task 049)
+# ==============================================================================
+
+audit-async-hub: ## Executes the 'Latency' audit: Verifying non-blocking SQL multiplexing.
+	@echo "[COREGRAPH] Auditing Async Hub: Initiating Saturation Challenge..."
+	@powershell -Command "$$env:PYTHONPATH='backend;backend/dal;tooling/simulation_server;tooling/simulation_server/core;.'; .\\venv\\Scripts\\python.exe backend/dal/hub.py"
+
+# ==============================================================================
+# 75. UNIVERSAL PERSISTENCE SYNTHESIS (Task 050)
+# ==============================================================================
+
+audit-persistence-universal: ## Executes the 'Total' audit: Verifying hardware-agnostic synthesis.
+	@echo "[COREGRAPH] Auditing Universal Synthesis: Initiating Genesis Burst..."
+	@powershell -Command "$$env:PYTHONPATH='backend;backend/dal;tooling/simulation_server;tooling/simulation_server/core;.'; .\\venv\\Scripts\\python.exe backend/dal/master_orchestrator.py"
+
+# ==============================================================================
+# 76. ADAPTIVE RENDERING (Task 051)
+# ==============================================================================
