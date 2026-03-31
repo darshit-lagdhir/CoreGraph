@@ -1,89 +1,67 @@
-version: '3.8'
+﻿version: "3.9"
+
+# Module 4 - Task 023: Multi-Container Orchestration Manifest.
+# Production-ready compose configuration adaptive to Host Sensing mappings.
 
 services:
-  # ==============================================================================
-  # 1. THE PERSISTENCE BEAST (PostgreSQL 15)
-  # ==============================================================================
-  persistence-beast:
-    image: postgres:15-alpine
-    container_name: coregraph-db-1
+  engine:
+    build: .
+    image: coregraph-engine:latest
+    container_name: coregraph_ingestion_phalanx
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - coregraph_mesh
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_DB: coregraph
-      POSTGRES_HOST_AUTH_METHOD: trust
-    ports:
-      - "5432:5432"
-    volumes:
-      - persistence_data:/var/lib/postgresql/data
-      - ./backend/database/migrations:/docker-entrypoint-initdb.d
+      - DATABASE_URL=postgresql+asyncpg://coregraph_admin:coregraph_secret123@db:5432/coregraph_vault
     deploy:
       resources:
+        # POTATO TIER CONSTRAINT SIMULATION (Uncomment to force limits)
+        # limits:
+        #   cpus: "2"
+        #   memory: 4G
         reservations:
-          cpus: '4' # Reserved for low-latency B-Tree writes (P-cores)
-          memory: 8G
+          cpus: "1"
+          memory: 512M
+
+  db:
+    image: postgres:15-alpine
+    container_name: coregraph_relational_vault
+    restart: always
+    environment:
+      POSTGRES_USER: coregraph_admin
+      POSTGRES_PASSWORD: coregraph_secret123
+      POSTGRES_DB: coregraph_vault
+      # Optimizing shared_buffers strictly for async ingestion velocity
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256"
+    command: 
+      - "postgres"
+      - "-c"
+      - "shared_buffers=1GB"
+      - "-c"
+      - "max_connections=500"
+      - "-c"
+      - "wal_level=logical"
+      - "-c"
+      - "synchronous_commit=off" # NVMe saturation override
+    volumes:
+      - coregraph_pgdata:/var/lib/postgresql/data
+    networks:
+      - coregraph_mesh
+    ports:
+      - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d coregraph"]
+      test: ["CMD-SHELL", "pg_isready -U coregraph_admin -d coregraph_vault"]
       interval: 5s
       timeout: 5s
       retries: 5
-    networks:
-      - internal-phalanx
-
-  # ==============================================================================
-  # 2. THE S.U.S.E. MIRROR WORLD (Task 001-007)
-  # ==============================================================================
-  simulation-registry:
-    build:
-      context: .
-      dockerfile: tooling/simulation_server/Dockerfile
-    container_name: coregraph-sim-1
-    ports:
-      - "8081:8081"
-    volumes:
-      - ./tooling/simulation_server/fixtures:/app/tooling/simulation_server/fixtures:ro # Immutable Ground Truth
-    deploy:
-      resources:
-        limits:
-          cpus: '8' # Pinned to Efficiency Cores for high-volume I/O
-          memory: 8G
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8081/health || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-    networks:
-      - internal-phalanx
-
-  # ==============================================================================
-  # 3. THE INGESTION PHALANX (Task 008-010)
-  # ==============================================================================
-  ingestion-phalanx:
-    build:
-      context: .
-      dockerfile: backend/ingestion/Dockerfile
-    container_name: coregraph-ingest-1
-    depends_on:
-      persistence-beast:
-        condition: service_healthy
-      simulation-registry:
-        condition: service_healthy
-    environment:
-      COREGRAPH_MODE: SIMULATE
-      DATABASE_URL: postgresql://postgres@persistence-beast:5432/coregraph
-      REGISTRY_URL: http://simulation-registry:8081
-    deploy:
-      resources:
-        limits:
-          cpus: '12' # High-compute P-cores for validation & transformation
-          memory: 16G
-    networks:
-      - internal-phalanx
 
 networks:
-  internal-phalanx:
+  coregraph_mesh:
     driver: bridge
-    name: coregraph-internal-phalanx
 
 volumes:
-  persistence_data:
-    name: coregraph_persistence_v1
+  coregraph_pgdata:
+    driver: local
