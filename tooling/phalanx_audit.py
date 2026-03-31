@@ -47,11 +47,11 @@ if __name__ == "__main__":
     # Certification on POTATO hardware (Tier 1) as mandated.
     runner = PhalanxAuditRunner(tier="POTATO")
     print(f"[AUDIT] Hardware Reveal: POTATO (2-Core Silicon / Multi-Threading Emulation)")
-    
+
     runner.run_data_storm_challenge()
     runner.run_input_responsiveness_test()
     runner.run_memory_footprint_seal()
-    
+
     # Frame-Stability Certificate (Task 053.7.D)
     print(f"[AUDIT] 4. FRAME-STABILITY: Maintaining 60FPS lock during 100% background load.")
     print("[SUCCESS] Web-Worker Data Phalanx Verified.")

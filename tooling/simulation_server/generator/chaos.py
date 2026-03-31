@@ -20,7 +20,7 @@ def get_fixture_path(name: str) -> str:
 def inject_ouroboros(targets: List[str]):
     """Creates intentional circular loops (A -> B -> A or A -> B -> C -> A)."""
     if len(targets) < 2: return
-    
+
     # 50/50: Tight vs Transitive
     if random.random() > 0.5: # Transitive (A -> B -> C -> A)
         for i in range(len(targets)):
@@ -54,14 +54,14 @@ def inject_infinite_descent(root_name: str, depth: int):
         path = get_fixture_path(current)
         bucket = hashlib.md5(current.encode()).hexdigest()[:2]
         os.makedirs(os.path.join(FIXTURES_DIR, bucket), exist_ok=True)
-        
+
         data = {
             "name": current,
             "versions": [{"version": "1.0.0", "dependencies": {next_node: "*"}, "published_at": "2024-03-25T21:55:00Z"}]
         }
         with open(path, 'w') as f: json.dump(data, f)
         current = next_node
-    
+
     # Terminate the chain
     with open(get_fixture_path(current), 'w') as f:
         json.dump({"name": current, "versions": [{"version": "1.0.0", "dependencies": {}, "published_at": "2024-03-25T21:55:00Z"}]}, f)
@@ -72,7 +72,7 @@ def inject_spiderweb(name: str, degree: int):
     path = get_fixture_path(name)
     bucket = hashlib.md5(name.encode()).hexdigest()[:2]
     os.makedirs(os.path.join(FIXTURES_DIR, bucket), exist_ok=True)
-    
+
     deps = {f"spider-link-{i}": "*" for i in range(degree)}
     data = {
         "name": name,
@@ -87,18 +87,18 @@ def poison(
 ):
     """Executing the 'Graph Poisoner' Protocol (Task 005)."""
     typer.echo(f"[CHAOS] Initiating Structural Hostility (Mode: {mode})...")
-    
+
     if mode in ["all", "ouroboros"]:
         typer.echo(" - Injecting Ouroboros Paradox (Circular Loops)...")
         all_files = []
         import glob
         for f in glob.glob(os.path.join(FIXTURES_DIR, "**", "*.json"), recursive=True)[:100]:
             all_files.append(os.path.basename(f).replace(".json", ""))
-        
+
         if not all_files:
             typer.echo("[FAILURE] No software ocean identities detected. Run 'make sim-gen-dev' first.")
             raise typer.Exit(1)
-            
+
         for _ in range(intensity):
             targets = random.sample(all_files, min(3, len(all_files)))
             inject_ouroboros(targets)

@@ -22,25 +22,25 @@ CURRENCY_REGISTRY: Dict[str, ISOCurrency] = {
     "CAD": ISOCurrency(code="CAD", numeric="124", exponent=2, volatility=0.03),
     "CHF": ISOCurrency(code="CHF", numeric="756", exponent=2, volatility=0.01),
     "CNY": ISOCurrency(code="CNY", numeric="156", exponent=2, volatility=0.02),
-    
+
     # 0-Exponent (Zero Minor Units)
     "JPY": ISOCurrency(code="JPY", numeric="392", exponent=0, volatility=0.03),
     "KRW": ISOCurrency(code="KRW", numeric="410", exponent=0, volatility=0.04),
     "VND": ISOCurrency(code="VND", numeric="704", exponent=0, volatility=0.05),
     "CLP": ISOCurrency(code="CLP", numeric="152", exponent=0, volatility=0.04),
     "PYG": ISOCurrency(code="PYG", numeric="600", exponent=0, volatility=0.06),
-    
+
     # 3-Exponent (High-Value Middle Eastern)
     "KWD": ISOCurrency(code="KWD", numeric="414", exponent=3, volatility=0.01),
     "BHD": ISOCurrency(code="BHD", numeric="048", exponent=3, volatility=0.01),
     "OMR": ISOCurrency(code="OMR", numeric="512", exponent=3, volatility=0.01),
     "JOD": ISOCurrency(code="JOD", numeric="400", exponent=3, volatility=0.02),
     "TND": ISOCurrency(code="TND", numeric="788", exponent=3, volatility=0.03),
-    
+
     # High-Precision Synthetics
     "BTC": ISOCurrency(code="BTC", numeric="000", exponent=8, volatility=0.15),
     "ETH": ISOCurrency(code="ETH", numeric="001", exponent=18, volatility=0.18),
-    
+
     # ... typically expanded to 50+ entries in production
 }
 

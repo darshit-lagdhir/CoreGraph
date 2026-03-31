@@ -47,11 +47,11 @@ if __name__ == "__main__":
     # Certification on POTATO hardware (Tier 1) as mandated.
     runner = VRAMAuditRunner(tier="POTATO")
     print(f"[AUDIT] Hardware Reveal: POTATO (Legacy Integrated Silicon / 512MB Shared Memory)")
-    
+
     runner.run_capacity_challenge()
     runner.run_artificial_starvation()
     runner.run_texture_switch_report()
-    
+
     # Context-Loss Stress-Test (Task 054.7.D)
     print(f"[AUDIT] 4. CONTEXT-LOSS STRESS-TEST: Detecting simulated WebGL Context Reset...")
     print(f"[AUDIT] Restoration of Residency Map: 340ms (Certified < 500ms threshold).")

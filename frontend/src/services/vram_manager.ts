@@ -45,12 +45,12 @@ export class VRAMGovernorKernel {
             this.evictLeastRecentlyUsed(incomingMB);
         }
 
-        this.activeResources.set(pageId, { 
-            size: sizeBytes, 
+        this.activeResources.set(pageId, {
+            size: sizeBytes,
             lastSeen: Date.now(),
             ref: bufferRef
         });
-        
+
         this.updateLRUStack(pageId);
     }
 
@@ -92,7 +92,7 @@ export class VRAMGovernorKernel {
         // Shelf-Packing Algorithm Coordinate generation for icon: ${iconId}
         console.log(`[HUD] VRAM Governor: Mapping atlas coordinates for icon: ${iconId}`);
         // Providing UV-Offsets [uMin, vMin, uMax, vMax] to the Branchless Kernel.
-        return new Float32Array([0.0, 0.0, 0.0625, 0.0625]); 
+        return new Float32Array([0.0, 0.0, 0.0625, 0.0625]);
     }
 
     /** Operational Hygiene (Task 054.10) */
@@ -111,11 +111,11 @@ export class VRAMGovernorKernel {
 export function runVRAMAudit(tier: string = 'POTATO') {
     console.log("──────── HUD VRAM STABILITY AUDIT ─────────");
     console.log(`[AUDIT] 1. HARDWARE REVEAL: Target ${tier} Tier Simulation.`);
-    
+
     // ARTIFICIAL STARVATION (Task 054.7.B)
     // Forcing an extremely small budget to trigger rapid LRU rotation.
     const governor = new VRAMGovernorKernel(tier);
-    
+
     // CAPACITY CHALLENGE (Task 054.7.A)
     console.log("[AUDIT] 2. CAPACITY CHALLENGE: Panning through high-density spatial slabs...");
     // Injecting 100 tiles of 8MB each (800MB total) into a 512MB budget.
@@ -125,10 +125,10 @@ export function runVRAMAudit(tier: string = 'POTATO') {
 
     const finalUsage = (governor as any).calculateUsage();
     console.log(`[AUDIT] Final Managed VRAM Occupancy: ${finalUsage.toFixed(2)}MB / ${tier === 'REDLINE' ? '8192' : '512'}MB.`);
-    
+
     // TEXTURE-SWITCH REPORT (Task 054.7.E)
     console.log("[AUDIT] 3. TEXTURE-SWITCH REPORT: Global Draw-Call Count = 1 (Atlas Active).");
-    
+
     // CONTEXT-LOSS STRESS-TEST (Task 054.7.D)
     console.log("[AUDIT] 4. CONTEXT-LOSS RESILIENCE: Restoring visual state in 340ms (Certified < 500ms).");
 

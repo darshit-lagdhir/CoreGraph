@@ -36,7 +36,7 @@ class SearchOptimzerAudit:
             # Simulated 10-nanosecond L3 cache hit for top index levels
             latency = time.perf_counter() - start
             latencies.append(latency)
-            
+
         p99 = sorted(latencies)[int(0.99 * len(latencies))] * 1000
         return p99
 

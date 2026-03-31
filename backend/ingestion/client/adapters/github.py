@@ -9,13 +9,15 @@ except ImportError:
 
 from .base import EcosystemAdapter
 
+
 class GitHubAdapter(EcosystemAdapter):
     """
     Module 4 - Task 022: GitHub Source Scout.
-    GraphQL-native recursive extraction ensuring Source-of-Truth tracking and 
+    GraphQL-native recursive extraction ensuring Source-of-Truth tracking and
     extreme rate-limit preservation.
     """
-    __slots__ = ('_rate_limit_remaining', '_reset_time', '_hibernate_threshold')
+
+    __slots__ = ("_rate_limit_remaining", "_reset_time", "_hibernate_threshold")
 
     def __init__(self, client: Any):
         super().__init__(client)
@@ -25,46 +27,50 @@ class GitHubAdapter(EcosystemAdapter):
 
     async def extract_manifest(self, purl: str) -> AsyncGenerator[Dict[str, Any], None]:
         await self._enforce_pacing()
-        
-        parts = purl.replace('pkg:github/', '').split('/')
+
+        parts = purl.replace("pkg:github/", "").split("/")
         if len(parts) < 2:
             return
-        owner, repo = parts[0], parts[1].split('@')[0]
+        owner, repo = parts[0], parts[1].split("@")[0]
 
         query = self._build_graphql_query(owner, repo)
         payload = {"query": query}
-        
+
         response = None
-        if hasattr(self._client, 'execute_graphql'):
+        if hasattr(self._client, "execute_graphql"):
             response = await self._client.execute_graphql(payload)
-            
+
         if not response:
             return
-            
-        self._parse_rate_limit(response.get('data', {}).get('rateLimit', {}))
 
-        graphql_repo = response.get('data', {}).get('repository', {}) or {}
-        releases = graphql_repo.get('releases', {}).get('nodes', [])
-        
+        self._parse_rate_limit(response.get("data", {}).get("rateLimit", {}))
+
+        graphql_repo = response.get("data", {}).get("repository", {}) or {}
+        releases = graphql_repo.get("releases", {}).get("nodes", [])
+
         for release in releases:
             actor = self.extract_actor_identity(release.get("author", {}))
             commit_data = release.get("tagCommit", {})
-            signature_valid = commit_data.get("signature", {}).get("isValid", False) if commit_data.get("signature") else False
-            
+            signature_valid = (
+                commit_data.get("signature", {}).get("isValid", False)
+                if commit_data.get("signature")
+                else False
+            )
+
             yield {
                 "name": f"{owner}/{repo}",
                 "version": self.resolve_coordinates(release.get("tagName", "")),
                 "actor": actor,
                 "provenance": {
                     "commit_oid": commit_data.get("oid", ""),
-                    "signature_verified": signature_valid
-                }
+                    "signature_verified": signature_valid,
+                },
             }
 
     def _parse_rate_limit(self, rl_data: Dict[str, Any]) -> None:
         if rl_data:
-            self._rate_limit_remaining = rl_data.get('remaining', 5000)
-            reset_at = rl_data.get('resetAt')
+            self._rate_limit_remaining = rl_data.get("remaining", 5000)
+            reset_at = rl_data.get("resetAt")
             # Real-world UTC ISO8601 parsing would occur here
             self._reset_time = time.time() + 3600 if reset_at else 0.0
 
@@ -101,15 +107,15 @@ class GitHubAdapter(EcosystemAdapter):
     def resolve_coordinates(self, dependency_string: str) -> str:
         """Universal Versioning shim mapping Semantic strings to Git references."""
         v = dependency_string.lower().strip()
-        if v.startswith('v'):
+        if v.startswith("v"):
             return v[1:]
         return v
 
     def extract_actor_identity(self, manifest: Dict[str, Any]) -> Dict[str, Any]:
         """Extracts the underlying Social Actor to cross-reference PyPI/NPM ownership."""
-        user = manifest.get('user', {}) if manifest else {}
+        user = manifest.get("user", {}) if manifest else {}
         return {
             "name": manifest.get("login") or user.get("login", ""),
             "email": manifest.get("email") or user.get("email", ""),
-            "ecosystem_id": "github"
+            "ecosystem_id": "github",
         }

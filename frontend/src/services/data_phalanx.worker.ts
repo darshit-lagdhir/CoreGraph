@@ -5,7 +5,7 @@
 
 self.onmessage = (event: MessageEvent) => {
     const { slabId, buffer } = event.data;
-    
+
     if (!buffer || !(buffer instanceof ArrayBuffer)) {
         return;
     }
@@ -16,13 +16,13 @@ self.onmessage = (event: MessageEvent) => {
     const view = new DataView(buffer);
     const nodeStride = 16; // [ID:4, X:4, Y:4, RISK:4]
     const nodeCount = Math.floor(buffer.byteLength / nodeStride);
-    
+
     // 3. VERTEX BUFFER CONSTRUCTOR: Writing directly to WebGL-ready TypedArray (Task 053.3.III)
     const processedBuffer = new Float32Array(nodeCount * 4);
 
     for (let i = 0; i < nodeCount; i++) {
         const offset = i * nodeStride;
-        
+
         // Reading numerical primitives from contiguous memory
         const id = view.getUint32(offset, true);
         const x = view.getFloat32(offset + 4, true);

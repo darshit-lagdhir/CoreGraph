@@ -58,17 +58,17 @@ async def chaos_middleware(request: Request, call_next):
 
     # Call Next (Generate Response)
     response = await call_next(request)
-    
+
     # Extract data for chaos application (Basic Body/Headers)
     # Note: For simplicity, we wrap the response here or apply rules before.
     # To properly simulate packet drops/latency effectively, we often want pre-call logic.
-    
+
     status, _, headers = await chaos_manager.apply_chaos(target, None)
-    
+
     # 1. STATUS CODE DEGRADATION
     if status != 200:
         return Response(content="[CHAOS] Injected Network Failure.", status_code=status, headers=headers)
-        
+
     return response
 
 # 5. REST API ROUTING (Masquerading as deps.dev)

@@ -1,12 +1,14 @@
 import abc
 from typing import Dict, Any, AsyncGenerator
 
+
 class EcosystemAdapter(abc.ABC):
     """
     Module 4 - Task 022: Base Ecosystem Adapter.
     Polymorphic interface for cross-registry extraction.
     """
-    __slots__ = ('_client',)
+
+    __slots__ = ("_client",)
 
     def __init__(self, client: Any):
         self._client = client

@@ -35,10 +35,10 @@ CREATE OR REPLACE FUNCTION fn_archive_historical_state() RETURNS TRIGGER AS $$
 BEGIN
     -- 1. Close the current temporal range
     OLD.sys_period := tstzrange(lower(OLD.sys_period), now());
-    
+
     -- 2. Push to history partition (Simulated for Task 012)
     -- In full implementation, we'd use 'INSERT INTO package_history'
-    
+
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;

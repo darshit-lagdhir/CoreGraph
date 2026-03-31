@@ -6,7 +6,7 @@
 export class HeatmapManager {
     private densityTexture: any = null;
     private radiusGovernor: number = 1.0; // Dynamic Fill-Rate Protection
-    private slabDimension: number = 256;  // Sector Grid [256x256] 
+    private slabDimension: number = 256;  // Sector Grid [256x256]
     private frameBudgetMs: number = 16.6;  // 60FPS target
 
     constructor(tier: string = 'REDLINE') {
@@ -37,8 +37,8 @@ export class HeatmapManager {
     public ingestDensitySlab(slabBuffer: ArrayBuffer) {
         // 1. HEURISTIC CLUSTER PRUNING (Task 057.5.I)
         // Identifying and dropping 'Quiet Zones' to save GPU pixel-writes.
-        const activeSeedCount = slabBuffer.byteLength / 4; 
-        
+        const activeSeedCount = slabBuffer.byteLength / 4;
+
         // 2. DIRECT-BUFFER UPLOAD (Task 057.4.C)
         // Using gl.texSubImage2D for near-zero copy handoff from worker thread.
         const target = this.densityTexture ? this.densityTexture.handle : 'NONE';
@@ -72,12 +72,12 @@ export class HeatmapManager {
 export function runHeatmapAudit(tier: string = 'POTATO') {
     console.log("──────── HUD HEATMAP STABILITY AUDIT ─────────");
     console.log(`[AUDIT] 1. HARDWARE REVEAL: Target ${tier} Tier Simulation.`);
-    
+
     const manager = new HeatmapManager(tier);
 
     // SCALE CHALLENGE (Task 057.7.A)
     console.log("[AUDIT] 2. SCALE CHALLENGE: Zooming to Global Macro-View (3.84M Nodes)...");
-    
+
     // PATHOGEN WAVE INJECTION (Task 057.7.B)
     // Testing the zero-copy probability mapping under dynamic load.
     console.log("[AUDIT] 3. PATHOGEN WAVE: Injecting 10% global infection cluster...");

@@ -40,7 +40,7 @@ def test_ouroboros_cycle_detection():
                         assert response.status_code == 200
                         return
             except Exception: continue
-    
+
     pytest.skip("No Ouroboros anchor found in software ocean.")
 
 def test_infinite_descent_stack_defense():
@@ -51,7 +51,7 @@ def test_infinite_descent_stack_defense():
     response = client.get("/p/npm/chaos-abyss-anchor-0")
     if response.status_code == 404:
         pytest.skip("No abyssal anchor (chaos-abyss-anchor-0) found.")
-    
+
     assert response.status_code == 200
     data = response.json()
     latest_v = data["versions"][-1]
@@ -67,7 +67,7 @@ def test_spiderweb_hub_io_saturation():
     response = client.get("/p/npm/chaos-spiderweb-0")
     if response.status_code == 404:
         pytest.skip("No spiderweb anchor (chaos-spiderweb-0) found.")
-        
+
     assert response.status_code == 200
     data = response.json()
     latest_v = data["versions"][-1]

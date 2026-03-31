@@ -34,7 +34,7 @@ void main() {
     // float visibility = step(u_threshold, max(risk_src, risk_dst));
     // (Simplified for kernel: checks distance and existence)
     float dist = distance(p_src.xy, p_dst.xy);
-    v_visibility = step(0.001, dist) * step(dist, 1000.0); 
+    v_visibility = step(0.001, dist) * step(dist, 1000.0);
 
     // 3. QUAD ORIENTATION FORMULA (Task 058.9)
     // Stretching the 1x1 Master Instance to span the gap.
@@ -44,7 +44,7 @@ void main() {
 
     // v_pos = p_src + (dir * a_quad_pos.x) + (normal * (a_quad_pos.y - 0.5) * thickness)
     vec3 v_pos = p_src + (dir * a_quad_pos.x) + (normal * (a_quad_pos.y - 0.5) * thickness);
-    
+
     v_uv = a_quad_pos;
     gl_Position = u_view_projection * vec4(v_pos, 1.0);
 }

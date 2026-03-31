@@ -64,20 +64,20 @@ void apply_stochastic_discard(float target_opacity, vec2 frag_coord) {
 vec3 transform_geometry(vec3 local_pos, float leviathan_factor, vec3 velocity) {
     // Morphing factor (Task 052.5.I): Linear interpolation of mesh vertices.
     float morph = mix(1.0, 1.4, leviathan_factor);
-    
+
     // Stretch factor (Task 052.5.III): Scalar product of velocity and geometry alignment.
     float stretch = 1.0 + length(velocity) * 0.01;
-    
+
     return local_pos * morph * stretch;
 }
 
 void main() {
     // Example analytical throughput: 100% branchless path.
-    float node_risk = 0.85; 
+    float node_risk = 0.85;
     vec3 node_color = compute_forensic_color(node_risk);
-    
+
     // Applying zero-sort transparency for overlapping spiderwebs.
     apply_stochastic_discard(0.7, gl_FragCoord.xy);
-    
+
     gl_FragColor = vec4(node_color, 1.0);
 }

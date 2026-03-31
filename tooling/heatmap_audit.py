@@ -49,11 +49,11 @@ if __name__ == "__main__":
     # Certification on POTATO hardware (Tier 1) as mandated.
     runner = HeatmapAuditRunner(tier="POTATO")
     print(f"[AUDIT] Hardware Reveal: POTATO (Intel Iris Pro / Shared VRAM / Shared TDP)")
-    
+
     runner.run_scale_challenge()
     runner.run_pathogen_wave_injection()
     runner.run_fill_rate_governor_test()
-    
+
     # Analytical Fidelity Test (Task 057.7.D / 057.7.E)
     print(f"[AUDIT] 4. ANALYTICAL FIDELITY SEAL: Heatmap Hotspots vs Database Ground-Truth...")
     print(f"[AUDIT] Mass-Distribution Match: 99.98% (Certified Lossless Global Aggregation).")

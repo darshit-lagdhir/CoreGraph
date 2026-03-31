@@ -7,9 +7,9 @@ export class PredictionEngine {
     private velocity: { x: number, y: number } = { x: 0, y: 0 };
     private lastPos: { x: number, y: number } = { x: 0, y: 0 };
     // Stability Constant: K_buffer (Task 056.9)
-    private horizonFactor: number = 1.1; 
+    private horizonFactor: number = 1.1;
     // Disk Seek Latency (T_disk) from host silicon sensing.
-    private diskLatencyMs: number = 2; 
+    private diskLatencyMs: number = 2;
 
     constructor(tier: string = 'REDLINE') {
         this.handshakeHardware(tier);
@@ -23,7 +23,7 @@ export class PredictionEngine {
         // REDLINE (Gen5 NVMe): Minimal horizon needed.
         // POTATO (Legacy HDD): Massive 3.0x expansion to hide high seek latency.
         this.horizonFactor = tier === 'REDLINE' ? 1.1 : 3.0;
-        this.diskLatencyMs = tier === 'REDLINE' ? 2 : 50; 
+        this.diskLatencyMs = tier === 'REDLINE' ? 2 : 50;
         console.log(`[HUD] Prediction Engine: Silicon Handshake (Horizon: ${this.horizonFactor}x / Latency-Mask: ${this.diskLatencyMs}ms).`);
     }
 
@@ -34,12 +34,12 @@ export class PredictionEngine {
     public updateMomentum(posX: number, posY: number) {
         const dx = posX - this.lastPos.x;
         const dy = posY - this.lastPos.y;
-        
+
         // LOW-PASS VELOCITY FILTERING (Task 056.8.C)
         // Smoothing momentum to prevent erratic pre-fetching from low-end mouse jitter.
         this.velocity.x = this.velocity.x * 0.85 + dx * 0.15;
         this.velocity.y = this.velocity.y * 0.85 + dy * 0.15;
-        
+
         this.lastPos = { x: posX, y: posY };
     }
 
@@ -53,7 +53,7 @@ export class PredictionEngine {
         const T_pipeline_est = this.diskLatencyMs + 20; // Avg parse/upload cost
         const stretchX = this.velocity.x * T_pipeline_est * this.horizonFactor;
         const stretchY = this.velocity.y * T_pipeline_est * this.horizonFactor;
-        
+
         return {
             xMin: viewBox.xMin + Math.min(0, stretchX),
             xMax: viewBox.xMax + Math.max(0, stretchX),
@@ -87,9 +87,9 @@ export class PredictionEngine {
 export function runPredictiveAudit(tier: string = 'POTATO') {
     console.log("──────── HUD PREDICTIVE NAVIGATION AUDIT ─────────");
     console.log(`[AUDIT] 1. HARDWARE REVEAL: Target ${tier} Tier Simulation.`);
-    
+
     const engine = new PredictionEngine(tier);
-    
+
     // PAN-VELOCITY CHALLENGE (Task 056.7.A)
     console.log("[AUDIT] 2. VELOCITY CHALLENGE: Initiating high-speed 144Hz automated fly-through...");
     for (let i = 0; i < 144; i++) {
@@ -101,10 +101,10 @@ export function runPredictiveAudit(tier: string = 'POTATO') {
     console.log("[AUDIT] 3. LATENCY SIMULATION: Injecting artificial 500ms disk seek-lag...");
     const expanded = engine.calculateLeadingFrustum({ xMin: 0, xMax: 100, yMin: 0, yMax: 100 });
     console.log(`[AUDIT] Horizon Expansion Vector: [${Math.abs(expanded.xMax - 100).toFixed(0)} units ahead].`);
-    
+
     // ZERO-POP CERTIFICATION (Task 056.7.B)
     console.log("[SUCCESS] Predicted Tile Hit Rate: 99.8% (Certified Zero Visible Popping).");
-    
+
     // SHADER-BLUR VISUAL SEAL (Task 056.7.D)
     // v_pos += velocity_vec * u_blur_strength
     const blur = engine.getMotionBlurUniforms();

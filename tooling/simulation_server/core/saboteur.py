@@ -59,18 +59,18 @@ class PayloadSaboteur:
 if __name__ == "__main__":
     saboteur = PayloadSaboteur()
     test_json = '{"data": {"nodes": [{"id": "1", "purl": "pkg:npm/react"}]}}'
-    
+
     print("──────── PAYLOAD SABOTEUR SHIELD AUDIT ─────────")
     # Test Truncation
     saboteur.configure({"test": {"mode": "TRUNCATE", "probability": 1.0}})
     res = saboteur.apply_sabotage(test_json, "test")
     print(f"[MUTATION] Truncated Payload: {res}")
-    
+
     # Test Null-Byte
     saboteur.configure({"test": {"mode": "NULL_BYTE", "probability": 1.0}})
     res = saboteur.apply_sabotage(test_json, "test")
     print(f"[MUTATION] Null-Byte Poison: {res.encode('utf-8')}")
-    
+
     # Test Type Bomb
     saboteur.configure({"test": {"mode": "TYPE_BOMB", "probability": 1.0}})
     res = saboteur.apply_sabotage(test_json, "test")

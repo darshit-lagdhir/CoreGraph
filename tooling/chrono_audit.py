@@ -49,11 +49,11 @@ if __name__ == "__main__":
     # Certification on POTATO hardware (Tier 1) as mandated.
     runner = ChronoAuditRunner(tier="POTATO")
     print(f"[AUDIT] Hardware Reveal: POTATO (Legacy 5400RPM HDD / 4GB Shared RAM)")
-    
+
     runner.run_scrub_speed_challenge()
     runner.run_disk_bottleneck_simulation()
     runner.run_shader_lerp_seal()
-    
+
     # 4. Memory Footprint Seal (Task 059.7.D)
     print(f"[AUDIT] 4. MEMORY FOOTPRINT SEAL: Total Delta Cache 32MB (Certified Static).")
     print("[SUCCESS] Temporal-Scrubber Interface Verified.")

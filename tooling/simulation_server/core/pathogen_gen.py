@@ -19,7 +19,7 @@ class PathogenGenerator:
 
     def inject_cve(self, target_type: str = "FOUNDATIONAL") -> Dict[str, Any]:
         cve_id = f"CVE-2026-{self.rng.randint(1000, 9999)}"
-        
+
         # Target Selection Matrix
         if target_type == "FOUNDATIONAL":
             purl = "pkg:npm/core-utility-hub"
@@ -30,7 +30,7 @@ class PathogenGenerator:
         else: # SOCIAL_TRUST
             purl = "pkg:github/trusted-maintainer-lib"
             cvss = 8.4
-            
+
         return {
             "cve_id": cve_id,
             "patient_zero": purl,

@@ -45,13 +45,13 @@ class CursorResolver:
         start_index = 0
         if after:
             start_index = self.decode_cursor(after) + 1
-        
+
         # Enforce GitHub-style 100-node limit
         limit = min(first, 100)
         end_index = min(start_index + limit, total_nodes)
-        
+
         has_next_page = end_index < total_nodes
-        
+
         return start_index, end_index, has_next_page
 
 class SimulationResolver:
@@ -72,7 +72,7 @@ class SimulationResolver:
         purl = f"pkg:{ecosystem}/{name}"
         if self.binary_engine:
             return self.binary_engine.fetch_node(purl)
-        
+
         # Fallback to filesystem for legacy JSON support
         json_path = os.path.join(self.fixtures_path, ecosystem, f"{name}.json")
         if os.path.exists(json_path):
@@ -91,7 +91,7 @@ if __name__ == "__main__":
     print(f"[RESOLVER] Index 99 -> Cursor: {c1}")
     idx = resolver.decode_cursor(c1)
     print(f"[RESOLVER] Decoded: {idx}")
-    
+
     # Test slicing
     start, end, exists = resolver.calculate_slice(first=100, after=c1, total_nodes=1000)
     print(f"[SLICER] After '{c1}' (Index 99), Fetch 100 -> Range: {start}-{end} | Next: {exists}")

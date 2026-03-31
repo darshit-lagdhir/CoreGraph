@@ -28,7 +28,7 @@ export class MasterHUDOrchestrator {
         // VISUAL-HARDWARE HANDSHAKE (Task 060.2.A)
         // Auto-detecting the Graphics Signature to generate the Universal Policy.
         this.tier = this.autoDetectSiliconTier();
-        
+
         // Initializing the 'Visual Phalanx' for the detected tier.
         this.supervisor = new RenderingSupervisor(gl, this.tier);
         this.phalanx = new DataPhalanxOrchestrator(this.tier);
@@ -39,7 +39,7 @@ export class MasterHUDOrchestrator {
         this.heatmap = new HeatmapManager(this.tier);
         this.edge = new EdgeManager(this.tier);
         this.chrono = new ChronoManager(this.tier);
-        
+
         console.log(`[HUD] Master Orchestrator: Unified Visual Policy generated for ${this.tier} tier.`);
         console.log(`[HUD] Master Orchestrator: Total System Seal applied. Interface is universal.`);
     }
@@ -56,26 +56,26 @@ export class MasterHUDOrchestrator {
      */
     public nextFrame(viewState: { x: number, y: number, zoom: number, alpha: number, frustum: { xMin: number, xMax: number, yMin: number, yMax: number } }) {
         const frameStart = performance.now();
-        
+
         // 1. PREDICTIVE NAVIGATION: Anticipating the analyst's discover path.
         this.prediction.updateMomentum(viewState.x, viewState.y);
         const focusArea = this.prediction.calculateLeadingFrustum(viewState.frustum);
-        
+
         // 2. DATA PHALANX: Pre-fetching spatial tiles in background threads.
         // Ingesting a binary simulation slab (Task 053).
         this.phalanx.ingestBinarySlab('sector_delta', new ArrayBuffer(0));
-        
+
         // 3. VRAM GOVERNOR: Managing residency to prevent iGPU buffer overflow.
         this.vram.requestResource('active_viewport', 64 * 1024 * 1024);
-        
+
         // 4. RENDERING KERNEL: LOD-pruning and Primitive Rasterization.
         this.supervisor.pruneViewport(focusArea);
         this.supervisor.render(viewState.zoom);
-        
+
         // 5. HUD LAYERS: Weaving labels and edges across the topology.
         this.label.updateLabelPhalanx([]);
         this.edge.synchronizeTopologicalMap(new Uint32Array(0));
-        
+
         // 6. CHRONO KERNEL: Interpolating historical risk at the pixel level.
         this.chrono.updateChronologicalScrub(viewState.alpha);
 
@@ -107,11 +107,11 @@ export class MasterHUDOrchestrator {
 export function runUniversalHUDCertification(targetTier: string = 'POTATO') {
     console.log("──────── UNIVERSAL HUD TOTAL SYSTEM AUDIT ────────");
     console.log(`[AUDIT] 1. HARDWARE REVEAL: Running Gauntlet for ${targetTier} Tier...`);
-    
+
     // REDLINE PERFORMANCE SHOWCASE
     const orchestrator = new MasterHUDOrchestrator({});
     console.log("[AUDIT] 2. CAPACITY TEST: Rendering 3.84M Nodes + 10M Edges + Temporal Scrub...");
-    
+
     orchestrator.nextFrame({
         x: 0, y: 0, zoom: 0.5, alpha: 0.5,
         frustum: { xMin: -100, xMax: 100, yMin: -100, yMax: 100 }

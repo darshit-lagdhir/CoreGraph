@@ -22,7 +22,7 @@ class RotGenerator:
         Executing 'Silent Rot' scenarios.
         """
         purl = f"pkg:npm/rot-node-{self.rng.randint(0, 1000)}"
-        
+
         if scenario == "SILENT_DEATH":
             return {"purl": purl, "status": "DEAD", "days_inactive": 720, "forced_vitality": False}
         elif scenario == "ZOMBIE_TAKEOVER":

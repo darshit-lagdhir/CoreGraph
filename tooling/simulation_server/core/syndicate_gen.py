@@ -20,11 +20,11 @@ class SyndicateGenerator:
     def generate_syndicate(self, size: int = 3, strategy: str = "TRUST_BUILDER") -> List[Dict[str, Any]]:
         syndicate_id = str(uuid.uuid4())[:8]
         identities = []
-        
+
         # Shared Hidden Markers (The Shadow Infrastructure)
         shared_gpg_key = f"0x{self.rng.getrandbits(64):x}"
         shared_ip_subnet = f"192.168.{self.rng.randint(0,255)}.0/24"
-        
+
         for i in range(size):
             identities.append({
                 "syndicate_id": syndicate_id,

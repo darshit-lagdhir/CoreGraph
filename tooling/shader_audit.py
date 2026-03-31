@@ -47,11 +47,11 @@ if __name__ == "__main__":
     # Certification on POTATO hardware (Tier 1) as mandated.
     runner = ShaderAuditRunner(tier="POTATO")
     print(f"[AUDIT] Hardware Reveal: POTATO (Intel UHD / Shared VRAM Bus / Limited EUs)")
-    
+
     runner.run_instruction_challenge()
     runner.run_divergence_stress_test()
     runner.run_quantization_report()
-    
+
     # Stochastic Alpha Seal (Task 052.7.D)
     print(f"[AUDIT] 4. STOCHASTIC TRANSPARENCY SEAL: Zero-Sort Alpha Depth stress-test.")
     print(f"[SUCCESS] Fixed-Time Transparency: No sorting stalls during 3.84M spiderweb overlap.")

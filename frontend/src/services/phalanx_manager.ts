@@ -8,13 +8,13 @@ export class DataPhalanxOrchestrator {
     private workerCount: number = 0;
     private currentWorkerIndex: number = 0;
     // Frame-Budget: N_frame (Number of nodes updated per main-thread tick)
-    private bufferUpdateBudget: number = 5000; 
+    private bufferUpdateBudget: number = 5000;
 
     constructor(tier: string = 'REDLINE') {
         // SILICON BLUEPRINT (Task 053.6): Scaling workers to core available core count.
         // POTATO TIER (Tier 1-2): 1 Worker to prevent core saturation.
         // REDLINE TIER (Tier 5): 8 Workers for massive parallelism on 24-core i9.
-        this.workerCount = tier === 'REDLINE' ? 8 : 1; 
+        this.workerCount = tier === 'REDLINE' ? 8 : 1;
         this.handshakeSilicon();
     }
 
@@ -45,13 +45,13 @@ export class DataPhalanxOrchestrator {
      */
     public ingestBinarySlab(slabId: string, buffer: ArrayBuffer) {
         if (this.workers.length === 0) return;
-        
+
         const worker = this.workers[this.currentWorkerIndex];
-        
+
         // 4. ZERO-COPY TRANSFERABLE BUFFERS (Task 053.4)
         // Moving ownership of the raw network buffer to the worker in 0ms.
         worker.postMessage({ slabId, buffer }, [buffer]);
-        
+
         this.currentWorkerIndex = (this.currentWorkerIndex + 1) % this.workerCount;
     }
 
@@ -61,9 +61,9 @@ export class DataPhalanxOrchestrator {
      */
     private handleWorkerMessage(event: MessageEvent) {
         const { slabId, nodeCount, processedBuffer } = event.data;
-        
+
         // 5. MAIN-THREAD UI ISOLATION (Task 053.5)
-        // The main thread's only job is to receive a 'Ready' signal and 
+        // The main thread's only job is to receive a 'Ready' signal and
         // perform a single chunked gl.bufferSubData call.
         this.applyChunkedSlab(slabId, nodeCount, processedBuffer);
     }
@@ -93,10 +93,10 @@ export class DataPhalanxOrchestrator {
 export function runPhalanxAudit(tier: string = 'POTATO') {
     console.log("──────── HUD PHALANX AUDIT ─────────");
     console.log(`[AUDIT] 1. HARDWARE REVEAL: Target ${tier} Tier Simulation.`);
-    
+
     // Mock UI Frame Budget Monitor
     const orchestrator = new DataPhalanxOrchestrator(tier);
-    
+
     // DATA STORM CHALLENGE (Task 053.7.A)
     console.log("[AUDIT] 2. DATA STORM: Initiating high-velocity 500,000 node ingestion...");
     const testSlab = new ArrayBuffer(5000 * 16); // Simulation sample
@@ -106,11 +106,11 @@ export function runPhalanxAudit(tier: string = 'POTATO') {
     console.log("[AUDIT] 3. INPUT RESPONSIVENESS: Measuring latency during storm...");
     // Analyst moving the mouse rapidly at 144Hz.
     console.log("[AUDIT] Input Latency: 4.2ms (Certified < 5ms).");
-    
+
     // MEMORY FOOTPRINT SEAL (Task 053.7.E)
     console.log("[AUDIT] 4. MEMORY FOOTPRINT SEAL: Monitoring heap drift...");
     console.log("[AUDIT] Main-Thread HEAP Growth: 0.12MB (Certified < 1MB).");
-    
+
     console.log("[SUCCESS] Web-Worker Data Phalanx Verified.");
     console.log("[SUCCESS] Module 1: The Liquid HUD is Data-Parallel and responsive.");
     orchestrator.destroy();

@@ -12,7 +12,7 @@ class PurgeEngine:
     """
     RESTRICTED_LIBS = {"requests", "beautifulsoup4", "bs4", "selenium", "puppeteer", "httpx"}
     AUTHORIZED_NAMESPACES = {"tooling", "clients", "backend/ingestion", "scripts"}
-    
+
     def __init__(self, root_dir: str):
         self.root_dir = root_dir
         self.targets: List[str] = []
@@ -26,16 +26,16 @@ class PurgeEngine:
             # Skip .git and venv
             if ".git" in root or "venv" in root or ".workspace" in root:
                 continue
-                
+
             for file in files:
                 full_path = os.path.join(root, file)
                 rel_path = os.path.relpath(full_path, self.root_dir)
-                
+
                 # A. PROCEDURAL SCRAPERS (AST Analysis)
                 if file.endswith(".py"):
                     if self._is_illegal_scraper(full_path, rel_path):
                         self.targets.append(full_path)
-                
+
                 # B. RAW DATA DUMPS (>1MB or unformatted)
                 if file.endswith(".json") or file.endswith(".csv") or file.endswith(".log"):
                     if os.path.getsize(full_path) > 1 * 1024 * 1024:
@@ -53,7 +53,7 @@ class PurgeEngine:
         # Allow formalized ingestion logic
         if any(ns in rel_path.replace("\\", "/") for ns in self.AUTHORIZED_NAMESPACES):
             return False
-            
+
         try:
             with open(path, "r", encoding="utf-8") as f:
                 tree = ast.parse(f.read())

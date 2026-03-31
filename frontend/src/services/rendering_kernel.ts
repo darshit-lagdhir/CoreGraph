@@ -107,7 +107,7 @@ export class RenderingSupervisor {
 export function runVisualAudit(tier: string = 'POTATO') {
     console.log("──────── HUD VISUAL AUDIT ─────────");
     console.log(`[AUDIT] 1. HARDWARE REVEAL: Target ${tier} Tier Simulation.`);
-    
+
     // Mock WebGL Context
     const mockGL = {
         createBuffer: () => ({}),
@@ -129,12 +129,11 @@ export function runVisualAudit(tier: string = 'POTATO') {
     // 3.84M nodes * 4 float attributes * 4 bytes = ~62MB (Standard)
     // 128MB resident VBO budget
     console.log("[AUDIT] VRAM Usage Gauge: [■■■■□□□□□□] 128MB / 4096MB (Stable)");
-    
+
     // 4. SUDDEN POTATO TRANSITION (Task 051.7.B)
     console.log("[AUDIT] 4. SUDDEN POTATO: Limiting GPU Bandwidth to 5MB/s...");
     console.log("[SUCCESS] LOD State-Machine stepped down: Frame-rate remains 62FPS.");
-    
+
     console.log("[SUCCESS] Adaptive WebGL Rendering Kernel Verified.");
     supervisor.destroy();
 }
-

@@ -7,7 +7,7 @@ export class EdgeManager {
     private instanceBuffer: any = null;
     private instanceWord: Uint32Array;
     // 1M Simultaneous Edges per single draw call (Task 058.1)
-    private maxBufferCapacity: number = 1000000; 
+    private maxBufferCapacity: number = 1000000;
 
     constructor(tier: string = 'REDLINE') {
         // [Source_Index, Target_Index] -> 8 bytes per edge instance.
@@ -41,11 +41,11 @@ export class EdgeManager {
         // 1. ASYNCHRONOUS EDGE THROTTLING (Task 058.8.II)
         // Prioritizing 'Near-Camera Edges' to maintain HUD 144Hz lock.
         const activeEdgeCount = Math.min(edges.length / 2, this.maxBufferCapacity);
-        
+
         // 2. ZERO-COPY INTENTION (Task 058.4.C)
         // Using gl.bufferSubData to stream IDs directly to the residency-pinned word.
         this.instanceWord.set(edges.subarray(0, activeEdgeCount * 2));
-        
+
         const target = this.instanceBuffer ? this.instanceBuffer.handle : 'NONE';
         console.log(`[HUD] Edge Mapper: Synchronized ${activeEdgeCount} links to ${target}.`);
         console.log("[HUD] Edge Mapper: Synthesizing 15M Link Spiderweb in 1 Draw Call (Verified).");
@@ -75,12 +75,12 @@ export class EdgeManager {
 export function runEdgeAudit(tier: string = 'POTATO') {
     console.log("──────── HUD EDGE EFFICIENCY AUDIT ─────────");
     console.log(`[AUDIT] 1. HARDWARE REVEAL: Target ${tier} Tier Simulation.`);
-    
+
     const manager = new EdgeManager(tier);
 
     // SCALE CHALLENGE (Task 058.7.A)
     console.log("[AUDIT] 2. SCALE CHALLENGE: Zooming to Leviathan Core (1M Visible Links)...");
-    
+
     // DENSITY STRESS-TEST (Task 058.7.B)
     // Testing the ability to draw 1M primitives in a single command.
     manager.synchronizeTopologicalMap(new Uint32Array(1000000 * 2));

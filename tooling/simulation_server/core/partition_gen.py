@@ -20,16 +20,16 @@ class PartitionGenerator:
     def inject_ghost_island(self, size: int = 50, conductance: float = 0.01) -> List[Dict[str, Any]]:
         island_id = str(uuid.uuid4())[:8]
         nodes = []
-        
+
         # Dense Internal Mesh (High Density)
         for i in range(size):
             purl = f"pkg:npm/ghost-node-{island_id}-{i}"
             deps = [f"pkg:npm/ghost-node-{island_id}-{self.rng.randint(0, size-1)}" for _ in range(3)]
-            
+
             # Low External Conductance
             if self.rng.random() < conductance:
                 deps.append("pkg:npm/reputable-core-lib")
-                
+
             nodes.append({
                 "purl": purl,
                 "dependencies": deps,

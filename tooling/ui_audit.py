@@ -49,11 +49,11 @@ if __name__ == "__main__":
     # Certification on POTATO hardware (Tier 1) as mandated.
     runner = UIAuditRunner(tier="POTATO")
     print(f"[AUDIT] Hardware Reveal: POTATO (Legacy Integrated GPU / 2-Core Silicon)")
-    
+
     runner.run_label_scaling_challenge()
     runner.run_dom_vs_webgl_comparison()
     runner.run_interaction_responsiveness_test()
-    
+
     # Legibility Seal (Task 055.7.E)
     print(f"[AUDIT] 4. LEGIBILITY SEAL: Forensic Visual Probe at 1000% zoom...")
     print(f"[AUDIT] SDF Epsilon Sharpness: 0.98 (Razor-sharp forensics verified).")

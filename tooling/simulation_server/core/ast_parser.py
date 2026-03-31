@@ -33,7 +33,7 @@ class OSINTQueryAnalyzer(Visitor):
                 for arg in node.arguments:
                     val = getattr(arg.value, 'value', None)
                     args[arg.name.value] = val
-                    
+
             # STRICT ENFORCEMENT: GitHub v4 limits 'first' to 100 nodes.
             if "first" in args and args["first"] > 100:
                  raise ValueError("GraphQL Error: first must be <= 100")

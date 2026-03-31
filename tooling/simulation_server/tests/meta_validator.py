@@ -47,16 +47,16 @@ class MetaValidator:
         """
         start = time.perf_counter()
         errors = []
-        
+
         # 1. STRUCTURAL AUDIT (Two-Pass)
         # Pass 1: Static Type Alignment
         # Pass 2: Live Endpoint Interception
-        
+
         # Example validation logic for 'GitHub v4' Masquerade
         if schema_name == "github_v4_introspection.json":
             if "purl" in fixture_data and not isinstance(fixture_data["purl"], str):
                 errors.append(f"Type Mismatch: purl must be String, got {type(fixture_data['purl'])}")
-                
+
         latency = (time.perf_counter() - start) * 1000
         return ValidationResult(
             endpoint=schema_name,
@@ -68,13 +68,13 @@ class MetaValidator:
 if __name__ == "__main__":
     validator = MetaValidator()
     validator.load_truth_models()
-    
+
     async def run_audit():
         print("──────── SIMULATOR META-VALIDATION AUDIT ─────────")
         # Valid Mock
         res = await validator.validate_fixture({"purl": "pkg:npm/react", "version": "18.2.0"}, "github_v4_introspection.json")
         print(f"[META] GitHub v4 Compliance: {'PASSED' if res.compliant else 'FAILED'} | Latency: {res.latency_ms:.4f}ms")
-        
+
         # Invalid Mock (Type Mismatch)
         res = await validator.validate_fixture({"purl": 12345}, "github_v4_introspection.json")
         print(f"[META] Invalid Mock Detection: {'PASSED' if not res.compliant else 'FAILED'} | Errors: {res.errors}")

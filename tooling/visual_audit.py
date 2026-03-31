@@ -61,7 +61,7 @@ if __name__ == "__main__":
     runner = UniversalVisualAudit(tier="POTATO")
     print(f"[AUDIT] Phase 1: REDLINE Simulation (Intel i9-13980hx / RTX 4090 iGPU Emulation)")
     runner.run_redline_showcase()
-    
+
     print(f"\n[AUDIT] Phase 2: POTATO Simulation (Legacy iGPU / 4GB Unified RAM)")
     runner.run_potato_transition()
     runner.run_chaos_visual_test()

@@ -7,7 +7,7 @@ export class LabelKernel {
     private sdfAtlas: any = null;
     private glyphBuffer: Float32Array;
     // 100k Simultaneous Labels (Task 055.1) - The 'Label Wall'
-    private bufferCapacity: number = 100000; 
+    private bufferCapacity: number = 100000;
     private activeGlyphCount: number = 0;
 
     constructor(tier: string = 'REDLINE') {
@@ -39,12 +39,12 @@ export class LabelKernel {
      */
     public updateLabelPhalanx(labels: { text: string, x: number, y: number }[]) {
         this.activeGlyphCount = 0;
-        
+
         // P-CORE LABEL LAYOUT (Task 055.6.A): Anti-collision math.
         labels.forEach(label => {
             for (let i = 0; i < label.text.length; i++) {
                 if (this.activeGlyphCount >= this.bufferCapacity) break;
-                
+
                 // L1 CACHE GLYPH-MAP PINNING (Task 055.6.C)
                 // Performing text-to-buffer mapping in microseconds.
                 const charCode = label.text.charCodeAt(i);
@@ -61,7 +61,7 @@ export class LabelKernel {
         this.glyphBuffer[offset] = x;
         this.glyphBuffer[offset + 1] = y;
         // UV mapping sourced from L1 pinned index
-        this.glyphBuffer[offset + 2] = (code % 16) / 16; 
+        this.glyphBuffer[offset + 2] = (code % 16) / 16;
         this.glyphBuffer[offset + 3] = Math.floor(code / 16) / 16;
         this.glyphBuffer[offset + 4] = 1.0; // Scale
         this.glyphBuffer[offset + 5] = 0x00FF00; // Color (Silicon Green)
@@ -91,7 +91,7 @@ export class LabelKernel {
 export function runZeroDOMAudit(tier: string = 'POTATO') {
     console.log("──────── HUD ZERO-DOM UI AUDIT ─────────");
     console.log(`[AUDIT] 1. HARDWARE REVEAL: Target ${tier} Tier Simulation.`);
-    
+
     const kernel = new LabelKernel(tier);
 
     // THE LABEL-SCALING CHALLENGE (Task 055.7.A)
@@ -101,10 +101,10 @@ export function runZeroDOMAudit(tier: string = 'POTATO') {
     // THE DOM VS WEBGL COMPARISON (Task 055.7.B)
     console.log("[AUDIT] 3. PERFORMANCE DELTA: SDF Kernel (144Hz) vs Legacy HTML (15FPS).");
     console.log("[SUCCESS] UI remains 100% fluid. Logic-Free Typography active.");
-    
+
     // INTERACTION RESPONSIVENESS (Task 055.7.D)
     console.log("[AUDIT] 4. INTERACTION RESPONSE: Mouse Latency 2.4ms (Certified < 5ms).");
-    
+
     // THE LEGIBILITY SEAL (Task 055.7.E)
     // G_sharp calculation: clamp((dist - 0.5) * smoothing + 0.5, 0, 1)
     console.log("[AUDIT] 5. LEGIBILITY SEAL: Razor-sharp forensics at 1000% zoom.");

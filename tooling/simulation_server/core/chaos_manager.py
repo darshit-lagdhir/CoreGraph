@@ -63,7 +63,7 @@ class AdaptiveChaosManager:
         Returns: (status_code, modified_data, headers)
         """
         rule = self.rules.get(target, ChaosRule.NONE)
-        
+
         # If no explicit rule, apply stochastic background failure if active
         if rule == ChaosRule.NONE and self.is_active:
             if random.random() < self.failure_rate:
@@ -101,20 +101,20 @@ chaos_manager = AdaptiveChaosManager()
 if __name__ == "__main__":
     print("──────── ADAPTIVE CHAOS AUDIT ─────────")
     manager = AdaptiveChaosManager(t_coeff=1.0)
-    
+
     async def run_audit():
         print("[AUDIT] Setting explicit rule: ERROR_429")
         manager.set_rule("global", ChaosRule.ERROR_429)
         status, _, _ = await manager.apply_chaos("global")
         print(f"[NOMINAL] Result: {status}")
-        
+
         print("\n[AUDIT] Testing Latency stochastic falloff...")
         manager.clear_rules()
         manager.latency_ms = 100
         start = time.perf_counter()
         await manager.apply_chaos("global") # Might sleep
         print(f"[NOMINAL] Duration: {(time.perf_counter() - start)*1000:.2f}ms")
-        
+
         print("\n[SUCCESS] Chaos Manager API Verified.")
 
     asyncio.run(run_audit())

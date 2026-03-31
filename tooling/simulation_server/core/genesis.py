@@ -70,7 +70,7 @@ class StreamingGenesis:
             # Sorting manifest lexicographically to enable O(log N) Binary Search (Task 031.4)
             print(f"[GENESIS] Sorting 3.84M Manifest Entries...")
             self.index_data.sort(key=lambda x: x[0])
-            
+
             header_size = 8 + (len(self.index_data) * 144)
             print(f"[GENESIS] Re-indexing Header: {len(self.index_data)} nodes | Header Size: {header_size / (1024**2):.2f} MB")
 

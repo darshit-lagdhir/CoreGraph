@@ -49,11 +49,11 @@ if __name__ == "__main__":
     # Certification on POTATO hardware (Tier 1) as mandated.
     runner = EdgeAuditRunner(tier="POTATO")
     print(f"[AUDIT] Hardware Reveal: POTATO (Legacy iGPU Silicon / 4GB Shared Memory)")
-    
+
     runner.run_scale_challenge()
     runner.run_zero_cpu_coordination_test()
     runner.run_potato_bottleneck_test()
-    
+
     # Memory Footprint Seal (Task 058.7.E)
     print(f"[AUDIT] 4. VRAM FOOTPRINT SEAL: Total Relational Memory 8.0MB (Certified < 128MB).")
     print("[SUCCESS] Instanced-Edge Architecture Verified.")

@@ -23,7 +23,7 @@ void main() {
     // 1. Density-Seed Sampling (Task 057.2.B)
     // Low-resolution accumulation pass.
     vec4 density_data = texture2D(u_density_texture, v_tex_coord);
-    
+
     // 2. Multi-Channel Risk Mapping (Task 057.3.III)
     // R: Pathogen Risk | G: Ecosystem Vitality | B: Dependency Density
     float risk = density_data.r;
@@ -39,7 +39,7 @@ void main() {
     // 4. Fragment Coalescence (Additive Blending)
     // Splat intensity scaling: I = (R/P) * log10(P+1)
     float intensity = risk * u_radius_governor;
-    
+
     // Liquid Risk Nebula output
     gl_FragColor = vec4(vec3(1.0, 0.2, 0.1) * intensity, intensity);
 }

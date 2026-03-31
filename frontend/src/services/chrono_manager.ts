@@ -7,7 +7,7 @@ export class ChronoManager {
     private bufferA: any = null; // Residency-pinned state at T_start
     private bufferB: any = null; // Residency-pinned state at T_end
     // Global Interpolation Weight (Task 059.9)
-    private timeAlpha: number = 0.0; 
+    private timeAlpha: number = 0.0;
     private lookAheadSize: number = 32 * 1024 * 1024; // 32MB Circular Delta-Buffer
 
     constructor(tier: string = 'REDLINE') {
@@ -40,7 +40,7 @@ export class ChronoManager {
         // SEQUENTIAL TIMELINE FENCING (Task 059.8.II)
         // Ensuring topological truth by ignoring out-of-order delta packets.
         const packetAge = parseInt(chronoID.split('_')[1]);
-        
+
         // ZERO-COPY TRANSFER (Task 059.4.C)
         // Direct move from Worker RAM to GPU sub-buffer.
         const bytes = slab.byteLength;
@@ -65,7 +65,7 @@ export class ChronoManager {
         // vec3 current_pos = mix(pos_a, pos_b, u_time_alpha);
         if (this.timeAlpha >= 0.0) {
             // Internal use for hud telemetry simulation
-            void this.timeAlpha; 
+            void this.timeAlpha;
         }
     }
 
@@ -84,7 +84,7 @@ export class ChronoManager {
 export function runTemporalAudit(tier: string = 'POTATO') {
     console.log("──────── HUD TEMPORAL FLUIDITY AUDIT ─────────");
     console.log(`[AUDIT] 1. HARDWARE REVEAL: Target ${tier} Tier Simulation.`);
-    
+
     const manager = new ChronoManager(tier);
 
     // SCRUB-SPEED CHALLENGE (Task 059.7.A)

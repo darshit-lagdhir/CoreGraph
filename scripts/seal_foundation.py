@@ -9,7 +9,7 @@ class FinalSeal:
     """
     AUTHORIZED_DIRS = {"backend", "tooling", "infra", "frontend", "scripts", "docs"}
     SEAL_FILE = ".seal-include"
-    
+
     @staticmethod
     def _get_hash(path: str) -> str:
         """
@@ -31,7 +31,7 @@ class FinalSeal:
         for root, dirs, files in os.walk(root_dir):
             if any(forbidden in root for forbidden in [".git", "venv", ".workspace"]):
                 continue
-                
+
             rel_root = os.path.relpath(root, root_dir)
             if any(rel_root.startswith(d) for d in self.AUTHORIZED_DIRS) or rel_root == ".":
                 for file in files:

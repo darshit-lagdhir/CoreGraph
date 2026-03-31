@@ -17,17 +17,17 @@ def identity_genesis_worker(count: int, seed: int, ecosystem: str):
     S.U.S.E. Physical Node Synthesizer (Task 002).
     """
     random.seed(seed)
-    
+
     for i in range(count):
         # 1. NOMENCLATURE SYNTHESIS
         base_name = f"{ecosystem}-{random.choice(['core', 'sync', 'stream', 'async', 'lib', 'db', 'ui', 'api', 'auth', 'test'])}-{random.randint(100, 999)}"
         purl = f"pkg:{ecosystem}/{base_name}"
-        
+
         # 2. BUCKETED ADJACENCY (Gen5 NVMe Optimization)
         bucket = hashlib.md5(base_name.encode()).hexdigest()[:2]
         bucket_dir = os.path.join(os.getcwd(), "tooling", "simulation_server", "fixtures", ecosystem, bucket)
         os.makedirs(bucket_dir, exist_ok=True)
-        
+
         # 3. TEMPORAL VERSION WEAVE (SemVer)
         versions = []
         num_v = random.randint(1, 10)
@@ -37,7 +37,7 @@ def identity_genesis_worker(count: int, seed: int, ecosystem: str):
                 "published_at": (datetime.datetime(2022, 1, 1) + datetime.timedelta(days=v_idx * 14)).isoformat() + "Z",
                 "dependencies": {}
             })
-            
+
         # 4. PHYSICAL PERSISTENCE (JSON SILICON)
         fixture = {
             "name": base_name,
@@ -49,7 +49,7 @@ def identity_genesis_worker(count: int, seed: int, ecosystem: str):
                 "size_bytes": random.randint(1024, 10485760)
             }
         }
-        
+
         with open(os.path.join(bucket_dir, f"{base_name}.json"), 'w') as f:
             json.dump(fixture, f)
 

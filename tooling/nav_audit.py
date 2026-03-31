@@ -49,11 +49,11 @@ if __name__ == "__main__":
     # Certification on POTATO hardware (Tier 1) as mandated.
     runner = NavAuditRunner(tier="POTATO")
     print(f"[AUDIT] Hardware Reveal: POTATO (Legacy HDD Silicon / 5,400 RPM Seek Profile)")
-    
+
     runner.run_velocity_challenge()
     runner.run_latency_simulation()
     runner.run_shader_blur_seal()
-    
+
     # Discovery Velocity Seal (Task 056.7.D)
     print(f"[AUDIT] 4. DISCOVERY VELOCITY SEAL: Frustum Pre-fetching verified.")
     print("[SUCCESS] Predictive-Viewport Kernel Verified.")

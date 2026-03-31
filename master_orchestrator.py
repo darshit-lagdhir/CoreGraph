@@ -87,7 +87,7 @@ class MasterOrchestrator:
         print("[GAUNTLET] Unleashing Predatory Throughput (24 Workers / Gen5 NVMe)...")
         time.sleep(0.5)
         print("[PASS] 3.88M Node Genesis Verified: <15 Minute Projection.")
-        
+
         # TEST 3: SYSTEM HYGIENE (Task 025.1)
         print("[GAUNTLET] Running Forensic Hygiene Audit (SHA-256 Consistency)...")
         time.sleep(0.3)
@@ -97,12 +97,12 @@ class MasterOrchestrator:
 
 if __name__ == "__main__":
     orchestrator = MasterOrchestrator()
-    
+
     if "--audit" in sys.argv:
         orchestrator.run_certification_suite()
         print("\n[SUCCESS] TOTAL SYSTEM CERTIFICATION COMPLETE: The Titan is Universal.")
     else:
         orchestrator.probe_and_configure()
         orchestrator.boot_phalanx()
-    
+
     print("\n[TERMINATED] Module 3: UNIVERSAL BEAST SYSTEM SEAL COMPLETE.")
