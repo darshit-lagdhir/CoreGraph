@@ -1,4 +1,4 @@
-﻿import os
+import os
 from typing import Any
 
 import redis
@@ -38,8 +38,8 @@ celery_app.conf.update(
     ),
     task_default_queue="default",
     task_routes={
-        "tasks.ingestion.*": {"queue": "ingestion"},
-        "tasks.computation.*": {"queue": "analytics"},
+        "ingestion.*": {"queue": "ingestion"},
+        "analytics.*": {"queue": "analytics"},
     },
     worker_concurrency=16,
     worker_prefetch_multiplier=1,
