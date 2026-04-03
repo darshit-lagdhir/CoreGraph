@@ -7,10 +7,11 @@ from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
+
 class ModuleTenArchitecturalFinalizationManifold:
     """
     Final Radiological Cache Purge and Architectural Sealing Protocol.
-    Ensures total eradication of developmental artifacts and cryptographic 
+    Ensures total eradication of developmental artifacts and cryptographic
     locking of the Module 10 analytical codebase.
     """
 
@@ -29,10 +30,7 @@ class ModuleTenArchitecturalFinalizationManifold:
         self._hardware_tier = hardware_tier
         self._diagnostic_handler = diagnostic_callback
         self._target_extensions = {".br", ".dict", ".herd", ".bin", ".poll", ".recovery"}
-        self._sealed_directories = [
-            "infra/cache",
-            "persistence/serialization"
-        ]
+        self._sealed_directories = ["infra/cache", "persistence/serialization"]
 
     def execute_final_workspace_scrub(self, project_root: str) -> Dict[str, Any]:
         """
@@ -41,7 +39,7 @@ class ModuleTenArchitecturalFinalizationManifold:
         """
         eradicated_count = 0
         bytes_zeroed = 0
-        
+
         for root, _, files in os.walk(project_root):
             for file in files:
                 if any(file.endswith(ext) for ext in self._target_extensions):
@@ -50,7 +48,7 @@ class ModuleTenArchitecturalFinalizationManifold:
                         # Binary-Zero Scrubbing Protocol
                         size = os.path.getsize(path)
                         with open(path, "wb") as f:
-                            f.write(os.urandom(size)) # Forensic noise injection
+                            f.write(os.urandom(size))  # Forensic noise injection
                             f.flush()
                         os.remove(path)
                         eradicated_count += 1
@@ -61,7 +59,7 @@ class ModuleTenArchitecturalFinalizationManifold:
         metrics = {
             "eradicated": eradicated_count,
             "zeroed_mb": bytes_zeroed / (1024 * 1024),
-            "f_pur": 1.0 if eradicated_count > 0 else 1.0 # Always succeeds if logic executes
+            "f_pur": 1.0 if eradicated_count > 0 else 1.0,  # Always succeeds if logic executes
         }
         self._push_purity_vitality(metrics)
         return metrics
@@ -71,26 +69,27 @@ class ModuleTenArchitecturalFinalizationManifold:
         Architectural Sealing Manifold: Recursive Merkle-Tree Finalization.
         """
         sha = hashlib.sha384()
-        
+
         for sub_dir in self._sealed_directories:
             full_path = os.path.join(project_root, sub_dir)
-            if not os.path.exists(full_path): continue
-            
+            if not os.path.exists(full_path):
+                continue
+
             for root, _, files in os.walk(full_path):
                 for file in sorted(files):
                     if file.endswith(".py"):
                         with open(os.path.join(root, file), "rb") as f:
                             sha.update(f.read())
-                            
+
         seal_hash = sha.hexdigest()
         logger.info(f"[SEAL] Module 10 Master Seal: {seal_hash}")
-        
+
         # Write the Architectural Seal
         cert_path = os.path.join(project_root, "MODULE_10_FINALIZED.cert")
         with open(cert_path, "w") as f:
             f.write(f"MODULE_10_SEAL_HASH={seal_hash}\n")
             f.write(f"TIMESTAMP={os.times()[0]}\n")
-            
+
         return seal_hash
 
     def _push_purity_vitality(self, metrics: Dict[str, Any]) -> None:
@@ -110,17 +109,19 @@ class ModuleTenArchitecturalFinalizationManifold:
 if __name__ == "__main__":
     # Self-Verification Deployment: Finalizing Module 10
     print("COREGRAPH FINALIZATION: Module 10 Sealing Initiated...")
-    
+
     # Simulate a few artifacts
-    with open("test_purge.br", "wb") as f: f.write(b"SAMPLE_BROTLI_DATA")
-    with open("test_purge.bin", "wb") as f: f.write(b"SAMPLE_RAW_MATRIX")
-    
+    with open("test_purge.br", "wb") as f:
+        f.write(b"SAMPLE_BROTLI_DATA")
+    with open("test_purge.bin", "wb") as f:
+        f.write(b"SAMPLE_RAW_MATRIX")
+
     # Execute Purge
     finalizer = ModuleTenArchitecturalFinalizationManifold(hardware_tier="REDLINE")
     # Using current dir for test
     p_report = finalizer.execute_final_workspace_scrub(".")
     seal = finalizer.generate_codebase_integrity_seal(".")
-    
+
     if p_report["eradicated"] >= 2 and seal:
         print(f"RESULT: MODULE 10 ARCHITECTURALLY SEALED. Hash: {seal[:16]}...")
         print(f"CLEANLINESS: {p_report['eradicated']} artifacts eradicated.")

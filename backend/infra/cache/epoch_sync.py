@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 class TemporalSnapshotSynchronizationManifold:
     """
     Temporal Snapshot Synchronization Manifold and Database-Epoch Alignment Kernel.
-    Ensures bit-perfect consistency between the distributed cache and the 
+    Ensures bit-perfect consistency between the distributed cache and the
     relational ledger using transaction-level anchoring (XID).
     """
 
@@ -27,7 +27,7 @@ class TemporalSnapshotSynchronizationManifold:
     ):
         self._hardware_tier = hardware_tier
         self._diagnostic_handler = diagnostic_callback
-        self._active_epoch_registry = {} # key: epoch_metadata
+        self._active_epoch_registry = {}  # key: epoch_metadata
         self._last_sync_time = 0.0
 
     def _calibrate_sync_frequency(self) -> Dict[str, Any]:
@@ -38,7 +38,7 @@ class TemporalSnapshotSynchronizationManifold:
         return {
             "poll_interval": 0.1 if is_redline else 10.0,
             "stochastic_sampling": not is_redline,
-            "is_redline": is_redline
+            "is_redline": is_redline,
         }
 
     def execute_transaction_epoch_extraction(self, db_conn: Any) -> int:
@@ -56,18 +56,16 @@ class TemporalSnapshotSynchronizationManifold:
         epoch_data = self._active_epoch_registry.get(key)
         if not epoch_data:
             return False
-            
+
         # Hard check: Does the cached XID match the required version?
         # If the database has mutated (XID > cached_XID), the entry is stale.
         is_consistent = epoch_data["xid"] >= current_xid
-        
+
         # HUD Sync: Sync Vitality packet
-        self._push_sync_vitality({
-            "key": key,
-            "delta": current_xid - epoch_data["xid"],
-            "consistent": is_consistent
-        })
-        
+        self._push_sync_vitality(
+            {"key": key, "delta": current_xid - epoch_data["xid"], "consistent": is_consistent}
+        )
+
         return is_consistent
 
     def anchor_cache_key(self, key: str, xid: int, ingestion_id: str) -> None:
@@ -77,7 +75,7 @@ class TemporalSnapshotSynchronizationManifold:
         self._active_epoch_registry[key] = {
             "xid": xid,
             "ingestion_id": ingestion_id,
-            "anchored_at": time.monotonic()
+            "anchored_at": time.monotonic(),
         }
 
     def _push_sync_vitality(self, metrics: Dict[str, Any]) -> None:
@@ -98,22 +96,22 @@ class TemporalSnapshotSynchronizationManifold:
 if __name__ == "__main__":
     # Self-Verification Deployment: Validating the Temporal Bulkhead
     print("COREGRAPH SYNC: Self-Audit Initiated...")
-    
+
     # 1. Simulate Database States
     sync = TemporalSnapshotSynchronizationManifold(hardware_tier="REDLINE")
-    
+
     # Baseline Epoch
     initial_xid = 5000
     m_key = "coregraph:npm:v1:hash_abc"
     sync.anchor_cache_key(m_key, initial_xid, "INGEST_001")
-    
+
     # 2. Verify Consistency (Same State)
     c1 = sync.verify_cache_ledger_consistency(m_key, 5000)
-    
+
     # 3. Verify Inconsistency (Mutated State)
     # Database is now at XID 5001. Cached XID 5000 is now stale.
     c2 = sync.verify_cache_ledger_consistency(m_key, 5001)
-    
+
     if c1 is True and c2 is False:
         print(f"RESULT: SYNC SEALED. CHRONOLOGICAL INTEGRITY VERIFIED.")
     else:

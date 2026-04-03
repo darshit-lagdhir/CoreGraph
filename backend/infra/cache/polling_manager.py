@@ -6,10 +6,11 @@ from typing import Any, Dict, List, Optional, Set
 
 logger = logging.getLogger(__name__)
 
+
 class AsynchronousWaitStatePollingManifold:
     """
     Asynchronous Polling Sleep-Loop and Concurrency Wait-State Manifold.
-    Manages non-blocking observation of cache materialization using 
+    Manages non-blocking observation of cache materialization using
     Fibonacci back-off and mission-aware task coalescing.
     """
 
@@ -28,7 +29,7 @@ class AsynchronousWaitStatePollingManifold:
     ):
         self._hardware_tier = hardware_tier
         self._diagnostic_handler = diagnostic_callback
-        self._waiter_registry = {} # key: asyncio.Future
+        self._waiter_registry = {}  # key: asyncio.Future
         self._max_wait_time = max_wait_sec
 
     def _get_fibonacci_backoff(self, attempt: int) -> float:
@@ -41,7 +42,9 @@ class AsynchronousWaitStatePollingManifold:
             return fib[attempt]
         return fib[-1]
 
-    async def execute_async_wait_state_loop(self, lock_key: str, redis_client: Any) -> Optional[bytes]:
+    async def execute_async_wait_state_loop(
+        self, lock_key: str, redis_client: Any
+    ) -> Optional[bytes]:
         """
         Asynchronous Polling Kernel: Non-blocking observation of graph materialization.
         Returns: The binary anchor if found, None if timeout occurs.
@@ -54,7 +57,7 @@ class AsynchronousWaitStatePollingManifold:
         # 2. Master Poller Election
         shared_future = asyncio.get_event_loop().create_future()
         self._waiter_registry[lock_key] = shared_future
-        
+
         start_time = time.monotonic()
         attempt = 0
         result_blob = None
@@ -64,25 +67,23 @@ class AsynchronousWaitStatePollingManifold:
                 # 3. Non-blocking Cache Check
                 # Looking for the data key (not the lock key).
                 # Derived key logic would match SHADeterministicCacheKeyManifold.
-                data_key = lock_key.replace("lock:", "") 
+                data_key = lock_key.replace("lock:", "")
                 result_blob = redis_client.get(data_key)
 
                 if result_blob:
                     # TODO: Verify Terminal Finalization Header here.
                     logger.info(f"[POLL] Data Materialized for {data_key}")
                     break
-                
+
                 # 4. Async Yield: Releasing thread back to the event loop.
                 sleep_duration = self._get_fibonacci_backoff(attempt)
                 await asyncio.sleep(sleep_duration)
                 attempt += 1
-                
+
                 # HUD Sync: Coordination Vitality
-                self._push_wait_vitality({
-                    "key": lock_key,
-                    "attempt": attempt,
-                    "elapsed": time.monotonic() - start_time
-                })
+                self._push_wait_vitality(
+                    {"key": lock_key, "attempt": attempt, "elapsed": time.monotonic() - start_time}
+                )
 
             # 5. Resolve Shared Future for all subscribers
             shared_future.set_result(result_blob)
@@ -114,33 +115,36 @@ class AsynchronousWaitStatePollingManifold:
 if __name__ == "__main__":
     # Self-Verification Deployment: Validating the Digital Waiting Room
     print("COREGRAPH POLLING: Self-Audit Initiated...")
-    
+
     # 1. Mock Redis Cluster Simulation
     class MockRedis:
-        def __init__(self): self.ready = False
-        def get(self, k): return b"SERIALIZED_GRAPH_ANCHO" if self.ready else None
+        def __init__(self):
+            self.ready = False
+
+        def get(self, k):
+            return b"SERIALIZED_GRAPH_ANCHO" if self.ready else None
 
     # 2. Execute Async Gauntlet
     async def run_test():
         redis = MockRedis()
         manifold = AsynchronousWaitStatePollingManifold(hardware_tier="REDLINE")
         m_key = "lock:npm:react"
-        
+
         # Scenario: Data becomes ready after 500ms
         async def populate_data():
             await asyncio.sleep(0.5)
             redis.ready = True
-            
+
         # Start concurrent pollers
         tasks = [
             manifold.execute_async_wait_state_loop(m_key, redis),
             manifold.execute_async_wait_state_loop(m_key, redis),
-            populate_data()
+            populate_data(),
         ]
-        
+
         results = await asyncio.gather(*tasks)
         r1, r2, _ = results
-        
+
         if r1 == r2 == b"SERIALIZED_GRAPH_ANCHO":
             print(f"RESULT: POLLING SEALED. SYNC HARMONY VERIFIED.")
         else:

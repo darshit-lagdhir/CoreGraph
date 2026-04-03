@@ -43,7 +43,7 @@ class GraphObjectDeconstructionManifold:
         self._idx_to_uuid: List[str] = []
         self._precision = 4
         self._mem_limit_bytes = 150 * 1024 * 1024
-        
+
         # Internal Logic Blacklist: Neutralizing algorithmic struggle traces
         self._internal_blacklist: Set[str] = {
             "is_visited",
@@ -52,7 +52,7 @@ class GraphObjectDeconstructionManifold:
             "search_depth",
             "bfs_predecessor",
             "corporate_weight_raw",
-            "maintainer_burnout_delta"
+            "maintainer_burnout_delta",
         }
 
     def _calibrate_extraction_velocity(self) -> Dict[str, Any]:
@@ -63,7 +63,7 @@ class GraphObjectDeconstructionManifold:
         return {
             "sector_size": 100000 if is_redline else 5000,
             "parallel_indexing": is_redline,
-            "explicit_gc_pacing": not is_redline
+            "explicit_gc_pacing": not is_redline,
         }
 
     def _topological_indexing(self) -> None:
@@ -83,7 +83,7 @@ class GraphObjectDeconstructionManifold:
         stripped = {}
         # Golden Metrics: The terminal analytical signals
         whitelist = {"id", "name", "cvi_score", "blast_radius", "pagerank", "budget_usd"}
-        
+
         for k, v in raw_attrs.items():
             if k in whitelist and k not in self._internal_blacklist:
                 if isinstance(v, float):
@@ -91,7 +91,7 @@ class GraphObjectDeconstructionManifold:
                     stripped[k] = round(v, self._precision)
                 else:
                     stripped[k] = v
-        
+
         return stripped
 
     def execute_object_skeleton_extraction(self) -> Dict[str, Any]:
@@ -102,38 +102,40 @@ class GraphObjectDeconstructionManifold:
         start_time = time.monotonic()
         total_objects = self._active_graph.number_of_nodes()
         total_edges = self._active_graph.number_of_edges()
-        
+
         gearbox = self._calibrate_extraction_velocity()
-        
+
         # 1. Topological Indexing
         self._topological_indexing()
-        
+
         # 2. Iterative Node Dismantling
         node_registry: List[Dict[str, Any]] = []
         objects_dismantled = 0
         bytes_stripped = 0
-        
+
         for node_id, attrs in self._active_graph.nodes(data=True):
             # Injecting canonical ID if missing from attributes
             base_data = attrs.copy()
             base_data["id"] = node_id
-            
+
             stripped_node = self._run_attribute_blackhole_scan(base_data)
             node_registry.append(stripped_node)
-            
+
             objects_dismantled += 1
-            
+
             # Hardware-Aware Pacing
             if objects_dismantled % gearbox["sector_size"] == 0:
                 if gearbox["explicit_gc_pacing"]:
                     gc.collect()
-                
+
                 # HUD Sync: Extraction Vitality Packet
-                self._push_extraction_vitality({
-                    "objects_dismantled": objects_dismantled,
-                    "total_objects": total_objects,
-                    "velocity": objects_dismantled / (time.monotonic() - start_time)
-                })
+                self._push_extraction_vitality(
+                    {
+                        "objects_dismantled": objects_dismantled,
+                        "total_objects": total_objects,
+                        "velocity": objects_dismantled / (time.monotonic() - start_time),
+                    }
+                )
 
         # 3. Edge Registry Reconciliation
         edge_registry: List[List[int]] = []
@@ -144,13 +146,13 @@ class GraphObjectDeconstructionManifold:
 
         # 4. Integrity Certification
         f_ext = self._verify_extraction_fidelity(len(node_registry))
-        
+
         extraction_time = time.monotonic() - start_time
         logger.info(
             f"[DECONSTRUCTOR] Skeleton Finalized | Nodes: {len(node_registry)} | "
             f"Edges: {len(edge_registry)} | F_ext: {f_ext:.2f} | T: {extraction_time:.2f}s"
         )
-        
+
         # Final payload assembly
         skeleton = {
             "metadata": {
@@ -158,12 +160,12 @@ class GraphObjectDeconstructionManifold:
                 "total_nodes": total_objects,
                 "total_edges": total_edges,
                 "f_ext": f_ext,
-                "hardware_tier": self._hardware_tier
+                "hardware_tier": self._hardware_tier,
             },
             "nodes": node_registry,
-            "links": edge_registry
+            "links": edge_registry,
         }
-        
+
         return skeleton
 
     def _verify_extraction_fidelity(self, node_count: int) -> float:
@@ -195,40 +197,41 @@ class GraphObjectDeconstructionManifold:
 if __name__ == "__main__":
     # Self-Verification Deployment: Validating the Object-to-Skeleton Manifold
     print("COREGRAPH DECONSTRUCTOR: Self-Audit Initiated...")
-    
+
     # 1. Generate pathologically attributed graph
     G = nx.DiGraph()
     for i in range(10000):
         uid = f"node-{i}"
-        G.add_node(uid, 
-            name=f"pkg-{i}", 
-            cvi_score=98.1234567, 
-            blast_radius=500, 
+        G.add_node(
+            uid,
+            name=f"pkg-{i}",
+            cvi_score=98.1234567,
+            blast_radius=500,
             pagerank=0.000123,
-            is_visited=True  # Noise to be stripped
+            is_visited=True,  # Noise to be stripped
         )
         if i > 0:
             G.add_edge(f"node-{i-1}", uid)
-            
+
     # 2. Execute Extraction
     deconstructor = GraphObjectDeconstructionManifold(G)
     skeleton = deconstructor.execute_object_skeleton_extraction()
-    
+
     # 3. Assert Structural Invariants
     success = True
     if skeleton["metadata"]["total_nodes"] != 10000:
         print("FAIL: Node population mismatch.")
         success = False
-    
+
     node_sample = skeleton["nodes"][0]
     if "is_visited" in node_sample:
         print("FAIL: Forensic Stripping failed (noise detected).")
         success = False
-        
+
     if node_sample["cvi_score"] != 98.1235:
         print(f"FAIL: Quantization Error: {node_sample['cvi_score']}")
         success = False
-        
+
     if success:
         print("RESULT: DECONSTRUCTOR SEALED. ABSOLUTE FIDELITY VERIFIED.")
     else:

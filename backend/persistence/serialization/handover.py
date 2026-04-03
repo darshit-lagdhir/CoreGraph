@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 class ZeroCopyMemoryHandoverManifold:
     """
     Zero-Copy Buffer Interface and Asynchronous Memory Handover Manifold.
-    Orchestrates a frictionless conduit between JSON realization and binary 
+    Orchestrates a frictionless conduit between JSON realization and binary
     compaction using circular byte-buffers and memoryview pointer rotations.
     """
 
@@ -33,14 +33,14 @@ class ZeroCopyMemoryHandoverManifold:
     ):
         self._hardware_tier = hardware_tier
         self._diagnostic_handler = diagnostic_callback
-        
+
         # Buffer dimensions: Redline (128MB), Potato (8MB)
         self._buffer_size = 128 * 1024 * 1024 if hardware_tier == "REDLINE" else 8 * 1024 * 1024
-        
+
         # Physical Stage: Pre-allocated contiguous memory
         self._buffer = bytearray(self._buffer_size)
         self._view = memoryview(self._buffer)
-        
+
         # Atomic Cursors (Simulated via threading primitives)
         self._write_pos = 0
         self._read_pos = 0
@@ -54,7 +54,7 @@ class ZeroCopyMemoryHandoverManifold:
         """
         data_len = len(data)
         bytes_written = 0
-        
+
         while bytes_written < data_len:
             with self._lock:
                 # 1. Wait for space
@@ -63,7 +63,7 @@ class ZeroCopyMemoryHandoverManifold:
                     if space > 0:
                         break
                     self._space_available.wait()
-                
+
                 # 2. Determine contiguous chunk size to avoid split logic complication
                 # (We can write until end of buffer or until we hit read_pos)
                 if self._write_pos >= self._read_pos:
@@ -75,13 +75,15 @@ class ZeroCopyMemoryHandoverManifold:
                 else:
                     # [W--->R]
                     chunk_limit = self._read_pos - self._write_pos - 1
-                
+
                 chunk_size = min(data_len - bytes_written, chunk_limit)
                 if chunk_size > 0:
-                    self._buffer[self._write_pos:self._write_pos + chunk_size] = data[bytes_written:bytes_written + chunk_size]
+                    self._buffer[self._write_pos : self._write_pos + chunk_size] = data[
+                        bytes_written : bytes_written + chunk_size
+                    ]
                     self._write_pos = (self._write_pos + chunk_size) % self._buffer_size
                     bytes_written += chunk_size
-                    
+
                     self._data_available.notify_all()
 
     def read_from_conduit(self, max_size: int) -> bytes:
@@ -95,7 +97,7 @@ class ZeroCopyMemoryHandoverManifold:
                 if available > 0:
                     break
                 self._data_available.wait()
-            
+
             # 2. Determine contiguous read size
             if self._write_pos > self._read_pos:
                 # [R--->W]
@@ -103,11 +105,11 @@ class ZeroCopyMemoryHandoverManifold:
             else:
                 # [R--->End]
                 read_limit = self._buffer_size - self._read_pos
-                
+
             chunk_size = min(max_size, read_limit)
-            result = bytes(self._view[self._read_pos:self._read_pos + chunk_size])
+            result = bytes(self._view[self._read_pos : self._read_pos + chunk_size])
             self._read_pos = (self._read_pos + chunk_size) % self._buffer_size
-            
+
             self._space_available.notify_all()
             return result
 
@@ -132,15 +134,16 @@ class ZeroCopyMemoryHandoverManifold:
 
 if __name__ == "__main__":
     import threading
+
     print("COREGRAPH HANDOVER: Self-Audit Initiated...")
-    
+
     handover = ZeroCopyMemoryHandoverManifold(hardware_tier="POTATO")
-    handover._buffer_size = 1024 # Small buffer to force many wraps
+    handover._buffer_size = 1024  # Small buffer to force many wraps
     handover._buffer = bytearray(handover._buffer_size)
     handover._view = memoryview(handover._buffer)
-    
+
     test_payload = b"DATA_BLOCK_" * 500  # ~5.5KB
-    
+
     def producer():
         handover.write_to_conduit(test_payload)
 
@@ -148,7 +151,7 @@ if __name__ == "__main__":
         received = b""
         while len(received) < len(test_payload):
             received += handover.read_from_conduit(128)
-        
+
         if received == test_payload:
             print("RESULT: HANDOVER KERNEL SEALED. FIDELITY VERIFIED.")
         else:
@@ -156,5 +159,7 @@ if __name__ == "__main__":
 
     t1 = threading.Thread(target=producer)
     t2 = threading.Thread(target=consumer)
-    t1.start(); t2.start()
-    t1.join(); t2.join()
+    t1.start()
+    t2.start()
+    t1.join()
+    t2.join()
