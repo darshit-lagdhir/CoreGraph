@@ -1,139 +1,120 @@
+import * as THREE from 'three';
+
 /**
- * CoreGraph Adaptive WebGL Rendering Kernel (Task 051)
- * Liquid HUD: Transcending the Draw-Call Barrier on Constrained Silicon.
+ * GAP RESOLUTION 004: HUD MULTI-RESOLUTION VERTEX-POOLING KERNEL.
+ * Manages millions of nodes using a hybrid Point-Cloud and InstancedMesh approach.
  */
+export class MultiResolutionVertexPoolingManifold {
+    private hardwareTier: 'REDLINE' | 'POTATO';
+    private pointCloud: THREE.Points;
+    private sphereInstances: THREE.InstancedMesh;
+    private maxSpheres: number;
+    private cviThreshold: number = 70.0;
+    
+    private positions: Float32Array;
+    private colors: Float32Array;
+    private sizes: Float32Array;
+    
+    private activeSphereCount: number = 0;
+    private nodeCount: number = 3880000;
 
-export class RenderingSupervisor {
-    private gl: WebGLRenderingContext | any; // Any for simulation convenience
-    private tier: string = 'REDLINE';
-    private zoom: number = 0.15; // Starting at Macro Cloud (Zoom < 20%)
-    private vbo: any = null;
-    private bufferCapacity: number = 3880000; // 3.84M Nodes Capacity
-    protected activeNodeCount: number = 0;
-
-    constructor(gl: WebGLRenderingContext | any, tier: string = 'REDLINE') {
-        this.gl = gl;
-        this.tier = tier;
-        this.handshakeHardware();
+    constructor(hardwareTier: 'REDLINE' | 'POTATO' = 'REDLINE') {
+        this.hardwareTier = hardwareTier;
+        this.maxSpheres = this.hardwareTier === 'REDLINE' ? 100000 : 500;
+        this.cviThreshold = this.hardwareTier === 'REDLINE' ? 70.0 : 85.0;
+        
+        // 1. Initialize Monolithic BufferGeometry (The Point-Cloud Baseline)
+        const geometry = new THREE.BufferGeometry();
+        this.positions = new Float32Array(this.nodeCount * 3);
+        this.colors = new Float32Array(this.nodeCount * 3);
+        this.sizes = new Float32Array(this.nodeCount);
+        
+        geometry.setAttribute('position', new THREE.BufferAttribute(this.positions, 3));
+        geometry.setAttribute('color', new THREE.BufferAttribute(this.colors, 3));
+        geometry.setAttribute('size', new THREE.BufferAttribute(this.sizes, 1));
+        
+        const material = new THREE.PointsMaterial({
+            size: 2,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.8,
+            sizeAttenuation: true
+        });
+        
+        this.pointCloud = new THREE.Points(geometry, material);
+        
+        // 2. Initialize Dynamic Sphere Manifold (InstancedMesh)
+        const sphereGeom = new THREE.SphereGeometry(1, 8, 8);
+        const sphereMat = new THREE.MeshPhongMaterial({ shininess: 100 });
+        this.sphereInstances = new THREE.InstancedMesh(sphereGeom, sphereMat, this.maxSpheres);
+        this.sphereInstances.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     }
 
     /**
-     * Visual Handshake (Task 051.6.C)
-     * Residency-pinned buffer allocation in VRAM.
+     * Executes the VRAM attribute update for the 3.88M node graph.
      */
-    private handshakeHardware() {
-        console.log(`[HUD] Visual Handshake: Initializing ${this.tier} Rendering Phalanx...`);
-        if (this.gl && this.gl.createBuffer) {
-            this.vbo = this.gl.createBuffer();
-            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vbo);
-            // Pre-allocate 3.84M vertices (Float32Array alignment)
-            // Attributes: [ID, RiskScore, PosX, PosY]
-            const initialData = new Float32Array(this.bufferCapacity * 4);
-            this.gl.bufferData(this.gl.ARRAY_BUFFER, initialData, this.gl.DYNAMIC_DRAW);
+    public updateBufferGeometry(nodeData: any[]): void {
+        const drawCount = Math.min(nodeData.length, this.nodeCount);
+        
+        for (let i = 0; i < drawCount; i++) {
+            const node = nodeData[i];
+            const idx = i * 3;
+            
+            // Sync positions
+            this.positions[idx] = node.x;
+            this.positions[idx + 1] = node.y;
+            this.positions[idx + 2] = node.z;
+            
+            // Sync colors based on CVI (Chromatic Risk Intelligence)
+            const color = this.calculateCVIColor(node.cvi);
+            this.colors[idx] = color.r;
+            this.colors[idx + 1] = color.g;
+            this.colors[idx + 2] = color.b;
+            
+            // Point Visibility (Hide if promoted to sphere)
+            this.sizes[i] = node.cvi >= this.cviThreshold ? 0.0 : 2.0;
         }
+        
+        this.pointCloud.geometry.attributes.position.needsUpdate = true;
+        this.pointCloud.geometry.attributes.color.needsUpdate = true;
+        this.pointCloud.geometry.attributes.size.needsUpdate = true;
+        
+        // 3. Promotion Logic: Update high-fidelity spheres
+        this.promoteCriticalNodes(nodeData);
     }
 
-    /**
-     * Three-Tier LOD State-Machine (Task 051.2)
-     * Decides geometry complexity based on Zoom and GPU Frame-Budget.
-     */
-    public determineLODTier(zoom: number): number {
-        this.zoom = zoom;
-        if (this.zoom < 0.20) return 1; // TIER 1: MACRO CLOUD (gl.POINTS)
-        if (this.zoom < 0.70) return 2; // TIER 2: REGIONAL SPIDERWEB (Instanced)
-        return 3; // TIER 3: FORENSIC MESH (High-Fidelity)
-    }
-
-    /**
-     * Frustum-Pruned Geometry Pipeline (Task 051.3)
-     * Maps viewport to Spatial Slabs and Overwrites off-screen VBO data.
-     */
-    public pruneViewport(viewportBoundingBox: any) {
-        // Communicating with Spatial-Partitioning Vault (Task 044)
-        if (viewportBoundingBox) {
-            console.log(`[HUD] Pruning for slab: ${viewportBoundingBox.id || 'primary'}`);
+    private promoteCriticalNodes(nodeData: any[]): void {
+        this.activeSphereCount = 0;
+        const dummy = new THREE.Object3D();
+        
+        for (const node of nodeData) {
+            if (node.cvi >= this.cviThreshold && this.activeSphereCount < this.maxSpheres) {
+                dummy.position.set(node.x, node.y, node.z);
+                dummy.scale.setScalar(node.blastRadius || 1.0);
+                dummy.updateMatrix();
+                
+                this.sphereInstances.setMatrixAt(this.activeSphereCount, dummy.matrix);
+                
+                if (this.sphereInstances.instanceColor) {
+                    this.sphereInstances.setColorAt(this.activeSphereCount, this.calculateCVIColor(node.cvi));
+                }
+                
+                this.activeSphereCount++;
+            }
         }
-        this.activeNodeCount = 100000; // Current visible density in frustum
+        
+        this.sphereInstances.count = this.activeSphereCount;
+        this.sphereInstances.instanceMatrix.needsUpdate = true;
+        if (this.sphereInstances.instanceColor) this.sphereInstances.instanceColor.needsUpdate = true;
     }
 
-    /**
-     * Liquid Render Phase (Task 051.9)
-     * Ensures VCI < K_fluid (0.8) for smooth 60FPS operation.
-     */
-    public render(zoom: number) {
-        const tier = this.determineLODTier(zoom);
-
-        switch (tier) {
-            case 1:
-                this.drawMacroCloud();
-                break;
-            case 2:
-                this.drawRegionalSpiderweb();
-                break;
-            case 3:
-                this.drawForensicMesh();
-                break;
-        }
+    private calculateCVIColor(cvi: number): THREE.Color {
+        if (cvi > 80) return new THREE.Color(0xff0000); // Pathogen Red
+        if (cvi > 50) return new THREE.Color(0xffa500); // Warning Orange
+        return new THREE.Color(0x444444); // Safe Gray
     }
 
-    private drawMacroCloud() {
-        // Shader-Based Point Clouds (Task 051.4): Zero Geometry Overhead
-        // gl.drawArrays(gl.POINTS, ...)
-        console.log(`[HUD] Tier 1: Rendering ${this.activeNodeCount} Nodes as Shader-Based Point Cloud.`);
+    public getObjects(): THREE.Object3D[] {
+        return [this.pointCloud, this.sphereInstances];
     }
-
-    private drawRegionalSpiderweb() {
-        // Instanced Rendering (Task 051.5): Drawing the Spiderweb in a SINGLE call
-        // gl.drawArraysInstanced(...)
-        console.log(`[HUD] Tier 2: Rendering Regional Spiderweb via GPU Instancing.`);
-    }
-
-    private drawForensicMesh() {
-        // Forensic Mesh: High-Fidelity with Occlusion Culling
-        console.log(`[HUD] Tier 3: Rendering Forensic-Fidelity Mesh (Focus Site).`);
-    }
-
-    /** GL-Resource Reclamation (Task 051.10) */
-    public destroy() {
-        if (this.gl && this.vbo) this.gl.deleteBuffer(this.vbo);
-        console.log("[HUD] GL-Resources Reclaimed: Memory returned to OS.");
-    }
-}
-
-// ==============================================================================
-// 7. THE "JUDGE-READY" LIQUID HUD AUDIT (Task 051.7)
-// ==============================================================================
-
-export function runVisualAudit(tier: string = 'POTATO') {
-    console.log("──────── HUD VISUAL AUDIT ─────────");
-    console.log(`[AUDIT] 1. HARDWARE REVEAL: Target ${tier} Tier Simulation.`);
-
-    // Mock WebGL Context
-    const mockGL = {
-        createBuffer: () => ({}),
-        bindBuffer: () => {},
-        bufferData: () => {},
-        deleteBuffer: () => {}
-    };
-
-    const supervisor = new RenderingSupervisor(mockGL, tier);
-
-    // 2. FRAME-RATE CHALLENGE (Task 051.7.A)
-    const zoomPoints = [0.1, 0.45, 0.9];
-    zoomPoints.forEach(z => {
-        console.log(`[AUDIT] zoom=${z} -> LOD Tier ${supervisor.determineLODTier(z)}`);
-        supervisor.render(z);
-    });
-
-    // 3. VRAM STABILITY MONITOR (Task 051.7.C)
-    // 3.84M nodes * 4 float attributes * 4 bytes = ~62MB (Standard)
-    // 128MB resident VBO budget
-    console.log("[AUDIT] VRAM Usage Gauge: [■■■■□□□□□□] 128MB / 4096MB (Stable)");
-
-    // 4. SUDDEN POTATO TRANSITION (Task 051.7.B)
-    console.log("[AUDIT] 4. SUDDEN POTATO: Limiting GPU Bandwidth to 5MB/s...");
-    console.log("[SUCCESS] LOD State-Machine stepped down: Frame-rate remains 62FPS.");
-
-    console.log("[SUCCESS] Adaptive WebGL Rendering Kernel Verified.");
-    supervisor.destroy();
 }

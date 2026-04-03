@@ -28,29 +28,30 @@ const GraphCanvas = () => {
   }, []);
 
   const nodeObject = useMemo(() => {
-    // Custom shader-based rendering strategy (simplified representation here)
-    // Instanced rendering would typically require low-level THREE.InstancedMesh access,
-    // which react-force-graph-3d supports via nodeThreeObject.
+    // GAP RESOLUTION 004: Multi-Resolution Vertex Pooling Handover
+    // Using a hybrid strategy to maintain 144Hz vision
     return (node: object) => {
       const gNode = node as GraphNode;
-      const radius = getLogarithmicRadius(gNode);
-      const color = getNodeColor(gNode);
-
-      const isNodeOnPath = selectedPath.includes(gNode.id);
-
-      const geometry = new THREE.SphereGeometry(radius, 16, 16);
-      const material = new THREE.MeshPhongMaterial({
-        color: new THREE.Color(color),
-        transparent: true,
-        opacity: selectedPath.length > 0 ? (isNodeOnPath ? 1.0 : 0.15) : 0.9,
-        emissive: isNodeOnPath ? new THREE.Color(color) : new THREE.Color(0x000000),
-        emissiveIntensity: isNodeOnPath ? 0.8 : 0,
-        shininess: 100,
-      });
-
-      // Dispose logic internally handled by react-force-graph on removal usually,
-      // but provided as a baseline here.
-      return new THREE.Mesh(geometry, material);
+      const cvi = gNode.cvi || 0;
+      
+      // Promotion Logic: Only high-CVI nodes get full 3D spheres
+      if (cvi > 70) {
+        const radius = getLogarithmicRadius(gNode);
+        const color = getNodeColor(gNode);
+        const geometry = new THREE.SphereGeometry(radius, 8, 8); // Optimized segment count
+        const material = new THREE.MeshPhongMaterial({
+          color: new THREE.Color(color),
+          emissive: new THREE.Color(color),
+          emissiveIntensity: 0.5,
+          shininess: 100,
+        });
+        return new THREE.Mesh(geometry, material);
+      }
+      
+      // Point-Cloud Baseline: Low-CVI nodes become single points
+      const dotGeom = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0)]);
+      const dotMat = new THREE.PointsMaterial({ color: 0x444444, size: 2 });
+      return new THREE.Points(dotGeom, dotMat);
     };
   }, [getLogarithmicRadius, getNodeColor]);
 
