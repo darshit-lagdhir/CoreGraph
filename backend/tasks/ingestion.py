@@ -3,11 +3,13 @@ import json
 from typing import Any, Dict, List, Optional
 
 import httpx
-from analytics.blast_radius import BlastRadiusCalculator
-from analytics.clustering import CommunityDetector
-from analytics.cvi_calculator import CVICalculator
-from analytics.graph_builder import GraphBuilder
-from analytics.serializer import GraphSerializer
+from analytics import (
+    BlastRadiusCalculator,
+    CommunityDetector,
+    CVICalculator,
+    GraphBuilder,
+    GraphSerializer,
+)
 from celery import chord, group
 from clients.ecosystems import EcosystemFactory
 from core.config import settings

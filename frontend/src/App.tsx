@@ -9,7 +9,7 @@ function App() {
 
   useEffect(() => {
     // Pipeline strictly decoupled from UI loop
-    const pipeline = new TelemetryPipeline('ws://localhost:8000/ws/telemetry');
+    const pipeline = new TelemetryPipeline('ws://localhost:8001/ws/telemetry');
     pipeline.connect();
     return () => pipeline.disconnect();
   }, []);

@@ -1,10 +1,12 @@
 import asyncio
 
-from analytics.blast_radius import calculate_blast_radius
-from analytics.centrality import calculate_pagerank
-from analytics.cvi_calculator import evaluate_cvi
-from analytics.graph_builder import build_acyclic_graph
-from analytics.serializer import serialize_and_cache
+from analytics import (
+    build_acyclic_graph,
+    calculate_blast_radius,
+    calculate_pagerank,
+    evaluate_cvi,
+    serialize_and_cache,
+)
 from worker import celery_app
 
 

@@ -44,7 +44,8 @@ export class TelemetryPipeline {
                 if (isPing) return;
 
                 // Decompressing utilizing 64KB ArrayBuffer vectors directly
-                const inflatedString = pako.inflate(new Uint8Array(event.data), { to: 'string' });
+                // backend uses gzip.compress Level 9, so we use ungzip here
+                const inflatedString = pako.ungzip(new Uint8Array(event.data), { to: 'string' });
                 const graphJson = JSON.parse(inflatedString);
 
                 useGraphStore.getState().setGraphData(graphJson);

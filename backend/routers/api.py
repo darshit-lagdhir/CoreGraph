@@ -1,5 +1,3 @@
-import json
-
 from core.config import settings
 from database import AsyncSessionLocal
 from fastapi import APIRouter, Depends, HTTPException, status
