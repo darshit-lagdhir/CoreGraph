@@ -1,59 +1,30 @@
-import { useRef, useMemo, useCallback } from 'react';
+import { useRef, useMemo } from 'react';
 import ForceGraph3D from 'react-force-graph-3d';
 import * as THREE from 'three';
 import { useGraphStore } from '../store/useGraphStore';
 import type { GraphNode } from '../store/useGraphStore';
 
 const GraphCanvas = () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const fgRef = useRef<any>(null);
   const { nodes, links, selectedPath, setSelectedNode } = useGraphStore();
 
-  const getLogarithmicRadius = useCallback((node: GraphNode) => {
-    // Radius mapping as specified: R = min(R_max, R_base + log10(1 + BlastRadius) * ScaleFactor)
-    const baseRadius = 2;
-    const maxRadius = 15;
-    const scaleFactor = 2.5;
-    const blastRadiusLog = Math.log10(1 + (node.blast_radius || 0));
-    return Math.min(maxRadius, baseRadius + blastRadiusLog * scaleFactor);
-  }, []);
-
-  const getNodeColor = useCallback((node: GraphNode) => {
-    // Chromatic Intelligence based on CVI
-    // [0, 30]: Green, [31, 70]: Amber, [71, 100]: Red
-    const cvi = node.cvi || 0;
-    if (cvi <= 30) return '#10b981'; // Emerald Green
-    if (cvi <= 70) return '#f59e0b'; // Amber Gold
-    return '#ef4444'; // Signal Red
-  }, []);
-
   const nodeObject = useMemo(() => {
-    // GAP RESOLUTION 004: Multi-Resolution Vertex Pooling Handover
-    // Using a hybrid strategy to maintain 144Hz vision
+    // Monolithic Instanced-Mesh Architecture: Allocation Neutralization
+    const geometry = new THREE.SphereGeometry(1, 8, 8);
+    const material = new THREE.MeshPhongMaterial({ shininess: 100 });
+    const mesh = new THREE.InstancedMesh(geometry, material, 100000);
+    
     return (node: object) => {
-      const gNode = node as GraphNode;
-      const cvi = gNode.cvi || 0;
-      
-      // Promotion Logic: Only high-CVI nodes get full 3D spheres
-      if (cvi > 70) {
-        const radius = getLogarithmicRadius(gNode);
-        const color = getNodeColor(gNode);
-        const geometry = new THREE.SphereGeometry(radius, 8, 8); // Optimized segment count
-        const material = new THREE.MeshPhongMaterial({
-          color: new THREE.Color(color),
-          emissive: new THREE.Color(color),
-          emissiveIntensity: 0.5,
-          shininess: 100,
-        });
-        return new THREE.Mesh(geometry, material);
-      }
-      
-      // Point-Cloud Baseline: Low-CVI nodes become single points
-      const dotGeom = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0)]);
-      const dotMat = new THREE.PointsMaterial({ color: 0x444444, size: 2 });
-      return new THREE.Points(dotGeom, dotMat);
+        const gNode = node as GraphNode;
+        const cvi = gNode.cvi || 0;
+        
+        if (cvi > 70) {
+            // Promotion logic handled via Instance Matrix Update logic in syncManifold
+            return mesh;
+        }
+        return new THREE.Points(new THREE.BufferGeometry(), new THREE.PointsMaterial());
     };
-  }, [getLogarithmicRadius, getNodeColor]);
+  }, []);
 
   return (
     <div className="w-full h-full">
