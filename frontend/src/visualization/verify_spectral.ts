@@ -1,0 +1,1 @@
+import { SpectralKernel } from './vulnerability_color_kernel'; const kernel = SpectralKernel; const color = kernel.execute_vulnerability_gradient_interpolation(75); const vitality = kernel.get_spectral_vitality(); if (vitality.spectral_integrity === 1.0 && color) { console.log('[+] SPECTRAL CORE: VALIDATION PASSED (F_spe = 1.0)'); process.exit(0); } else { process.exit(1); }

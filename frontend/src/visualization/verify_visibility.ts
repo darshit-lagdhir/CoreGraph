@@ -1,0 +1,1 @@
+import { VisibilityKernel } from './occlusion_query_kernel'; const kernel = VisibilityKernel; const vitality = kernel.get_visibility_vitality(); if (vitality.visibility_integrity === 1.0) { console.log('[+] VISIBILITY CORE: VALIDATION PASSED (F_vis = 1.0)'); process.exit(0); } else { process.exit(1); }

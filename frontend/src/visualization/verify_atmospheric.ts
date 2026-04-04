@@ -1,0 +1,1 @@
+import { LightingKernel } from './lighting_kernel'; const kernel = LightingKernel; const intensity = kernel.execute_risk_based_photon_mapping(95, 1.0); const vitality = kernel.get_atmospheric_vitality(); if (vitality.atmospheric_integrity === 1.0 && intensity > 0) { console.log('[+] ATMOSPHERIC CORE: VALIDATION PASSED (F_atm = 1.0)'); process.exit(0); } else { process.exit(1); }
