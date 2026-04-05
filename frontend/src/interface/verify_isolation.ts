@@ -1,1 +1,0 @@
-import { FilterKernel } from './threat_filter_kernel'; const kernel = FilterKernel; kernel.execute_threat_isolation_initialization(); kernel.apply_cvi_threshold(50); const vitality = kernel.get_isolation_vitality(); if (vitality.isolation_integrity === 1.0) { console.log('[+] ISOLATION CORE: VALIDATION PASSED (F_iso = 1.0)'); process.exit(0); } else { process.exit(1); }

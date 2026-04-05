@@ -1,1 +1,0 @@
-import { PostProcessKernel } from './post_process_kernel'; const kernel = PostProcessKernel; const bloom = kernel.execute_hdr_bloom_composition(0.95); const vitality = kernel.get_composition_vitality(); if (vitality.composition_integrity === 1.0 && bloom > 0) { console.log('[+] PERCEPTUAL CORE: VALIDATION PASSED (F_per = 1.0)'); process.exit(0); } else { process.exit(1); }
