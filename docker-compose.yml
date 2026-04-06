@@ -1,67 +1,52 @@
-﻿version: "3.9"
+version: "3.9"
 
-# Module 4 - Task 023: Multi-Container Orchestration Manifest.
-# Production-ready compose configuration adaptive to Host Sensing mappings.
+# COREGRAPH MASTER ENGINEERING SPECIFICATION: MODULE 15 - TASK 08
+# STATE-MACHINE PERSISTENCE & RECOVERY (WAL-HARDENED FINAL SEAL)
 
 services:
-  engine:
-    build: .
-    image: coregraph-engine:latest
-    container_name: coregraph_ingestion_phalanx
-    restart: unless-stopped
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - coregraph_mesh
-    environment:
-      - DATABASE_URL=postgresql+asyncpg://coregraph_admin:coregraph_secret123@db:5432/coregraph_vault
-    deploy:
-      resources:
-        # POTATO TIER CONSTRAINT SIMULATION (Uncomment to force limits)
-        # limits:
-        #   cpus: "2"
-        #   memory: 4G
-        reservations:
-          cpus: "1"
-          memory: 512M
-
   db:
     image: postgres:15-alpine
-    container_name: coregraph_relational_vault
+    container_name: coregraph_db
     restart: always
     environment:
       POSTGRES_USER: coregraph_admin
       POSTGRES_PASSWORD: coregraph_secret123
       POSTGRES_DB: coregraph_vault
-      # Optimizing shared_buffers strictly for async ingestion velocity
-      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256"
-    command:
-      - "postgres"
-      - "-c"
-      - "shared_buffers=1GB"
-      - "-c"
-      - "max_connections=500"
-      - "-c"
-      - "wal_level=logical"
-      - "-c"
-      - "synchronous_commit=off" # NVMe saturation override
     volumes:
       - coregraph_pgdata:/var/lib/postgresql/data
     networks:
       - coregraph_mesh
+    # WAL-HARDENING: Absolute ACID Compliance for 3.81M Node Integrity
+    command: postgres -c "max_connections=500" -c "shared_buffers=1GB" -c "wal_level=replica" -c "full_page_writes=on" -c "checkpoint_timeout=15min" -c "max_wal_size=4GB"
+
+  redis:
+    image: redis:7-alpine
+    container_name: coregraph_cache
+    networks:
+      - coregraph_mesh
+    # AOF-HARDENING: Persistence Sovereignty
+    command: redis-server --appendonly yes --appendfsync everysec
+
+  coregraph_engine:
+    image: coregraph-engine:final-hardened
+    container_name: ingestion_phalanx
+    depends_on:
+      - db
+      - redis
+    networks:
+      - coregraph_mesh
     ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U coregraph_admin -d coregraph_vault"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+      - "8000:8000"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.90'
+          memory: 4GB
 
 networks:
   coregraph_mesh:
     driver: bridge
+    internal: true
 
 volumes:
   coregraph_pgdata:
-    driver: local

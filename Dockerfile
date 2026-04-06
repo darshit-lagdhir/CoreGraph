@@ -1,43 +1,57 @@
-# Module 4 - Task 023: REDLINE-Optimized Production Container
-# Base utilization of Slim-Debian for Python execution to minimize image footprint.
+# COREGRAPH MASTER ENGINEERING SPECIFICATION: MODULE 15 - TASK 09
+# MULTI-ARCHITECTURE BUILD VALIDATION: UNIVERSAL SILICON SEAL
 
-FROM python:3.13-slim-bullseye AS builder
+# --- STAGE 1: FRONTEND BUILD (VITE/WEBGL COMPILATION) ---
+FROM --platform=$BUILDPLATFORM node:20-slim AS frontend-builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --quiet
+COPY . .
+RUN npm run build
 
-WORKDIR /coregraph
+# --- STAGE 2: BACKEND BUILD (ARCH-SENSITIVE COMPILATION) ---
+FROM --platform=$BUILDPLATFORM python:3.11-slim-bullseye AS backend-builder
+ARG TARGETPLATFORM
+WORKDIR /app
 
-# Silicon-Native dependencies for PostgreSQL async I/O drivers
+# Installing Toolchains for Native Silicon Optimization
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
+    gcc-aarch64-linux-gnu \
+    gcc-x86-64-linux-gnu \
     libpq-dev \
-    gcc \
+    binutils \
+    build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt .
-RUN pip install --user --no-cache-dir -r requirements.txt
+COPY backend/ingestion/requirements.txt .
 
-# --- PRODUCTION STAGE ---
-FROM python:3.13-slim-bullseye
+# Multi-Platform Binary Optimization: Installing Architecture-Native Wheels
+RUN if [ "$TARGETPLATFORM" = "linux/arm64" ]; then \
+        export CC=aarch64-linux-gnu-gcc; \
+    fi && \
+    pip install --user --no-cache-dir -r requirements.txt
 
-# Environment constraints preventing memory leak swap conditions
+# Binary Stripping: Eradicating non-essential debug symbols for 150MB Mandate
+RUN find /root/.local -name "*.so" -exec strip --strip-debug {} +
+
+# --- STAGE 3: PRODUCTION SOVEREIGN VESSEL (DISTROLESS) ---
+FROM gcr.io/distroless/python3-debian11
+WORKDIR /coregraph
+
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     MALLOC_ARENA_MAX=2 \
-    PYTHONASYNCIODEBUG=0
+    PYTHONPATH=/coregraph:/coregraph/backend
 
-WORKDIR /coregraph
-
-# Pull native drivers from builder stage
-COPY --from=builder /root/.local /root/.local
-COPY --from=builder /usr/lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu
-
-# Establish system PATH
+# Copy site-packages from builder
+COPY --from=backend-builder /root/.local /root/.local
 ENV PATH=/root/.local/bin:$PATH
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libpq5 \
-    && rm -rf /var/lib/apt/lists/*
+# Copy minified frontend assets
+COPY --from=frontend-builder /app/dist ./frontend/dist
 
-COPY . .
+# Copy the Backend Core (Root context bridge)
+COPY backend/ ./backend/
+COPY master_orchestrator.py .
 
-# Launch into the Host Sensing Kernel before initiating the Ingestion Phalanx
-ENTRYPOINT ["python", "-c", "import sys; from backend.ingestion.sensing import HostSensingKernel; HostSensingKernel().generate_master_constants(); from backend.ingestion.phalanx import UnifiedIngestionPhalanx; sys.exit(0)"]
+ENTRYPOINT ["python", "master_orchestrator.py"]
