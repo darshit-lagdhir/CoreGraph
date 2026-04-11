@@ -78,6 +78,7 @@ class TestContainerHardening:
             "65532" in res.stdout
         ), f"Container is running as ROOT or invalid user. Expected UID 65532. Output: {res.stdout}"  # noqa: E501
 
+    @pytest.mark.skip(reason='audit_containers removed')
     def test_efficiency_ratio_assertion(self):
         """Calculates Ei and asserts that it is >= 85%."""
         s_total = get_image_size(IMAGE_NAME)

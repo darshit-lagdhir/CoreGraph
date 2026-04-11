@@ -53,7 +53,14 @@ class DatabaseManager:
             pool_timeout=self.pool_timeout,
             pool_recycle=1800,
             pool_pre_ping=True,
-            connect_args={"prepared_statement_cache_size": 500},
+            isolation_level="REPEATABLE READ",
+            connect_args={
+                "prepared_statement_cache_size": 500,
+                "server_settings": {
+                    "jit": "off"
+                }
+            },
+            execution_options={"isolation_level": "REPEATABLE READ"}
         )
 
         self.session_factory = async_sessionmaker(

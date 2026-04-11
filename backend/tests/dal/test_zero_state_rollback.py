@@ -19,7 +19,7 @@ async def test_zero_state_mathematical_consistency(engine, session):
     async with engine.begin() as conn:
         await conn.execute(text("DROP SCHEMA public CASCADE;"))
         await conn.execute(text("CREATE SCHEMA public;"))
-        await conn.execute(text("GRANT ALL ON SCHEMA public TO postgres;"))
+        await conn.execute(text("GRANT ALL ON SCHEMA public TO admin;"))
         await conn.execute(text("GRANT ALL ON SCHEMA public TO public;"))
 
     # 2. UPWARD (Alembic Genesis)

@@ -7,7 +7,6 @@ from typing import Any, Dict, List
 
 logger = logging.getLogger("coregraph.orchestration.worker")
 
-
 class WorkerLifecycleGovernor:
     """
     The Proactive Worker Recycling Kernel and Memory-Leak Neutralization Protocol.
@@ -20,20 +19,24 @@ class WorkerLifecycleGovernor:
         "staggered_recycle_interval",
         "zombie_grace_period",
         "metabolic_vitality",
-        "active_process_registry"
+        "active_process_registry",
+        "_ipc_lock"
     )
 
     def __init__(self, tier: str = "redline"):
         self.tier = tier.lower()
         is_potato = self.tier == "potato"
-        
+
+        # Atomic Shared-Memory Lock mapping for thread-safe recycling sequences
+        self._ipc_lock = asyncio.Lock()
+
         # HW-Aware Lifespan Calibration
         self.max_tasks_per_child: int = 2500 if is_potato else 500
         self.max_memory_per_child: int = 100 * 1024 if is_potato else 150 * 1024  # Size in KB
-        
+
         self.staggered_recycle_interval: float = 0.5 if is_potato else 0.1
         self.zombie_grace_period: int = 15
-        
+
         self.metabolic_vitality: Dict[str, Any] = {
             "recycled_workers": 0,
             "zombies_neutralized": 0,
@@ -41,7 +44,7 @@ class WorkerLifecycleGovernor:
             "fork_latency_ms": 0.0,
             "average_worker_age_tasks": 0
         }
-        
+
         self.active_process_registry: List[Dict[str, Any]] = []
 
     def get_recycling_settings(self) -> Dict[str, Any]:
@@ -61,33 +64,29 @@ class WorkerLifecycleGovernor:
         Issues recycling requests while protecting the 144Hz HUD from context-switch storms.
         """
         start_time = time.perf_counter()
-        
-        for pid in worker_pids:
-            try:
-                # Issue Soft-Termination to trigger max-tasks cleanup mapping
-                logger.debug(f"Initiating graceful recycle for PID {pid}")
-                os.kill(pid, signal.SIGTERM)
-                
-                # Check for Zombie State
-                await self._enforce_zombie_neutralization(pid)
-                self.metabolic_vitality["recycled_workers"] += 1
-                
-                # Yield Event Loop to spread the forking overhead
-                await asyncio.sleep(self.staggered_recycle_interval)
-                
-            except ProcessLookupError:
-                logger.debug(f"PID {pid} already relinquished.")
-            except Exception as e:
-                logger.error(f"Failed to recycle worker PID {pid}: {e}")
 
-        total_latency = (time.perf_counter() - start_time) * 1000.0
-        self.metabolic_vitality["fork_latency_ms"] = round(total_latency, 3)
-        self._signal_hud_metabolic_pulse()
+        async with self._ipc_lock:
+            for pid in worker_pids:
+                try:
+                    # Graceful Degradation Pattern: Only signal, never SIGKILL active contexts immediately
+                    logger.debug(f"Initiating graceful recycle for PID {pid}")
+                    import sys
+                    if sys.platform == "win32":
+                        os.kill(pid, signal.SIGTERM)
+                    else:
+                        os.kill(pid, signal.SIGTERM)
 
-    async def _enforce_zombie_neutralization(self, pid: int) -> None:
-        """
-        The SIGKILL enforcement timer. Forcefully reclaims residency if the worker locks up.
-        """
+                    # Check for Zombie State securely
+                    await self._enforce_zombie_neutralization(pid)
+                    self.metabolic_vitality["recycled_workers"] += 1
+
+                    # Yield Event Loop to spread the forking overhead (Thread-safe block limit)
+                    await asyncio.sleep(self.staggered_recycle_interval)
+
+                except ProcessLookupError:
+                    logger.debug(f"PID {pid} already relinquished.")
+                except Exception as e:
+                    logger.error(f"Failed to gracefully recycle worker PID {pid}: {e}")
         import sys
         is_windows = sys.platform == "win32"
         

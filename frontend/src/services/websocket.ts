@@ -27,31 +27,58 @@ export class AsynchronousGlobalUmbilicalManifold {
         const start_time = performance.now();
 
         return new Promise((resolve) => {
-            this._socket = new WebSocket(this._gateway_url);
-            this._socket.binaryType = 'arraybuffer';
+            try {
+                this._socket = new WebSocket(this._gateway_url);
+                this._socket.binaryType = 'arraybuffer';
 
-            this._socket.onopen = () => {
-                // Dispatch Binary Upgrade Frame [Type: 0x01 | Session_UUID | Epoch_ID]
-                const handshake_frame = new ArrayBuffer(20);
-                const view = new DataView(handshake_frame);
-                view.setUint8(0, 0x01); // Handshake Type
-                // UUID as bytes...
-                view.setUint32(16, epoch_id, true);
+                this._socket.onopen = () => {
+                    try {
+                        // Dispatch Binary Upgrade Frame [Type: 0x01 | Session_UUID | Epoch_ID]
+                        const handshake_frame = new ArrayBuffer(20);
+                        const view = new DataView(handshake_frame);
+                        view.setUint8(0, 0x01); // Handshake Type
+                        // UUID as bytes...
+                        view.setUint32(16, epoch_id, true);
 
-                this._socket?.send(handshake_frame);
-                this._handshake_latency = performance.now() - start_time;
-                this._reconnect_attempts = 0;
-                resolve(true);
-            };
+                        if (this._socket?.readyState === WebSocket.OPEN) {
+                            this._socket?.send(handshake_frame);
+                        }
+                        this._handshake_latency = performance.now() - start_time;
+                        this._reconnect_attempts = 0;
+                        resolve(true);
+                    } catch (e) {
+                        console.error('Handshake execution failed.', e);
+                        resolve(false);
+                    }
+                };
 
-            this._socket.onclose = () => {
-                this._execute_autonomous_reconnection_sequence();
+                this._socket.onerror = (error) => {
+                    console.error('Sovereign Connection Error:', error);
+                    // Do not resolve false immediately to let onclose handle reconnect, or handle gracefully without infinite loops.
+                };
+
+                this._socket.onclose = (event) => {
+                    // Prevent infinite 401 loop: if critical auth failure (4000-4003 usually), halt.
+                    if (event.code === 4001 || event.code === 4003) {
+                        console.error('Critical Authorization Failure - Halting re-connection loop to preserve system stability.');
+                        resolve(false);
+                        return;
+                    }
+                    this._execute_autonomous_reconnection_sequence();
+                    resolve(false);
+                };
+
+                this._socket.onmessage = (event) => {
+                    try {
+                        this._process_binary_frame(event.data);
+                    } catch (e) {
+                        console.error('Binary frame processing anomaly intercepted:', e);
+                    }
+                };
+            } catch (e) {
+                console.error('WebSocket instantiation failure suppressed.', e);
                 resolve(false);
-            };
-
-            this._socket.onmessage = (event) => {
-                this._process_binary_frame(event.data);
-            };
+            }
         });
     }
 
@@ -60,6 +87,11 @@ export class AsynchronousGlobalUmbilicalManifold {
      * Prevents thundering herd scenarios during gateway failover.
      */
     private _execute_autonomous_reconnection_sequence(): void {
+        if (this._reconnect_attempts > 15) {
+            console.warn('Max reconnection limit reached. Holding umbilical pattern.');
+            return;
+        }
+
         this._reconnect_attempts++;
 
         // Jittered Exponential Backoff: delay = (2^n * 100) + rand(20%)
@@ -67,10 +99,7 @@ export class AsynchronousGlobalUmbilicalManifold {
 
         setTimeout(() => {
             // Re-attempt handshake (session recovery logic)
-        }, delay);
-    }
-
-    /**
+            this.execute_protocol_handshake_tunnel(Date.now());
      * _process_binary_frame: Zero-Copy Dispatch.
      */
     private _process_binary_frame(data: ArrayBuffer): void {

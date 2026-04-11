@@ -28,7 +28,7 @@ async def test_global_intelligence_assembly(session):
 
     # 3. Assemble I_Omega Object
     # This triggers search, risk, and behavioral modules
-    intel_obj = await engine.get_intelligence_object("npm:lodash")
+    intel_obj = await engine.get_intelligence_object("lodash")
 
     # 4. Global Validation: Master Context Alignment
     assert intel_obj is not None

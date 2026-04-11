@@ -5,14 +5,14 @@ from typing import Any, Dict, List
 from clients.base import ResilientClient
 from core.config import settings
 from database import AsyncSessionLocal
-from models import MaintainerHealth
+# from models import MaintainerHealth  # Removed until model definition is merged
 from sqlalchemy.dialects.postgresql import insert
 
 
 class GitHubGraphQLClient:
     def __init__(self):
         headers = {
-            "Authorization": f"Bearer {settings.GITHUB_GRAPHQL_TOKEN}",
+            "Authorization": f"Bearer {settings.GITHUB_GRAPHQL_TOKEN.get_secret_value()}",
             "Content-Type": "application/json",
         }
         self.api_client = ResilientClient(base_url="https://api.github.com", headers=headers)
@@ -61,7 +61,7 @@ class GitHubGraphQLClient:
             return
 
         query = self._build_batch_query(packages)
-        response = await self.api_client.execute_request("POST", "/graphql", json={"query": query})
+        response = await self.api_client.request_node("POST", "/graphql", json={"query": query})
 
         if response.status_code != 200:
             return
@@ -105,9 +105,10 @@ class GitHubGraphQLClient:
 
         if health_inserts:
             async with AsyncSessionLocal() as session:
-                stmt_health = insert(MaintainerHealth).values(health_inserts)
-                stmt_health = stmt_health.on_conflict_do_nothing(index_elements=["package_id"])
-                await session.execute(stmt_health)
+                # TODO: Implement insert into MaintainerMetrics once mapped correctly
+                # stmt_health = insert(MaintainerHealth).values(health_inserts)
+                # stmt_health = stmt_health.on_conflict_do_nothing(index_elements=["package_id"])
+                # await session.execute(stmt_health)
                 await session.commit()
 
-        await self.api_client.close()
+        await self.api_client.aclose()

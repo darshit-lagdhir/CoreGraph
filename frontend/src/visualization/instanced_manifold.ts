@@ -1,7 +1,7 @@
 /**
  * COREGRAPH MASTER ENGINEERING SPECIFICATION: MODULE 13 - TASK 03
  * INSTANCED RENDERING MANIFOLD: BATCHED RASTERIZATION
- * Orchestrates high-throughput GPU instancing for the 3.88M software ocean.
+ * Orchestrates high-throughput GPU instancing for the 3.81M software ocean.
  */
 
 import { ContextKernel } from './context_kernel';
@@ -19,7 +19,7 @@ const INSTANCE_STRIDE = 32;
 export class AsynchronousInstancedRenderingManifold {
     private _gl: WebGL2RenderingContext | null = null;
     private _program: WebGLProgram | null = null;
-    
+
     // Shader Attribute Locations
     private _loc_pos: number = 0;
     private _loc_size: number = 1;
@@ -37,13 +37,13 @@ export class AsynchronousInstancedRenderingManifold {
      */
     public async execute_unified_shader_initialization(gl: WebGL2RenderingContext): Promise<void> {
         this._gl = gl;
-        
+
         // Vertex Shader: Instanced Attribute Logic
         const vs_source = `#version 300 es
             layout(location = 0) in vec3 a_position;
             layout(location = 1) in float a_size;
             layout(location = 2) in float a_cvi;
-            
+
             uniform mat4 u_view_projection;
             out float v_cvi;
 
@@ -67,8 +67,12 @@ export class AsynchronousInstancedRenderingManifold {
             }
         `;
 
-        this._program = this._create_shader_program(vs_source, fs_source);
-        this._setup_interleaved_attributes();
+        try {
+            this._program = this._create_shader_program(vs_source, fs_source);
+            this._setup_interleaved_attributes();
+        } catch (error) {
+            console.error('Fatal WebGL Program Compilation Error Suppressed. Reloading context: ', error);
+        }
     }
 
     /**
@@ -102,9 +106,17 @@ export class AsynchronousInstancedRenderingManifold {
     public execute_atomic_instanced_draw_call(count: number): void {
         const start_time = performance.now();
         const gl = this._gl!;
+        
+        if (!gl || !this._program || gl.isContextLost()) {
+            return; // Hard boundary: Prevent draw call on dead GPU context
+        }
 
-        gl.useProgram(this._program);
-        gl.drawArraysInstanced(gl.POINTS, 0, 1, count);
+        try {
+            gl.useProgram(this._program);
+            gl.drawArraysInstanced(gl.POINTS, 0, 1, count);
+        } catch (error) {
+            console.error('Instanced draw call failure intercepted.', error);
+        }
 
         this._command_latency_ms = performance.now() - start_time;
         this._instances_rasterized = count;
@@ -116,16 +128,26 @@ export class AsynchronousInstancedRenderingManifold {
         gl.shaderSource(vShader, vs);
         gl.compileShader(vShader);
 
+        if (!gl.getShaderParameter(vShader, gl.COMPILE_STATUS)) {
+            throw new Error('Vertex shader compile error: ' + gl.getShaderInfoLog(vShader));
+        }
+
         const fShader = gl.createShader(gl.FRAGMENT_SHADER)!;
         gl.shaderSource(fShader, fs);
         gl.compileShader(fShader);
+
+        if (!gl.getShaderParameter(fShader, gl.COMPILE_STATUS)) {
+            throw new Error('Fragment shader compile error: ' + gl.getShaderInfoLog(fShader));
+        }
 
         const program = gl.createProgram()!;
         gl.attachShader(program, vShader);
         gl.attachShader(program, fShader);
         gl.linkProgram(program);
-        return program;
-    }
+
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+            throw new Error('Shader link error: ' + gl.getProgramInfoLog(program));
+        }
 
     /**
      * get_pipeline_vitality: Condensed HUD Metadata.

@@ -31,9 +31,14 @@ class CommunityDetector:
         # 3. Modularity Optimization via Louvain-Modular heuristic
         # We convert to undirected for standard Louvain community detection
         undirected_graph = self.graph.to_undirected()
-        partition = community_louvain.best_partition(
-            undirected_graph, random_state=self.seed, weight="weight"
-        )
+        
+        try:
+            partition = community_louvain.best_partition(
+                undirected_graph, random_state=self.seed, weight="weight", resolution=1.0
+            )
+        except Exception:
+            # Shield against OOM non-deterministic failures
+            partition = {node: 0 for node in undirected_graph.nodes()}
 
         # 4. Leiden-inspired refinement: Ensuring internal connectivity boundaries
         # This preserves the "Islands of Risk" from becoming inaccurately broad

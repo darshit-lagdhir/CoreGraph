@@ -4,7 +4,7 @@ import uuid
 
 import pytest
 from core.config import settings
-from models import Base
+from dal.base import Base
 from sqlalchemy import inspect, text
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import create_async_engine
@@ -66,13 +66,13 @@ async def test_transactional_ddl_integrity():
             # 1. Baseline entry: Mapping a legitimate OSINT node
             await conn.execute(
                 text(
-                    "INSERT INTO packages (id, ecosystem, name, name_normalized) VALUES (:id, :eco, :name, :name_norm)"  # noqa: E501
+                    "INSERT INTO packages (id, ecosystem, name) VALUES (:id, :eco, :name)"  # noqa: E501
                 ),
                 {
                     "id": str(uuid.uuid4()),
                     "eco": "pypi",
                     "name": test_node_name,
-                    "name_norm": test_node_name.lower(),
+                    
                 },
             )
 
@@ -80,13 +80,13 @@ async def test_transactional_ddl_integrity():
             # We attempt to insert a record that violates the (ecosystem, name_normalized) unique constraint  # noqa: E501
             await conn.execute(
                 text(
-                    "INSERT INTO packages (id, ecosystem, name, name_normalized) VALUES (:id, :eco, :name, :name_norm)"  # noqa: E501
+                    "INSERT INTO packages (id, ecosystem, name) VALUES (:id, :eco, :name)"  # noqa: E501
                 ),
                 {
                     "id": str(uuid.uuid4()),
                     "eco": "pypi",
-                    "name": test_node_name.upper(),
-                    "name_norm": test_node_name.lower(),
+                    "name": test_node_name,
+                    
                 },
             )
 

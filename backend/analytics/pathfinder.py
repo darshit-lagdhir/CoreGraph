@@ -24,11 +24,13 @@ class QuantizedDeterministicPathfinderManifold:
         for node_id, weight in float_weights.items():
             self._quantized_weights[node_id] = int(weight * self._quantization_scale)
 
-    def find_shortest_path_deterministic(self, graph, start_node, target_node):
-        pq = [(0, start_node, [start_node])]
+    def find_shortest_path_deterministic(self, graph, start_node, target_node, max_depth=5000):
+        pq = [(0, start_node, [start_node], 0)]
         visited = set()
         while pq:
-            cost, u, path = heapq.heappop(pq)
+            cost, u, path, depth = heapq.heappop(pq)
+            if depth > max_depth:
+                continue
             if u == target_node:
                 return {"Path": path, "Status": "DETERMINISTIC_PATH_CERTIFIED"}
             if u in visited: continue
@@ -36,7 +38,7 @@ class QuantizedDeterministicPathfinderManifold:
             for v in graph.get(u, []):
                 if v not in visited:
                     new_cost = cost + self._quantized_weights.get(v, 0)
-                    heapq.heappush(pq, (new_cost, v, path + [v]))
+                    heapq.heappush(pq, (new_cost, v, path + [v], depth + 1))
         return {"Status": "NO_PATH_DETECTED"}
 
 class Pathfinder:

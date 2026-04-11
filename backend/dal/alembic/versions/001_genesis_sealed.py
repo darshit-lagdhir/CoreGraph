@@ -176,7 +176,9 @@ def upgrade() -> None:
     # 5. NATIVE TRIGGER INJECTION (Task 027)
     with open("backend/dal/migrations/triggers/v1_native_triggers.sql") as f:
         trigger_sql = f.read()
-    op.execute(sa.text(trigger_sql))
+    for statement in trigger_sql.split('-- SPLIT --'):
+        if statement.strip():
+            op.execute(sa.text(statement.strip()))
 
 
 def downgrade() -> None:
@@ -216,3 +218,5 @@ def downgrade() -> None:
     op.execute("DROP EXTENSION IF EXISTS pg_trgm CASCADE;")
     op.execute("DROP EXTENSION IF EXISTS earthdistance CASCADE;")
     op.execute('DROP EXTENSION IF EXISTS "uuid-ossp" CASCADE;')
+
+

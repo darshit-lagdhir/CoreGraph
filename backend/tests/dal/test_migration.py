@@ -25,15 +25,7 @@ def test_schema_migration_continuity():
     def purge_vault():
         # High-Velocity Purge: Direct SQL injection into the containerized vault
         # Ensures zero residual artifacts from parallel test sessions (CoreGraph Protocol)
-        sql = (
-            "DROP TABLE IF EXISTS alembic_version CASCADE; "
-            "DROP TABLE IF EXISTS dependency_edges CASCADE; "
-            "DROP TABLE IF EXISTS package_versions CASCADE; "
-            "DROP TABLE IF EXISTS packages CASCADE; "
-            "DROP TABLE IF EXISTS maintainer_metrics CASCADE; "
-            "DROP TABLE IF EXISTS author_profiles CASCADE; "
-            "DROP MATERIALIZED VIEW IF EXISTS mv_package_risk_summary CASCADE;"
-        )
+        sql = 'DROP SCHEMA public CASCADE; CREATE SCHEMA public; GRANT ALL ON SCHEMA public TO admin;'
         subprocess.run(
             [
                 "docker",
@@ -54,11 +46,10 @@ def test_schema_migration_continuity():
         env = os.environ.copy()
         env["PYTHONPATH"] = "backend"
         # Adjusted path for Windows venv
-        alembic_path = os.path.join(os.getcwd(), "venv", "Scripts", "alembic.exe")
-        result = subprocess.run([alembic_path] + args, env=env, capture_output=True, text=True)
+        result = subprocess.run([sys.executable, "-m", "alembic", "-c", "backend/dal/alembic.ini"] + args, env=env, capture_output=True, text=True)
         if result.returncode != 0:
             # Only fail on TRUE errors, not INFO logging
-            raise Exception(f"Alembic failure (RC={result.returncode}): {result.stderr}")
+            raise Exception(f"Alembic failure (RC={result.returncode}): stdout: {result.stdout}, stderr: {result.stderr}")
         return result.stdout
 
     try:
@@ -80,3 +71,4 @@ def test_schema_migration_continuity():
         pytest.fail(
             f"SCHEMA GOVERNANCE FAILURE: Migration history is non-linear or broken. Error: {e}"
         )
+
