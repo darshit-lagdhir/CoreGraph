@@ -18,7 +18,7 @@ export interface TRay {
  */
 export class AsynchronousOcularProjectionManifold {
     private _inverse_vp_matrix: Float32Array = new Float32Array(16);
-    
+
     // Ocular Vitality
     private _rays_dispatched: number = 0;
     private _inversion_latency_ms: number = 0;

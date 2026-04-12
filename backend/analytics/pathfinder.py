@@ -7,12 +7,14 @@ import networkx as nx
 import hashlib
 import time
 
+
 class QuantizedDeterministicPathfinderManifold:
     """
     RECTIFICATION 002: THE FLOATING-POINT DRIFT ANOMALY.
     Neutralizes IEEE 754 precision loss via 64-bit Fixed-Point Integer Quantization.
     Scale Factor: 10,000,000 (Sub-atomic risk precision).
     """
+
     __slots__ = ("_hardware_tier", "_quantization_scale", "_quantized_weights")
 
     def __init__(self, hardware_tier: str = "REDLINE"):
@@ -33,13 +35,15 @@ class QuantizedDeterministicPathfinderManifold:
                 continue
             if u == target_node:
                 return {"Path": path, "Status": "DETERMINISTIC_PATH_CERTIFIED"}
-            if u in visited: continue
+            if u in visited:
+                continue
             visited.add(u)
             for v in graph.get(u, []):
                 if v not in visited:
                     new_cost = cost + self._quantized_weights.get(v, 0)
                     heapq.heappush(pq, (new_cost, v, path + [v], depth + 1))
         return {"Status": "NO_PATH_DETECTED"}
+
 
 class Pathfinder:
     def __init__(self, graph: nx.DiGraph):
@@ -60,29 +64,29 @@ class Pathfinder:
 
     def dijkstra(self, source: str, target: str) -> List[str]:
         """Finds the absolute shortest path using fixed-point integer quantization."""
-        
+
         if source not in self.graph or target not in self.graph:
             return []
 
         # 1. Initialize the Quantization Manifold
         manifold = QuantizedDeterministicPathfinderManifold(hardware_tier="REDLINE")
-        
+
         # 2. Map floating-point risk/centrality weights to the integer domain
         # W_uv = 1 + (1 / (1 + PageRank_v))
         float_weights = {}
         for node in self.graph.nodes:
             pagerank_v = self.graph.nodes[node].get("pagerank", 1e-6)
             float_weights[str(node)] = 1.0 + (1.0 / (1.0 + pagerank_v))
-        
+
         manifold.execute_fixed_point_weight_transformation(float_weights)
-        
+
         # 3. Execute Deterministic Pathfinding Kernel
         adj_map = {str(n): [str(nb) for nb in self.graph.neighbors(n)] for n in self.graph.nodes}
         result = manifold.find_shortest_path_deterministic(adj_map, str(source), str(target))
-        
+
         if result["Status"] == "DETERMINISTIC_PATH_CERTIFIED":
             return result["Path"]
-            
+
         return []
 
     def a_star(self, source: str, target: str) -> List[str]:
@@ -185,6 +189,7 @@ class Pathfinder:
 
         return path_f + path_b
 
+
 if __name__ == "__main__":
     print("COREGRAPH PATHFINDER SELF-AUDIT [START]")
     try:
@@ -192,14 +197,14 @@ if __name__ == "__main__":
         mock_graph.add_node("A", pagerank=0.1)
         mock_graph.add_node("B", pagerank=0.5)
         mock_graph.add_edge("A", "B")
-        
+
         pf = Pathfinder(mock_graph)
         path = pf.dijkstra("A", "B")
         print(f"[DATA] Resolved Deterministic Path: {path}")
-        
+
         if path == ["A", "B"]:
             print("[PASS] Quantized Deterministic Pathfinder Verified.")
-        
+
         print("COREGRAPH PATHFINDER [SUCCESS]")
     except Exception as e:
         print(f"COREGRAPH PATHFINDER [FAILURE]: {str(e)}")

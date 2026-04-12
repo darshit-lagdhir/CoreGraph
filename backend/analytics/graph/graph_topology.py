@@ -1,5 +1,6 @@
 from backend.dal.repositories.adjacency_kernel import AdjacencyKernel
 
+
 class GraphTopologyManifold:
     def __init__(self, max_nodes=4000000):
         self.adjacency = AdjacencyKernel(max_nodes=max_nodes)
@@ -13,7 +14,7 @@ class GraphTopologyManifold:
         visited = set([start_node])
         q = [start_node]
         depth = 0
-        
+
         while q and depth < depth_limit:
             next_q = []
             for u in q:

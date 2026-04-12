@@ -4,13 +4,14 @@ import uuid
 from datetime import datetime
 from typing import List, Dict, Any, Optional
 
+
 class CGBPEncoder:
     """
     CoreGraph Binary Protocol (CGBP) Industrial-Grade Encoder.
     Packs 3.88M OSINT nodes into an ultra-dense format optimized for i9-13980hx IPC.
     Achieves 20:1 compression ratio over standard JSON/MessagePack.
     """
-    
+
     __slots__ = ("ecosystem_map", "GENESIS_TS", "_buffer", "_view")
 
     def __init__(self):
@@ -29,7 +30,7 @@ class CGBPEncoder:
 
         pkg_id = node_data["id"]
         pkg_id_int = pkg_id.int if isinstance(pkg_id, uuid.UUID) else pkg_id
-        
+
         while True:
             byte = pkg_id_int & 0x7F
             pkg_id_int >>= 7
@@ -41,11 +42,13 @@ class CGBPEncoder:
             offset += 1
 
         flags = 0
-        if node_data.get("is_vulnerable", False): flags |= 1 << 7
-        if node_data.get("is_verified", False): flags |= 1 << 6
+        if node_data.get("is_vulnerable", False):
+            flags |= 1 << 7
+        if node_data.get("is_verified", False):
+            flags |= 1 << 6
         eco_id = self.ecosystem_map.get(node_data.get("ecosystem", "npm"), 15)
         flags |= eco_id & 0x1F
-        
+
         struct.pack_into("B", self._buffer, offset, flags)
         offset += 1
 
@@ -77,12 +80,18 @@ class CGBPEncoder:
             res.append(byte | 0x80)
         return bytes(res)
 
+
 class CGBPDecoder:
     """High-speed decompressor leveraging hardware bit-shuffling logic."""
 
     def __init__(self):
         self.ecosystem_reverse_map = {
-            0: "npm", 1: "pypi", 2: "cargo", 3: "go", 4: "maven", 15: "unknown",
+            0: "npm",
+            1: "pypi",
+            2: "cargo",
+            3: "go",
+            4: "maven",
+            15: "unknown",
         }
         self.GENESIS_TS = 1735689600
 
@@ -113,10 +122,12 @@ class CGBPDecoder:
         }
 
     def _decode_varint(self, stream: io.BytesIO) -> int:
-        shift = 0; result = 0
+        shift = 0
+        result = 0
         while True:
             b = stream.read(1)[0]
             result |= (b & 0x7F) << shift
-            if not (b & 0x80): break
+            if not (b & 0x80):
+                break
             shift += 7
         return result

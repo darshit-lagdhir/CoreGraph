@@ -20,7 +20,7 @@ const DEPTH_CONFIG = {
  */
 export class AsynchronousDepthSovereigntyManifold {
     private _gl: WebGL2RenderingContext | null = null;
-    
+
     // Spatial Vitality
     private _pixels_sorted: number = 0;
     private _occlusion_latency_ms: number = 0;
@@ -38,10 +38,10 @@ export class AsynchronousDepthSovereigntyManifold {
         // 1. Configure Hardware Depth Test
         gl.enable(gl.DEPTH_TEST);
         gl.depthFunc(gl.LEQUAL);
-        
+
         // 2. Initialize Layer-Priority Stacking
         this._apply_logarithmic_depth_coefficients();
-        
+
         // 3. Clear Stale Fragments
         gl.clear(gl.DEPTH_BUFFER_BIT);
 

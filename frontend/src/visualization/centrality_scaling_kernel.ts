@@ -21,7 +21,7 @@ const SCALING_CONFIG = {
  */
 export class AsynchronousStructuralScalingManifold {
     private _gl: WebGL2RenderingContext | null = null;
-    
+
     // Hierarchical Vitality
     private _nodes_scaled: number = 0;
     private _scaling_latency_ms: number = 0;
@@ -38,10 +38,10 @@ export class AsynchronousStructuralScalingManifold {
 
         // 1. Calculate Power-Law Distribution Bounds
         const { minRank, maxRank } = this._calculate_rank_distribution(nodeRanks);
-        
+
         // 2. Perform Logarithmic Normalization
         this._execute_power_law_distribution_scaling(minRank, maxRank);
-        
+
         this._scaling_latency_ms = performance.now() - start_time;
         this._nodes_scaled = nodeRanks.length;
     }

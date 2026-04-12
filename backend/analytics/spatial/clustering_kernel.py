@@ -1,4 +1,6 @@
 import struct
+
+
 class ClusteringKernel:
     @staticmethod
     def assign(x: float, y: float, grid_size: float) -> int:

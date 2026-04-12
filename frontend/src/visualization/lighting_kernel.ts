@@ -20,7 +20,7 @@ const LIGHTING_CONFIG = {
  */
 export class AsynchronousAtmosphericLightingManifold {
     private _radiosity_registry: Float32Array | null = null;
-    
+
     // Atmospheric Vitality
     private _pixels_illuminated: number = 0;
     private _radiosity_latency_ms: number = 0;
@@ -40,7 +40,7 @@ export class AsynchronousAtmosphericLightingManifold {
 
         this._radiosity_latency_ms = performance.now() - start_time;
         this._pixels_illuminated++;
-        
+
         return intensity;
     }
 
@@ -50,13 +50,13 @@ export class AsynchronousAtmosphericLightingManifold {
      */
     private _calculate_pulse_emission(cvi: number, time_s: number): number {
         const base_intensity = Math.max(LIGHTING_CONFIG.min_intensity, (cvi / 100.0) * LIGHTING_CONFIG.max_intensity);
-        
+
         // If CVI > 90, apply pulse-modulation
         if (cvi > 90) {
             const pulse = 0.5 * (1.0 + Math.sin(2.0 * Math.PI * LIGHTING_CONFIG.pulse_frequency * time_s));
             return base_intensity * (0.5 + 0.5 * pulse);
         }
-        
+
         return base_intensity;
     }
 

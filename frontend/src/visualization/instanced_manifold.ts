@@ -50,7 +50,7 @@ export class AsynchronousInstancedRenderingManifold {
             void main() {
                 v_cvi = a_cvi;
                 gl_Position = u_view_projection * vec4(a_position, 1.0);
-                gl_PointSize = a_size * (20.0 / gl_Position.w); 
+                gl_PointSize = a_size * (20.0 / gl_Position.w);
             }
         `;
 
@@ -106,7 +106,7 @@ export class AsynchronousInstancedRenderingManifold {
     public execute_atomic_instanced_draw_call(count: number): void {
         const start_time = performance.now();
         const gl = this._gl!;
-        
+
         if (!gl || !this._program || gl.isContextLost()) {
             return; // Hard boundary: Prevent draw call on dead GPU context
         }

@@ -24,7 +24,7 @@ export const IntelligenceReadout: React.FC<{ node?: NodeData; onClose: () => voi
   });
 
   return (
-    <article 
+    <article
       className="fixed top-8 right-8 w-80 bg-bg-surface border border-muted p-6 rounded-lg backdrop-blur-xl shadow-2xl z-hud-overlay"
       aria-label={`Intelligence Readout for ${node.nomenclature}`}
       role="region"
@@ -34,7 +34,7 @@ export const IntelligenceReadout: React.FC<{ node?: NodeData; onClose: () => voi
           <h2 className="text-xl font-bold text-main">{node.nomenclature}</h2>
           <p className="text-xs font-mono text-dim">{node.version} | ID: {node.id}</p>
         </div>
-        <button 
+        <button
           onClick={onClose}
           className="text-dim hover:text-main transition-fast"
           aria-label="Close Readout"
@@ -70,9 +70,9 @@ export const IntelligenceReadout: React.FC<{ node?: NodeData; onClose: () => voi
           <span className="text-[10px] text-dim uppercase tracking-widest font-semibold">Downstream Blast Radius</span>
           <div className="flex items-center gap-2">
             <div className="flex-1 h-2 bg-bg-surface-elevated rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-threat-critical" 
-                  style={{ width: `${Math.min(node.blast_radius / 1000 * 100, 100)}%` }} 
+                <div
+                  className="h-full bg-threat-critical"
+                  style={{ width: `${Math.min(node.blast_radius / 1000 * 100, 100)}%` }}
                 />
             </div>
             <span className="text-xs font-mono text-threat-critical">{node.blast_radius}</span>

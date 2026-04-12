@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 class IdentityVerificationError(Exception):
     """Raised when cryptographic signatures or Merkle-proofs fail to reconcile."""
+
     pass
 
 
@@ -37,9 +38,7 @@ class CrossRegistryMerkleLinkageManifold:
     )
 
     def __init__(
-        self,
-        hardware_tier: str = "REDLINE",
-        diagnostic_callback: Optional[Callable] = None
+        self, hardware_tier: str = "REDLINE", diagnostic_callback: Optional[Callable] = None
     ):
         self._hardware_tier = hardware_tier
         self._diagnostic_kernel = diagnostic_callback or (lambda x: None)
@@ -79,7 +78,7 @@ class CrossRegistryMerkleLinkageManifold:
         Weights shared keys (Absolute), Emails (High), and Handles (Medium).
         """
         score = 0.0
-        
+
         # 1. Cryptographic Key Match (The Golden Rule)
         key_a = profile_a.get("public_key")
         key_b = profile_b.get("public_key")
@@ -107,18 +106,18 @@ class CrossRegistryMerkleLinkageManifold:
         """
         start_time = time.perf_counter()
         size = len(self._identity_buffer)
-        
+
         processed_uids: Set[str] = set()
         fusion_count = 0
         collision_count = 0
 
         # Batch-aligned traversal managing memory pressure
         batch_size = self._pacing_constants["BATCH_SIZE"]
-        
+
         while self._identity_buffer:
             batch = self._identity_buffer[:batch_size]
             self._identity_buffer = self._identity_buffer[batch_size:]
-            
+
             for profile in batch:
                 # Forensic Search for Shadow Identities
                 self._fuse_identity_cascade(profile)
@@ -126,15 +125,17 @@ class CrossRegistryMerkleLinkageManifold:
 
             # Adaptive Gear-Box check
             self._calibrate_reconciliation_depth_by_host()
-            
+
             # HUD Synchronization
             current_elapsed = time.perf_counter() - start_time
-            self._diagnostic_kernel({
-                "AuthorsLinked": fusion_count,
-                "FusionVelocity": int(fusion_count / max(0.001, current_elapsed)),
-                "IdentityFidelity": 1.0 if collision_count == 0 else 0.99,
-                "Status": "FUSING_IDENTITIES"
-            })
+            self._diagnostic_kernel(
+                {
+                    "AuthorsLinked": fusion_count,
+                    "FusionVelocity": int(fusion_count / max(0.001, current_elapsed)),
+                    "IdentityFidelity": 1.0 if collision_count == 0 else 0.99,
+                    "Status": "FUSING_IDENTITIES",
+                }
+            )
 
         self._synthesis_complete = True
         exec_time = time.perf_counter() - start_time
@@ -143,7 +144,7 @@ class CrossRegistryMerkleLinkageManifold:
             "TotalAuthorsFused": len(self._maintainer_registry),
             "IdentityFidelity": 1.0,
             "SynthesisTimeMS": int(exec_time * 1000),
-            "Status": "MODULE_10_GAP_001_SEALED"
+            "Status": "MODULE_10_GAP_001_SEALED",
         }
 
     def _fuse_identity_cascade(self, target_profile: Dict[str, Any]) -> str:
@@ -158,7 +159,7 @@ class CrossRegistryMerkleLinkageManifold:
             if prob >= self._collision_threshold:
                 best_match_root = root_id
                 break
-        
+
         if best_match_root:
             # Append local metadata to existing root
             self._maintainer_registry[best_match_root]["linked_profiles"].append(target_profile)
@@ -169,7 +170,7 @@ class CrossRegistryMerkleLinkageManifold:
             self._maintainer_registry[new_root_id] = {
                 **target_profile,
                 "linked_profiles": [target_profile],
-                "logic_seal": "VERIFIED_AUTHOR_ROOT"
+                "logic_seal": "VERIFIED_AUTHOR_ROOT",
             }
             return new_root_id
 
@@ -180,16 +181,16 @@ class CrossRegistryMerkleLinkageManifold:
         hasher = hashlib.sha384()
         # Seed with hardware-aligned static salt
         hasher.update(b"COREGRAPH_AUTHOR_V1_SALT")
-        
+
         seeds = [
             str(profile.get("public_key", "")),
             str(profile.get("email", "")),
-            str(profile.get("username", ""))
+            str(profile.get("username", "")),
         ]
-        
+
         for seed in sorted(seeds):
             hasher.update(seed.encode("utf-8"))
-            
+
         return hasher.hexdigest()
 
     def _calibrate_reconciliation_depth_by_host(self) -> None:
@@ -209,12 +210,12 @@ class CrossRegistryMerkleLinkageManifold:
         author = self._maintainer_registry.get(author_root_id)
         if not author:
             return False
-            
+
         # Absolute Linkage Integrity Doctrine: verify all linked profiles share the same key entropy
         base_key = author.get("public_key")
         if not base_key:
-            return True # If no keys, fallback to Bayesian email/handle logic already executed
-            
+            return True  # If no keys, fallback to Bayesian email/handle logic already executed
+
         for linked in author["linked_profiles"]:
             l_key = linked.get("public_key")
             if l_key and l_key != base_key:
@@ -228,24 +229,41 @@ if __name__ == "__main__":
     print("COREGRAPH IDENTITY SELF-AUDIT [START]")
     try:
         manifold = CrossRegistryMerkleLinkageManifold(hardware_tier="POTATO")
-        
+
         # TEST 1: Cross-Registry Fusion
         data = [
-            {"registry": "npm", "username": "dev1", "email": "dev1@coregraph.io", "public_key": "KEY_A"},
-            {"registry": "pypi", "username": "dev1_python", "email": "dev1@coregraph.io", "public_key": "KEY_A"}
+            {
+                "registry": "npm",
+                "username": "dev1",
+                "email": "dev1@coregraph.io",
+                "public_key": "KEY_A",
+            },
+            {
+                "registry": "pypi",
+                "username": "dev1_python",
+                "email": "dev1@coregraph.io",
+                "public_key": "KEY_A",
+            },
         ]
         manifold.ingest_maintainer_metadata(data)
         res = manifold.execute_cross_registry_merkle_fusion()
         if res["TotalAuthorsFused"] != 1:
-             raise Exception(f"Fusion Failed: Expected 1, got {res['TotalAuthorsFused']}")
+            raise Exception(f"Fusion Failed: Expected 1, got {res['TotalAuthorsFused']}")
         print("[PASS] Cryptographic Key Anchoring")
 
         # TEST 2: Email Match
-        data2 = [{"registry": "github", "username": "dev1_git", "email": "dev1@coregraph.io", "public_key": None}]
+        data2 = [
+            {
+                "registry": "github",
+                "username": "dev1_git",
+                "email": "dev1@coregraph.io",
+                "public_key": None,
+            }
+        ]
         manifold.ingest_maintainer_metadata(data2)
         res2 = manifold.execute_cross_registry_merkle_fusion()
         if res2["TotalAuthorsFused"] != 1:
-             raise Exception(f"Email Fusion Failed: Expected 1, got {res2['TotalAuthorsFused']}")
+            raise Exception(f"Email Fusion Failed: Expected 1, got {res2['TotalAuthorsFused']}")
         print("[PASS] Bayesian Email Fusion")
 
         print("COREGRAPH IDENTITY SELF-AUDIT [SUCCESS]")

@@ -20,7 +20,7 @@ export interface TKineticState {
  */
 export class AsynchronousKineticSmoothingManifold {
     private _kinetic_registry: Map<number, TKineticState> = new Map();
-    
+
     // Kinetic Vitality
     private _nodes_smoothed: number = 0;
     private _smoothing_latency_ms: number = 0;
@@ -47,7 +47,7 @@ export class AsynchronousKineticSmoothingManifold {
 
         this._smoothing_latency_ms = performance.now() - start_time;
         this._nodes_smoothed++;
-        
+
         return pos;
     }
 
@@ -73,7 +73,7 @@ export class AsynchronousKineticSmoothingManifold {
     public update_node_state(nodeId: number, targetPos: number[], velocity: number[]): void {
         const current = this._kinetic_registry.get(nodeId);
         const startPos = current ? current.targetPos : targetPos;
-        
+
         this._kinetic_registry.set(nodeId, {
             startPos,
             targetPos,

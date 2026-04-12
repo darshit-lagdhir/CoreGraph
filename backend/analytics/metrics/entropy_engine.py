@@ -1,7 +1,10 @@
 import math
+
+
 class VectorizedEntropyEngine:
     def calculate_shannon(self, payload: bytes) -> float:
-        if not payload: return 0.0
+        if not payload:
+            return 0.0
         freq = {}
         for b in payload:
             freq[b] = freq.get(b, 0) + 1

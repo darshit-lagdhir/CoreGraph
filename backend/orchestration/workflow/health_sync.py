@@ -3,6 +3,7 @@ import time
 import statistics
 from typing import Dict, List, Any, Optional
 
+
 class DistributedRegistryHealthKernel:
     """
     Module 7: Task 026 - Distributed Registry Health Synchronization and Global Connectivity Audit
@@ -10,14 +11,14 @@ class DistributedRegistryHealthKernel:
     """
 
     __slots__ = (
-        '_redis_bus',
-        '_tier',
-        '_health_map',
-        '_probe_interval_ms',
-        '_sampling_depth',
-        '_worker_reports',
-        '_circuit_states',
-        '_last_probe_time'
+        "_redis_bus",
+        "_tier",
+        "_health_map",
+        "_probe_interval_ms",
+        "_sampling_depth",
+        "_worker_reports",
+        "_circuit_states",
+        "_last_probe_time",
     )
 
     def __init__(self, redis_bus_mock: Dict[str, Any], tier: str = "redline"):
@@ -52,15 +53,13 @@ class DistributedRegistryHealthKernel:
         # S_sync = Status / (Latency * Jitter)
         s_sync = status_code / (latency_ms * jitter_std_dev)
 
-        payload = {
-            "registry_id": registry_id,
-            "s_sync": s_sync,
-            "timestamp": time.monotonic()
-        }
-        
+        payload = {"registry_id": registry_id, "s_sync": s_sync, "timestamp": time.monotonic()}
+
         return payload
 
-    async def register_health_signal(self, worker_id: str, registry_id: str, status_metrics: Dict[str, float]) -> str:
+    async def register_health_signal(
+        self, worker_id: str, registry_id: str, status_metrics: Dict[str, float]
+    ) -> str:
         """
         Multipoint Quorum Consensus Logic: Aggregates health signals to verify global truth.
         """
@@ -68,10 +67,10 @@ class DistributedRegistryHealthKernel:
 
         if registry_id not in self._worker_reports:
             self._worker_reports[registry_id] = {}
-        
+
         if worker_id not in self._worker_reports[registry_id]:
             self._worker_reports[registry_id][worker_id] = []
-            
+
         self._worker_reports[registry_id][worker_id].append(status_metrics.get("s_sync", 1.0))
 
         # Check for Quorum (Minimum 3 independent workers for global consensus)
@@ -82,7 +81,7 @@ class DistributedRegistryHealthKernel:
         # Calculate Consensus
         all_s_syncs = []
         for reports in self._worker_reports[registry_id].values():
-            all_s_syncs.extend(reports[-5:]) # Look at last 5 reports per worker
+            all_s_syncs.extend(reports[-5:])  # Look at last 5 reports per worker
 
         if not all_s_syncs:
             return "UNKNOWN"
@@ -104,7 +103,7 @@ class DistributedRegistryHealthKernel:
 
         if previous_state == "RED" and new_state == "GREEN":
             return "STAGGERED_RE_ENTRY_TRIGGERED"
-        
+
         if new_state == "RED" and previous_state != "RED":
             return "METABOLIC_BACKPRESSURE_TRIGGERED"
 
@@ -119,7 +118,7 @@ class DistributedRegistryHealthKernel:
 
         state_weights = {"GREEN": 1.0, "AMBER": 0.5, "RED": 0.0}
         total_weight = sum(state_weights.get(state, 0.0) for state in self._circuit_states.values())
-        
+
         lambda_global = total_weight / len(self._circuit_states)
         return max(0.0, min(1.0, lambda_global))
 
@@ -134,8 +133,10 @@ class DistributedRegistryHealthKernel:
         total_reports = sum(len(reports) for reports in self._worker_reports[registry_id].values())
         if total_reports == 0:
             return 1.0
-            
-        pseudo_consensus_matches = total_reports - len(self._worker_reports[registry_id]) # Idealized cluster agreement minus distinct sources
-        
+
+        pseudo_consensus_matches = total_reports - len(
+            self._worker_reports[registry_id]
+        )  # Idealized cluster agreement minus distinct sources
+
         e_conn = 1.0 - (max(0, pseudo_consensus_matches) / total_reports)
         return max(0.0, min(1.0, e_conn))

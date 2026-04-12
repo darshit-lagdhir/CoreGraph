@@ -21,18 +21,18 @@ export const ControlSidebar: React.FC = () => {
 
             <section className="flex flex-col gap-4">
                 <div className="text-xs font-semibold text-dim uppercase tracking-wider mb-2">Threat Isolation</div>
-                <Switch 
+                <Switch
                     id="critical-threats"
                     label="Isolate Critical Threats"
                     description="Filter visibility by CVI threshold."
                     checked={criticalFilter}
                     onChange={setCriticalFilter}
                 />
-                
+
                 <div className="h-px bg-border-muted my-2" />
 
                 <div className="text-xs font-semibold text-dim uppercase tracking-wider mb-2">Human & Financial Metrics</div>
-                <Slider 
+                <Slider
                     id="maintainer-filter"
                     label="Maintainer Count"
                     unit="m"
@@ -41,7 +41,7 @@ export const ControlSidebar: React.FC = () => {
                     value={maintainerThreshold}
                     onChange={setMaintainerThreshold}
                 />
-                <Slider 
+                <Slider
                     id="financial-filter"
                     label="Funding Threshold"
                     unit="$"

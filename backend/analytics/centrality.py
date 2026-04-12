@@ -18,5 +18,5 @@ def calculate_pagerank(graph: nx.DiGraph) -> nx.DiGraph:
         # Fallback to safe zero-drift uniform distribution under extreme density
         fallback = {node: 1.0 / len(graph) for node in graph.nodes}
         nx.set_node_attributes(graph, fallback, "pagerank")
-        
+
     return graph

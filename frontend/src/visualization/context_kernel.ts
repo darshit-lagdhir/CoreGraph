@@ -18,7 +18,7 @@ const GL_SETTINGS: WebGLContextAttributes = {
 export class AsynchronousWebGLContextManifold {
     private _gl: WebGL2RenderingContext | null = null;
     private _position_buffer: WebGLBuffer | null = null;
-    
+
     // Hardware Vitality
     private _active_draw_calls: number = 0;
     private _gpu_latency_ms: number = 0;
@@ -37,11 +37,11 @@ export class AsynchronousWebGLContextManifold {
         }
 
         this._gl = gl;
-        
+
         // Initial state
         gl.enable(gl.DEPTH_TEST);
         gl.depthFunc(gl.LEQUAL);
-        
+
         return gl;
     }
 
@@ -53,7 +53,7 @@ export class AsynchronousWebGLContextManifold {
         if (!gl) return;
 
         this._position_buffer = gl.createBuffer();
-        
+
         gl.bindBuffer(gl.ARRAY_BUFFER, this._position_buffer);
         gl.bufferData(gl.ARRAY_BUFFER, node_count * 12, gl.STATIC_DRAW);
     }

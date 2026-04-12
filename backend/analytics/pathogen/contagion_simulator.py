@@ -68,7 +68,7 @@ class PredictivePathogenSimulationManifold:
             return
 
         self._breached_communities.add(root_community_id)
-        
+
         # Hardy Iterative BFS Traversal for Contagion modeling
         active_queue = [root_node]
         visited = {root_node}
@@ -186,7 +186,7 @@ class PredictivePathogenSimulationManifold:
                 apex_path = [t_node]
 
                 curr_node = t_node
-                
+
                 depth = 0
                 max_depth = 5000
                 while depth < max_depth:
@@ -194,7 +194,7 @@ class PredictivePathogenSimulationManifold:
                     preds = list(sub_graph.predecessors(curr_node))
                     # Prevent circular tracing loops
                     preds = [p for p in preds if p not in apex_path]
-                    
+
                     if not preds:
                         break
 

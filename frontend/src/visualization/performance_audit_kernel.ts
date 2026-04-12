@@ -22,7 +22,7 @@ export interface TAuditMetrics {
 export class AsynchronousPerformanceForensicManifold {
     private _frame_times: number[] = [];
     private _vram_baseline: number = 0;
-    
+
     // Performance Vitality
     private _average_fps: number = 0;
     private _memory_flatline_ratio: number = 1.0;
@@ -52,7 +52,7 @@ export class AsynchronousPerformanceForensicManifold {
         }
 
         this._peak_draw_call_latency = performance.now() - start_time;
-        
+
         return this._average_fps;
     }
 

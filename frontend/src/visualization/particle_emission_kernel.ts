@@ -19,7 +19,7 @@ export interface TParticleInstance {
  * Orchestrates instanced particle emission and parametric trajectory interpolation.
  */
 export class AsynchronousBlastRadiusKinematicsManifold {
-    
+
     // Kinetic Vitality
     private _projectiles_launched: number = 0;
     private _trajectory_latency_ms: number = 0;
@@ -44,7 +44,7 @@ export class AsynchronousBlastRadiusKinematicsManifold {
 
         this._trajectory_latency_ms = performance.now() - start_time;
         this._projectiles_launched++;
-        
+
         return instance;
     }
 
@@ -54,10 +54,10 @@ export class AsynchronousBlastRadiusKinematicsManifold {
      */
     public get_current_position(instance: TParticleInstance, currentTime: number): number[] {
         const t = Math.max(0, Math.min(1, (currentTime - instance.startTime) / instance.duration));
-        
+
         // Quadratic Ease-In-Out
         const ease = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-        
+
         return [
             instance.origin[0] + (instance.target[0] - instance.origin[0]) * ease,
             instance.origin[1] + (instance.target[1] - instance.origin[1]) * ease,

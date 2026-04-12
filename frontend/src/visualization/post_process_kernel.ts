@@ -20,7 +20,7 @@ const POST_PROCESS_CONFIG = {
  */
 export class AsynchronousPerceptualCompositionManifold {
     private _bloom_pyramid: Float32Array[] = [];
-    
+
     // Composition Vitality
     private _pixels_refined: number = 0;
     private _composition_latency_ms: number = 0;
@@ -40,7 +40,7 @@ export class AsynchronousPerceptualCompositionManifold {
 
         this._composition_latency_ms = performance.now() - start_time;
         this._pixels_refined++;
-        
+
         return bloom_signal;
     }
 
@@ -50,7 +50,7 @@ export class AsynchronousPerceptualCompositionManifold {
      */
     private _calculate_bloom_contribution(luminance: number): number {
         if (luminance < POST_PROCESS_CONFIG.bloom_threshold) return 0.0;
-        
+
         // Non-linear glow ramp
         return (luminance - POST_PROCESS_CONFIG.bloom_threshold) * POST_PROCESS_CONFIG.bloom_intensity;
     }
@@ -63,7 +63,7 @@ export class AsynchronousPerceptualCompositionManifold {
         // uv is [u, v] normalized to [-1, 1] from screen center
         const radial_dist = Math.sqrt(uv[0] * uv[0] + uv[1] * uv[1]);
         const shift = radial_dist * POST_PROCESS_CONFIG.aberration_strength;
-        
+
         return [shift, shift * 0.5, 0.0]; // RGB offsets
     }
 

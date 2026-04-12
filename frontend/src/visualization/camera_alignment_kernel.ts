@@ -24,7 +24,7 @@ export class AsynchronousViewportTransformationManifold {
     private _view_matrix: Float32Array = new Float32Array(16);
     private _projection_matrix: Float32Array = new Float32Array(16);
     private _view_projection_matrix: Float32Array = new Float32Array(16);
-    
+
     // Navigation Vitality
     private _viewports_projected: number = 0;
     private _matrix_latency_ms: number = 0;
@@ -50,7 +50,7 @@ export class AsynchronousViewportTransformationManifold {
 
         this._matrix_latency_ms = performance.now() - start_time;
         this._viewports_projected++;
-        
+
         return this._view_projection_matrix;
     }
 

@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 class TopologicalIntegrityError(Exception):
     """Raised when PageRank mass re-balancing or ghost removal fails to conserve energy."""
+
     pass
 
 
@@ -33,9 +34,7 @@ class ArchitecturalScytheHygieneManifold:
     )
 
     def __init__(
-        self,
-        hardware_tier: str = "REDLINE",
-        diagnostic_callback: Optional[Callable] = None
+        self, hardware_tier: str = "REDLINE", diagnostic_callback: Optional[Callable] = None
     ):
         self._hardware_tier = hardware_tier
         self._diagnostic_kernel = diagnostic_callback or (lambda x: None)
@@ -51,9 +50,7 @@ class ArchitecturalScytheHygieneManifold:
         }
 
     def execute_surgical_node_de_materialization(
-        self, 
-        graph: Dict[str, Any], 
-        ghost_ids: List[str]
+        self, graph: Dict[str, Any], ghost_ids: List[str]
     ) -> Dict[str, Any]:
         """
         Removes ghost nodes from the hot analytical path and re-balances topological mass.
@@ -66,29 +63,31 @@ class ArchitecturalScytheHygieneManifold:
         for i, node_id in enumerate(ghost_ids):
             if node_id in graph:
                 node_data = graph[node_id]
-                
+
                 # 1. Forensic Archival (Transfer to Ossuary)
                 self._transfer_to_historical_cold_storage(node_id, node_data)
-                
+
                 # 2. Extract Topological Mass (PageRank) for redistribution
                 redirected_mass += node_data.get("pagerank", 0.0)
-                
+
                 # 3. Sever edges (Adjacency List Reclamation)
                 severed_edges += len(node_data.get("dependencies", []))
-                
+
                 # 4. Atomic Memory Deallocation (Simulation of zeroing slots)
-                reclaimed_bytes += 1024 # Estimated overhead per node object
+                reclaimed_bytes += 1024  # Estimated overhead per node object
                 del graph[node_id]
-            
+
             # Periodic Pacing & HUD Telemetry
             if (i + 1) % self._pacing_constants["BATCH_SIZE"] == 0:
                 self._calibrate_purge_intensity_by_host()
                 elapsed = time.perf_counter() - start_time
-                self._diagnostic_kernel({
-                    "GhostsMitigated": i + 1,
-                    "CleanupVelocity": int((i + 1) / max(0.001, elapsed)),
-                    "Status": "RADIOLOGICAL_PURGE_ACTIVE"
-                })
+                self._diagnostic_kernel(
+                    {
+                        "GhostsMitigated": i + 1,
+                        "CleanupVelocity": int((i + 1) / max(0.001, elapsed)),
+                        "Status": "RADIOLOGICAL_PURGE_ACTIVE",
+                    }
+                )
                 if self._hardware_tier != "REDLINE":
                     time.sleep(self._pacing_constants["COOLDOWN_MS"] / 1000.0)
 
@@ -104,7 +103,7 @@ class ArchitecturalScytheHygieneManifold:
             "BytesReclaimed": reclaimed_bytes,
             "TopologicalPurity": 1.0,
             "HygieneMasterSeal": self._generate_hygiene_master_seal(ghost_ids),
-            "Status": "MODULE_10_GAP_003_SEALED"
+            "Status": "MODULE_10_GAP_003_SEALED",
         }
 
     def _redistribute_lost_gravity_sim(self, graph: Dict[str, Any], mass: float) -> None:
@@ -124,7 +123,7 @@ class ArchitecturalScytheHygieneManifold:
         """Produces the SHA-384 non-repudiation seal for the purge state."""
         hasher = hashlib.sha384()
         hasher.update(b"COREGRAPH_HYGIENE_V1_SALT")
-        for p_id in sorted(purged_ids[:100]): # Sample-based seal
+        for p_id in sorted(purged_ids[:100]):  # Sample-based seal
             hasher.update(p_id.encode())
         return hasher.hexdigest()
 
@@ -136,27 +135,28 @@ class ArchitecturalScytheHygieneManifold:
                 gc.collect()
                 time.sleep(0.01)
 
+
 if __name__ == "__main__":
     print("COREGRAPH HYGIENE SELF-AUDIT [START]")
     try:
         manifold = ArchitecturalScytheHygieneManifold(hardware_tier="POTATO")
-        
+
         # TEST: Leviathan Purge & Mass Conservation
         mock_graph = {
             "node_alpha": {"pagerank": 0.5, "dependencies": ["node_beta"]},
             "node_beta": {"pagerank": 0.3, "dependencies": []},
-            "node_gamma": {"pagerank": 0.2, "dependencies": []}
+            "node_gamma": {"pagerank": 0.2, "dependencies": []},
         }
-        
+
         # Purge Node Alpha (The Leviathan)
         res = manifold.execute_surgical_node_de_materialization(mock_graph, ["node_alpha"])
-        
+
         print(f"[DATA] Ghosts Purged: {res['GhostsMitigated']}, Remaining: {len(mock_graph)}")
-        
+
         # Check Mass conservation: 0.3 + 0.2 (living) + 0.5 (redistributed) = 1.0
         total_pagerank = sum(n["pagerank"] for n in mock_graph.values())
         print(f"[DATA] Total PageRank Mass: {total_pagerank:.4f}")
-        
+
         if abs(total_pagerank - 1.0) < 1e-9:
             print("[PASS] Topological Mass Conservation Verified.")
         else:

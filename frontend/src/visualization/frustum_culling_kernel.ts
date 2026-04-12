@@ -19,7 +19,7 @@ export interface TFrustumPlane {
 export class AsynchronousSpatialPruningManifold {
     private _frustum_planes: TFrustumPlane[] = [];
     private _visibility_bitset: Uint8Array | null = null;
-    
+
     // Optical Vitality
     private _nodes_pruned: number = 0;
     private _intersection_latency_ms: number = 0;
@@ -32,10 +32,10 @@ export class AsynchronousSpatialPruningManifold {
      */
     public execute_hierarchical_quadtree_traversal(viewProjection: number[], quadtreeRoot: any): void {
         const start_time = performance.now();
-        
+
         // 1. Derive Frustum Planes from View-Projection Matrix
         this._derive_frustum_planes(viewProjection);
-        
+
         // 2. Recursive Traversal and AABB Gating
         this._nodes_pruned = 0;
         this._traverse_quadtree(quadtreeRoot);
@@ -56,7 +56,7 @@ export class AsynchronousSpatialPruningManifold {
      */
     private _traverse_quadtree(node: any): void {
         const intersection = this._execute_aabb_frustum_intersection(node.aabb);
-        
+
         if (intersection === 0) { // Fully Outside
             this._nodes_pruned += node.total_leaf_count;
             return; // Prune entire branch

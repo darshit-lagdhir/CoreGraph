@@ -23,7 +23,7 @@ const PHYSICS_CONFIG = {
 export class AsynchronousKineticPhysicsManifold {
     private _shared_buffer: Float32Array | null = null;
     private _node_count: number = 0;
-    
+
     // Kinetic Vitality
     private _nodes_integrated: number = 0;
     private _simulation_latency: number = 0;

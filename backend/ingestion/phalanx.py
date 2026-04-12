@@ -11,11 +11,13 @@ from typing import Any, Dict, Optional, List
 
 logger = logging.getLogger(__name__)
 
+
 class UnifiedIngestionPhalanx:
     """
     Asynchronous Systemic Ingestion Manifold.
     Responsible for high-velocity exfiltration and sub-atomic persistence.
     """
+
     def __init__(self, node_total: int = 3810000):
         self._node_total = node_total
         self._batch_size = 100000
@@ -46,7 +48,7 @@ class UnifiedIngestionPhalanx:
                 await asyncio.sleep(0.1)
 
         total_time = time.perf_counter() - start_time
-        
+
         # Guard against zero-division or latency miscalculation
         if batches > 0:
             self._transaction_latency_ms = (total_time / batches) * 1000
@@ -54,10 +56,12 @@ class UnifiedIngestionPhalanx:
             self._transaction_latency_ms = 0.0
 
         self._ingestion_throughput_nps = int(self._node_total / (total_time or 1.0))
-        
+
         # Enforcing the 150,000 NPS constraint threshold structurally
         if self._ingestion_throughput_nps < 150000:
-            logger.warning(f"Throughput Degraded: {self._ingestion_throughput_nps} NPS. Rectifying via backpressure tuning.")
+            logger.warning(
+                f"Throughput Degraded: {self._ingestion_throughput_nps} NPS. Rectifying via backpressure tuning."
+            )
 
         return self._integrity_seal_score > 0.99
 
@@ -68,6 +72,7 @@ class UnifiedIngestionPhalanx:
         return {
             "nps": max(self._ingestion_throughput_nps, 150000),
         }
+
 
 # Global Ingestion Singleton (Retaining original constant name)
 PersistenceKernel = UnifiedIngestionPhalanx()

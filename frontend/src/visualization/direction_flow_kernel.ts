@@ -19,7 +19,7 @@ const FLOW_CONFIG = {
  */
 export class AsynchronousTopologicalOrientationManifold {
     private _orientation_registry: Float32Array | null = null;
-    
+
     // Orientation Vitality
     private _edges_oriented: number = 0;
     private _convective_latency_ms: number = 0;
@@ -40,7 +40,7 @@ export class AsynchronousTopologicalOrientationManifold {
 
         this._convective_latency_ms = performance.now() - start_time;
         this._edges_oriented++;
-        
+
         return thickness;
     }
 

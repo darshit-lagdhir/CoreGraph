@@ -16,13 +16,13 @@ class DistributedResilienceManifold:
     """
 
     __slots__ = (
-        '_tier',
-        '_heartbeat_interval_s',
-        '_failover_threshold_s',
-        '_active_vitality_registry',
-        '_poison_pill_registry',
-        '_hud_sync_counter',
-        '_mock_unacked_tasks'
+        "_tier",
+        "_heartbeat_interval_s",
+        "_failover_threshold_s",
+        "_active_vitality_registry",
+        "_poison_pill_registry",
+        "_hud_sync_counter",
+        "_mock_unacked_tasks",
     )
 
     def __init__(self, tier: str = "redline") -> None:
@@ -33,7 +33,7 @@ class DistributedResilienceManifold:
         self._poison_pill_registry: Dict[str, int] = {}
         # Unacknowledged tasks mapped by worker_id
         self._mock_unacked_tasks: Dict[str, List[str]] = {}
-        
+
         self._hud_sync_counter = 0
 
         self._calibrate_resilience_parameters()
@@ -43,11 +43,11 @@ class DistributedResilienceManifold:
         Hardware-Aware Survivability Gear-Box.
         """
         if self._tier == "redline":
-            self._heartbeat_interval_s = 0.10     # 100ms Deep-Sensing
-            self._failover_threshold_s = 0.50     # 500ms Aggressive Failover Window
-        else: # potato
-            self._heartbeat_interval_s = 5.00     # 5s Aggregate Tolerance
-            self._failover_threshold_s = 30.00    # 30s Network Jitter Tolerance
+            self._heartbeat_interval_s = 0.10  # 100ms Deep-Sensing
+            self._failover_threshold_s = 0.50  # 500ms Aggressive Failover Window
+        else:  # potato
+            self._heartbeat_interval_s = 5.00  # 5s Aggregate Tolerance
+            self._failover_threshold_s = 30.00  # 30s Network Jitter Tolerance
 
     async def _emit_hud_pulse(self) -> None:
         """
@@ -57,17 +57,19 @@ class DistributedResilienceManifold:
         if self._hud_sync_counter % 50 == 0:
             await asyncio.sleep(0)
 
-    async def execute_vitality_handshake(self, worker_id: str, unacked_tasks: Optional[List[str]] = None) -> bool:
+    async def execute_vitality_handshake(
+        self, worker_id: str, unacked_tasks: Optional[List[str]] = None
+    ) -> bool:
         """
         THE DISTRIBUTED HEARTBEAT KERNEL
         Updates the worker's temporal proof. Mimics `SET key current_time EX threshold` in Redis.
         """
         await self._emit_hud_pulse()
         self._active_vitality_registry[worker_id] = time.time()
-        
+
         if unacked_tasks is not None:
             self._mock_unacked_tasks[worker_id] = unacked_tasks
-            
+
         return True
 
     async def _trigger_snapshot_stability_signal(self) -> None:
@@ -89,7 +91,7 @@ class DistributedResilienceManifold:
 
         for worker_id, last_heartbeat in list(self._active_vitality_registry.items()):
             time_since_beat = current_time - last_heartbeat
-            
+
             # The "Split-Brain" Threshold identification
             if time_since_beat > self._failover_threshold_s:
                 failed_workers.append(worker_id)
@@ -103,10 +105,10 @@ class DistributedResilienceManifold:
             recovered_tasks += len(trapped)
             # Remove worker from registry
             self._active_vitality_registry.pop(fw, None)
-            
+
         return {
             "failed_workers_identified": failed_workers,
-            "tasks_recovered_and_resyndicated": recovered_tasks
+            "tasks_recovered_and_resyndicated": recovered_tasks,
         }
 
     def fingerprint_task_failure(self, package_id: str, exception_type: str) -> bool:
@@ -115,15 +117,15 @@ class DistributedResilienceManifold:
         Catalogs anomalous crashes. If toxicity threshold is breached, the node is isolated.
         Returns: True if Toxic (Suppress), False if recoverable anomaly.
         """
-        signature = hashlib.md5(f"{package_id}_{exception_type}".encode('utf-8')).hexdigest()
-        
+        signature = hashlib.md5(f"{package_id}_{exception_type}".encode("utf-8")).hexdigest()
+
         count = self._poison_pill_registry.get(signature, 0) + 1
         self._poison_pill_registry[signature] = count
-        
+
         # 3 strikes = Global Suppression Signal
         if count >= 3:
             return True
-            
+
         return False
 
 
@@ -134,56 +136,72 @@ async def _execute_resilience_diagnostics() -> None:
     print("--- INITIATING SYSTEMIC RESILIENCE DIAGNOSTICS ---")
 
     redline_manifold = DistributedResilienceManifold(tier="redline")
-    
+
     # 1. THE WORKER GENOCIDE (SPLIT_BRAIN) TEST
     print("[*] Validating Distributed Heartbeat & Surgical Failover Array...")
-    
+
     # Register healthy workers
     await redline_manifold.execute_vitality_handshake("alpha_worker_1", ["task_A1", "task_A2"])
     await redline_manifold.execute_vitality_handshake("beta_worker_2", ["task_B1"])
-    await redline_manifold.execute_vitality_handshake("delta_worker_3", ["task_C1", "task_C2", "task_C3"])
-    
+    await redline_manifold.execute_vitality_handshake(
+        "delta_worker_3", ["task_C1", "task_C2", "task_C3"]
+    )
+
     # Simulate time passing, alpha_worker dies instantly over threshold.
     # Note: We manually hack time for test deterministic logic
-    redline_manifold._active_vitality_registry["alpha_worker_1"] -= 2.0  # Force > 0.5s failure threshold
-    
+    redline_manifold._active_vitality_registry[
+        "alpha_worker_1"
+    ] -= 2.0  # Force > 0.5s failure threshold
+
     failover_report = await redline_manifold.trigger_failover_sweep()
-    
-    assert "alpha_worker_1" in failover_report["failed_workers_identified"], "Failed worker NOT detected by watchdogs!"
-    assert "beta_worker_2" not in failover_report["failed_workers_identified"], "Healthy worker falsely reclaimed!"
-    assert failover_report["tasks_recovered_and_resyndicated"] == 2, f"Failed recovering tasks! Got {failover_report['tasks_recovered_and_resyndicated']}"
-    print("    [+] Quorum-Based Sovereignty enforced. 100% of trapped tasks recovered from silent worker.")
+
+    assert (
+        "alpha_worker_1" in failover_report["failed_workers_identified"]
+    ), "Failed worker NOT detected by watchdogs!"
+    assert (
+        "beta_worker_2" not in failover_report["failed_workers_identified"]
+    ), "Healthy worker falsely reclaimed!"
+    assert (
+        failover_report["tasks_recovered_and_resyndicated"] == 2
+    ), f"Failed recovering tasks! Got {failover_report['tasks_recovered_and_resyndicated']}"
+    print(
+        "    [+] Quorum-Based Sovereignty enforced. 100% of trapped tasks recovered from silent worker."
+    )
 
     # 2. THE POISON PILL STORM GAUNTLET
     print("[*] Auditing Toxicity Pattern Recognition (Poison Pill Interdiction)...")
-    
+
     toxic_node_id = "malicious_react_payload"
     exception_sig = "SegmentationFault_MemoryExhaustion"
-    
+
     # First failure - Worker dies processing it.
     is_suppressed = redline_manifold.fingerprint_task_failure(toxic_node_id, exception_sig)
     assert is_suppressed is False
-    
+
     # Second failure - Another worker fails
     is_suppressed = redline_manifold.fingerprint_task_failure(toxic_node_id, exception_sig)
     assert is_suppressed is False
-    
+
     # Third failure - Toxicity threshold breached!
     is_suppressed = redline_manifold.fingerprint_task_failure(toxic_node_id, exception_sig)
     assert is_suppressed is True, "Toxicity barrier failed! Cluster death-spiral imminent!"
-    
-    print("    [+] Automated Anomaly Interdiction active. Poison payload quarantined. Immune System Nominal.")
+
+    print(
+        "    [+] Automated Anomaly Interdiction active. Poison payload quarantined. Immune System Nominal."
+    )
 
     # 3. POTATO TIER TOLERANCE
     print("[*] Simulating Network Partition Attenuation (Potato Tier)...")
     potato_manifold = DistributedResilienceManifold(tier="potato")
-    
+
     await potato_manifold.execute_vitality_handshake("potato_node_1", ["task_X"])
     # Simulate network lag (15 seconds passed)
     potato_manifold._active_vitality_registry["potato_node_1"] -= 15.0
-    
+
     p_failover = await potato_manifold.trigger_failover_sweep()
-    assert len(p_failover["failed_workers_identified"]) == 0, "Potato tier failed to obey 30-sec tolerance gear-box!"
+    assert (
+        len(p_failover["failed_workers_identified"]) == 0
+    ), "Potato tier failed to obey 30-sec tolerance gear-box!"
     print("    [+] Adaptive Tolerance engaged. Spurious failover events successfully neutralized.")
 
     print("--- DIAGNOSTIC COMPLETE: RESILIENCE KERNEL SECURE ---")

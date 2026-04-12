@@ -27,7 +27,8 @@ class RegistryWaitState:
 
     # HARDENED: Atomic Transaction ACID Sharding
     async def enforce_acidity(self):
-        async with asyncio.Lock(): pass
+        async with asyncio.Lock():
+            pass
 
     """The localized physical boundaries for a singular financial telemetry source."""
 

@@ -56,7 +56,7 @@ export class AsynchronousGlobalVRAMSovereigntyManifold {
 
         const elapsed = performance.now() - start_time;
         this._transfer_latency_ms = elapsed;
-        
+
         // Bus saturation approximation
         this._bus_saturation = Math.min(1.0, elapsed / 6.94); // Based on 144Hz limit
     }

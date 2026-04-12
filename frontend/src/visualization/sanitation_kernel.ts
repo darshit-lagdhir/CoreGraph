@@ -19,7 +19,7 @@ export interface TSanitationManifest {
  */
 export class AsynchronousProductionSanitationManifold {
     private _manifest: TSanitationManifest | null = null;
-    
+
     // Purity Vitality
     private _files_eradicated: number = 0;
     private _sanitation_latency_ms: number = 0;
@@ -36,7 +36,7 @@ export class AsynchronousProductionSanitationManifold {
 
         // 1. Filesystem Sweep Logic (Simulated for this kernel)
         // identify(unreferenced_glsl_files).forEach(delete);
-        
+
         this._files_eradicated += 5; // Legacy test files removed
         this._sanitation_latency_ms = performance.now() - start_time;
     }

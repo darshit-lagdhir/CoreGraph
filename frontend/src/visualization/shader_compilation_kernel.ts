@@ -20,7 +20,7 @@ export interface TProgramRegistry {
 export class AsynchronousUnifiedShaderFinalizationManifold {
     private _program_registry: TProgramRegistry | null = null;
     private _shader_modules: Map<string, string> = new Map();
-    
+
     // Finalization Vitality
     private _instructions_linked: number = 0;
     private _linking_latency_ms: number = 0;
@@ -51,12 +51,12 @@ export class AsynchronousUnifiedShaderFinalizationManifold {
      */
     public fuse_visual_modules(modules: { [key: string]: string }): string {
         let unified_source = "#version 300 es\nprecision highp float;\n";
-        
+
         for (const key in modules) {
             unified_source += `// Module: ${key}\n${modules[key]}\n`;
             this._instructions_linked += modules[key].split('\n').length;
         }
-        
+
         return unified_source;
     }
 

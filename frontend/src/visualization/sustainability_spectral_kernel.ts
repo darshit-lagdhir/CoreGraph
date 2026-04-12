@@ -21,7 +21,7 @@ export enum TSustainabilityArchetype {
 export class AsynchronousSustainabilitySpectralManifold {
     private _maintenance_decay_constant: number = 0.999;
     private _oklab_conversion_matrix: Float32Array = new Float32Array(9);
-    
+
     // Sustainability Vitality
     private _nodes_spectralized: number = 0;
     private _transformation_latency_ms: number = 0;
@@ -44,7 +44,7 @@ export class AsynchronousSustainabilitySpectralManifold {
 
         this._transformation_latency_ms = performance.now() - start_time;
         this._nodes_spectralized++;
-        
+
         return color;
     }
 

@@ -19,7 +19,7 @@ export interface TVisibilityState {
  */
 export class AsynchronousVisibilityGatingManifold {
     private _query_registry: Map<number, TVisibilityState> = new Map();
-    
+
     // Visibility Vitality
     private _edges_culled: number = 0;
     private _query_latency_ms: number = 0;
@@ -35,7 +35,7 @@ export class AsynchronousVisibilityGatingManifold {
         const start_time = performance.now();
 
         let state = this._query_registry.get(clusterId);
-        
+
         // 1. Check Query Availability
         if (state && state.query_id) {
             const available = gl.getQueryParameter(state.query_id, gl.QUERY_RESULT_AVAILABLE);
@@ -43,13 +43,13 @@ export class AsynchronousVisibilityGatingManifold {
                 const result = gl.getQueryParameter(state.query_id, gl.QUERY_RESULT);
                 state.is_occluded = result === 0;
                 state.pixel_count = result;
-                
+
                 if (state.is_occluded) this._edges_culled += 100; // Cluster size
             }
         }
 
         this._query_latency_ms = performance.now() - start_time;
-        
+
         return state ? !state.is_occluded : true;
     }
 

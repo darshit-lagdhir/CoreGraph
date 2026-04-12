@@ -13,11 +13,13 @@ logger = logging.getLogger(__name__)
 import asyncio
 import hashlib
 
+
 class AsynchronousLingerTimerDurabilityManifold:
     """
     RECTIFICATION 003: THE VOLATILE DATA PERSISTENCE GAP.
     Neutralizes the 'Forensic Vanishment' risk via a 500ms Deterministic Heartbeat.
     """
+
     __slots__ = ("_hardware_tier", "_linger_ms", "_is_running", "_active_buffer_id", "_buffers")
 
     def __init__(self, hardware_tier: str = "REDLINE"):
@@ -41,10 +43,12 @@ class AsynchronousLingerTimerDurabilityManifold:
 
     async def execute_timer_triggered_flush_cycle(self):
         dirty = self._buffers[self._active_buffer_id]
-        if not dirty: return
+        if not dirty:
+            return
         self._active_buffer_id = 1 - self._active_buffer_id
-        await asyncio.sleep(0.005) # I/O
+        await asyncio.sleep(0.005)  # I/O
         self._buffers[1 - self._active_buffer_id].clear()
+
 
 class WALGovernor:
     """
@@ -87,19 +91,24 @@ class WALGovernor:
         Asynchronous Linger-Timer Integration (RECTIFICATION 003).
         Anchors the 'Truth' to silicon within the 500ms window regardless of volume.
         """
-        
+
         # 1. Initialize the Durability Manifold if not present
         if not hasattr(self, "_durability_manifold"):
-            self._durability_manifold = AsynchronousLingerTimerDurabilityManifold(hardware_tier=self.tier)
+            self._durability_manifold = AsynchronousLingerTimerDurabilityManifold(
+                hardware_tier=self.tier
+            )
             await self._durability_manifold.start_heartbeat()
             print(f"[WAL] RECTIFICATION 003: Linger Heartbeat Multi-Threaded Sync Active.")
 
         # 2. Ingest the bit-packed signal into the ping-pong manifold
         signal = self.pack_transaction(node_id, op_code, delta)
         self._durability_manifold.ingest_signal(signal)
-        
+
         # 3. Pressure-based trigger still active as a second-order guard
-        if len(self._durability_manifold._buffers[self._durability_manifold._active_buffer_id]) >= self.buffer_limit:
+        if (
+            len(self._durability_manifold._buffers[self._durability_manifold._active_buffer_id])
+            >= self.buffer_limit
+        ):
             await self._durability_manifold.execute_timer_triggered_flush_cycle()
 
     async def _sequential_flush(self):

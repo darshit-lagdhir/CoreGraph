@@ -9,16 +9,18 @@ import time
 import hashlib
 from typing import Dict, Any, List
 
+
 class TitanBattlefieldOrchestrator:
     """
     Multi-Vector Failure Coalescing Manifold.
     Resolved the Sequential-Failure deadlock by implementing Asynchronous Cross-Layer Sync.
     """
+
     def __init__(self):
         self._supremacy_fidelity: float = 1.0
         self._battlefield_vitality: float = 1.0
         self._recovery_latency_ms: float = 0.0
-        
+
         # Terminal Integrity Lock
         self._sovereignty_seal: str = ""
 
@@ -28,23 +30,23 @@ class TitanBattlefieldOrchestrator:
         Simulates: Worker SIGKILL + Network-Loss + Storage-Stall.
         """
         start_time = time.perf_counter()
-        
+
         print("[WAR-GAME]: Initiating Triple-Failure Vector.")
         # Vector A: Violent Process Termination (Asynchronous)
         # Vector B: Electromagnetic Network Silence
         # Vector C: Transactional WAL-Stall
-        
+
         tasks = [
-            asyncio.sleep(0.005), # Simulating Kernel-Level Reaping
-            asyncio.sleep(0.002), # Simulating Faraday-Cage Isolation
-            asyncio.sleep(0.010)  # Simulating WAL-Journal Recovery
+            asyncio.sleep(0.005),  # Simulating Kernel-Level Reaping
+            asyncio.sleep(0.002),  # Simulating Faraday-Cage Isolation
+            asyncio.sleep(0.010),  # Simulating WAL-Journal Recovery
         ]
-        
+
         await asyncio.gather(*tasks)
-        
+
         self._recovery_latency_ms = (time.perf_counter() - start_time) * 1000
         self._supremacy_fidelity = 1.0
-        
+
         return self._recovery_latency_ms < 1500
 
     def generate_sovereignty_seal(self) -> str:
@@ -65,8 +67,9 @@ class TitanBattlefieldOrchestrator:
             "fidelity": self._supremacy_fidelity,
             "vitality": self._battlefield_vitality,
             "master_seal": self._sovereignty_seal or self.generate_sovereignty_seal(),
-            "status": "INVINCIBLE"
+            "status": "INVINCIBLE",
         }
+
 
 # Global Supremacy Singleton
 Orchestrator = TitanBattlefieldOrchestrator()

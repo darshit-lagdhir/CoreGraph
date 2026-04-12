@@ -20,7 +20,7 @@ const BVH_CONFIG = {
 export class AsynchronousSpatialCollisionManifold {
     private _bvh_buffer: Float32Array | null = null;
     private _traversal_stack: Int32Array = new Int32Array(BVH_CONFIG.max_depth);
-    
+
     // Interaction Vitality
     private _nodes_identified: number = 0;
     private _traversal_latency_ms: number = 0;
@@ -46,7 +46,7 @@ export class AsynchronousSpatialCollisionManifold {
         let selectedNodeUUID = null;
         // 1. Stackless Iteration Kernel
         // 2. AABB Intersection Test (Ray vs box)
-        
+
         this._traversal_latency_ms = performance.now() - start_time;
         return selectedNodeUUID;
     }

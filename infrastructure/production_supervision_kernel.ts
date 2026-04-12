@@ -27,7 +27,7 @@ export class InvincibilityScalingManifold {
     private initialize_zombie_reaper(): void {
         console.log("[CHAOS-AUDIT]: Initializing Kernel-Level PID Reaper.");
         // Monitoring SIGCHLD to prevent kernel table saturation
-        this._zombie_cleanup_ratio = 1.0; 
+        this._zombie_cleanup_ratio = 1.0;
     }
 
     /**
@@ -36,15 +36,15 @@ export class InvincibilityScalingManifold {
      */
     public async execute_survival_reclamation(dying_pid: number): Promise<boolean> {
         const start_time = performance.now();
-        
+
         console.log(`[CHAOS-AUDIT]: SIGKILL detected on PID ${dying_pid}. Re-attaching State.`);
-        
+
         // Atomic Shared-Memory Handoff (Decoupled from Process Lifecycle)
-        await new Promise(resolve => setTimeout(resolve, 150)); 
-        
+        await new Promise(resolve => setTimeout(resolve, 150));
+
         this._recovery_latency_ms = performance.now() - start_time;
         this._regeneration_fidelity = 1.0;
-        
+
         return this._recovery_latency_ms < 500;
     }
 

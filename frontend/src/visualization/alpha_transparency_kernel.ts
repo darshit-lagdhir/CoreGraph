@@ -19,7 +19,7 @@ const ALPHA_CONFIG = {
  */
 export class AsynchronousVolumetricCompositingManifold {
     private _alpha_registry: Float32Array | null = null;
-    
+
     // Volumetric Vitality
     private _pixels_composited: number = 0;
     private _compositing_latency_ms: number = 0;
@@ -46,7 +46,7 @@ export class AsynchronousVolumetricCompositingManifold {
 
         this._compositing_latency_ms = performance.now() - start_time;
         this._pixels_composited++;
-        
+
         return alpha;
     }
 
