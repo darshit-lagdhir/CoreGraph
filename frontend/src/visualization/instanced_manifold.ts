@@ -149,6 +149,9 @@ export class AsynchronousInstancedRenderingManifold {
             throw new Error('Shader link error: ' + gl.getProgramInfoLog(program));
         }
 
+        return program;
+    }
+
     /**
      * get_pipeline_vitality: Condensed HUD Metadata.
      */
