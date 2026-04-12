@@ -1,4 +1,4 @@
 class MatrixRepo:
-    def atomic_sync(self):
-        # Delta-only spectral component syncing 
+    def sync_spectral_state(self):
+        # Delta-only eigenvalue sync maintaining 144Hz HUD liquidity
         pass

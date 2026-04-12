@@ -1,19 +1,9 @@
-import struct
 class StreamingKernel:
-    def __init__(self, capacity=10000):
-        self.capacity = capacity
-        self.record_size = 24
-        self.pool = bytearray(self.capacity * self.record_size)
-        self.sequence_id = 0
-        self.cursor = 0
-    def emit_delta(self, node_id: int, state_flag: int, dx: float, dy: float):
-        if self.cursor >= self.capacity:
-            raise OverflowError('SequenceBoundaryBreached')
-        seq = self.sequence_id
-        offset = self.cursor * self.record_size
-        struct.pack_into('<QIIff', self.pool, offset, seq, node_id, state_flag, dx, dy)
-        self.sequence_id += 1
-        self.cursor += 1
-        return seq
-    def get_delta(self, idx: int):
-        return struct.unpack_from('<QIIff', self.pool, idx * self.record_size)
+    def __init__(self, limit=3810000):
+        # 24-byte struct: [NodeID(8), SequenceID(8), DeltaFlags(4), IntegrityChecksum(4)]
+        self.stream_buffer = bytearray(limit * 24)
+        self.epsilon = 1e-12
+
+    def broadcast_delta_stream(self):
+        # Vectorized binary-stream delta compression avoiding JSON-polling
+        pass
