@@ -51,6 +51,12 @@ const App = () => {
 
                     // CVI Threat Level
                     data[idx+4] = Math.random() > 0.95 ? 80 + Math.random() * 20 : Math.random() * 40;
+
+                    // Maintainers (0 to 100m)
+                    data[idx+5] = Math.random() * 100;
+
+                    // Funding (0 to 10M)
+                    data[idx+6] = Math.random() * 10000000;
                 }
 
                 // Directly allocate and upload the 32-byte stride buffer
@@ -61,22 +67,80 @@ const App = () => {
 
                 // 4. Camera Init
                 const cameraManifold = new AsynchronousViewportTransformationManifold();
-                let angle = 0;
-                let lastTime = performance.now();
+
+                // Add interactive mouse controls
+                let cameraRadius = 150;
+                let cameraTheta = 0;
+                let cameraPhi = Math.PI / 4;
+                let targetX = 0, targetY = 0, targetZ = 0;
+
+                let isDragging = false;
+                let isRightDragging = false;
+                let lastMouseX = 0;
+                let lastMouseY = 0;
+
+                canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+                canvas.addEventListener('mousedown', (e) => {
+                    if (e.button === 0) isDragging = true;
+                    if (e.button === 2) isRightDragging = true;
+                    lastMouseX = e.clientX;
+                    lastMouseY = e.clientY;
+                });
+
+                window.addEventListener('mouseup', () => {
+                    isDragging = false;
+                    isRightDragging = false;
+                });
+
+                window.addEventListener('mousemove', (e) => {
+                    if (!isDragging && !isRightDragging) return;
+
+                    const dx = e.clientX - lastMouseX;
+                    const dy = e.clientY - lastMouseY;
+                    lastMouseX = e.clientX;
+                    lastMouseY = e.clientY;
+
+                    if (isDragging) { // Left click: rotate
+                        cameraTheta += dx * 0.005;
+                        cameraPhi = Math.max(0.1, Math.min(Math.PI - 0.1, cameraPhi + dy * 0.005));
+                    }
+
+                    if (isRightDragging) { // Right click: pan
+                        const speed = cameraRadius * 0.001;
+                        // Approximate panning in camera space
+                        const rightX = Math.sin(cameraTheta - Math.PI/2);
+                        const rightZ = Math.cos(cameraTheta - Math.PI/2);
+                        targetX -= rightX * dx * speed;
+                        targetZ -= rightZ * dx * speed;
+
+                        const upX = Math.sin(cameraTheta) * Math.cos(cameraPhi);
+                        const upY = -Math.sin(cameraPhi);
+                        const upZ = Math.cos(cameraTheta) * Math.cos(cameraPhi);
+                        targetX += upX * dy * speed;
+                        targetY += upY * dy * speed;
+                        targetZ += upZ * dy * speed;
+                    }
+                });
+
+                canvas.addEventListener('wheel', (e) => {
+                    cameraRadius = Math.max(10, Math.min(1000, cameraRadius + e.deltaY * 0.1));
+                });
 
                 const render = (time: number) => {
-                    const dt = time - lastTime;
-                    lastTime = time;
-                    angle += 0.0003 * dt;
-
-                    gl.clearColor(0.011, 0.011, 0.015, 1.0); // background
+                    gl.clearColor(0.04, 0.05, 0.08, 1.0); // Deeper OSINT terminal background
                     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
                     gl.enable(gl.BLEND);
                     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
+                    // Spherical to Cartesian
+                    const cx = targetX + cameraRadius * Math.sin(cameraPhi) * Math.cos(cameraTheta);
+                    const cy = targetY + cameraRadius * Math.cos(cameraPhi);
+                    const cz = targetZ + cameraRadius * Math.sin(cameraPhi) * Math.sin(cameraTheta);
+
                     const vpMatrix = cameraManifold.execute_perspective_transformation_sequence({
-                        position: [Math.cos(angle) * 150, 40, Math.sin(angle) * 150],
-                        target: [0, 0, 0],
+                        position: [cx, cy, cz],
+                        target: [targetX, targetY, targetZ],
                         fov: 45 * Math.PI / 180,
                         aspect: window.innerWidth / window.innerHeight,
                         near: 0.1,

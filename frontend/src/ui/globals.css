@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /**
  * COREGRAPH MASTER ENGINEERING SPECIFICATION: MODULE 14
  * GLOBAL DESIGN SYSTEM: ERGONOMIC DARK-MODE CONSTANTS

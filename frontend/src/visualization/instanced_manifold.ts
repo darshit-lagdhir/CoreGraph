@@ -5,6 +5,7 @@
  */
 
 import { ContextKernel } from './context_kernel';
+import { GUIStore } from '../store/ui_store';
 
 /**
  * TInstanceStride: Interleaved attribute offsets (32-byte cache-line).
@@ -43,12 +44,18 @@ export class AsynchronousInstancedRenderingManifold {
             layout(location = 0) in vec3 a_position;
             layout(location = 1) in float a_size;
             layout(location = 2) in float a_cvi;
+            layout(location = 3) in float a_maintainers;
+            layout(location = 4) in float a_funding;
 
             uniform mat4 u_view_projection;
             out float v_cvi;
+            out float v_maintainers;
+            out float v_funding;
 
             void main() {
                 v_cvi = a_cvi;
+                v_maintainers = a_maintainers;
+                v_funding = a_funding;
                 gl_Position = u_view_projection * vec4(a_position, 1.0);
                 gl_PointSize = a_size * (20.0 / gl_Position.w);
             }
@@ -58,9 +65,28 @@ export class AsynchronousInstancedRenderingManifold {
         const fs_source = `#version 300 es
             precision highp float;
             in float v_cvi;
+            in float v_maintainers;
+            in float v_funding;
+
             out vec4 outColor;
 
+            uniform bool u_isolate_critical;
+            uniform float u_max_maintainers;
+            uniform float u_max_funding;
+
             void main() {
+                if (u_isolate_critical && v_cvi < 80.0) {
+                    discard;
+                }
+
+                if (v_maintainers > u_max_maintainers) {
+                    discard;
+                }
+
+                if (v_funding > u_max_funding) {
+                    discard;
+                }
+
                 vec3 safe_color = vec3(0.0, 1.0, 0.4); // Emerald
                 vec3 critical_color = vec3(1.0, 0.1, 0.1); // Crimson
                 outColor = vec4(mix(safe_color, critical_color, v_cvi / 100.0), 1.0);
@@ -98,6 +124,16 @@ export class AsynchronousInstancedRenderingManifold {
         gl.enableVertexAttribArray(2);
         gl.vertexAttribPointer(2, 1, gl.FLOAT, false, INSTANCE_STRIDE, 16);
         gl.vertexAttribDivisor(2, 1);
+
+        // Attribute 3: Maintainers (float)
+        gl.enableVertexAttribArray(3);
+        gl.vertexAttribPointer(3, 1, gl.FLOAT, false, INSTANCE_STRIDE, 20);
+        gl.vertexAttribDivisor(3, 1);
+
+        // Attribute 4: Funding (float)
+        gl.enableVertexAttribArray(4);
+        gl.vertexAttribPointer(4, 1, gl.FLOAT, false, INSTANCE_STRIDE, 24);
+        gl.vertexAttribDivisor(4, 1);
     }
 
     /**
@@ -113,6 +149,17 @@ export class AsynchronousInstancedRenderingManifold {
 
         try {
             gl.useProgram(this._program);
+
+            // Push GUI States down to shader level
+            const isolateCriticalLoc = gl.getUniformLocation(this._program, 'u_isolate_critical');
+            gl.uniform1i(isolateCriticalLoc, GUIStore.isolateCriticalThreats ? 1 : 0);
+
+            const maxMaintainersLoc = gl.getUniformLocation(this._program, 'u_max_maintainers');
+            gl.uniform1f(maxMaintainersLoc, GUIStore.maintainerThreshold);
+
+            const maxFundingLoc = gl.getUniformLocation(this._program, 'u_max_funding');
+            gl.uniform1f(maxFundingLoc, GUIStore.fundingThreshold);
+
             gl.drawArraysInstanced(gl.POINTS, 0, 1, count);
         } catch (error) {
             console.error('Instanced draw call failure intercepted.', error);
