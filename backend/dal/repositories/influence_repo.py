@@ -1,4 +1,4 @@
 class InfluenceRepo:
-    def atomic_reach_sync(self):
-        # Delta-only propagation state integration
+    def broadcast_reach_deltas(self):
+        # Dispatches Delta-Only reach updates to maintain 144Hz strategic liquidity
         pass

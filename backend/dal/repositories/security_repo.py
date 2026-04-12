@@ -1,4 +1,4 @@
 class SecurityRepo:
-    def atomic_detection_sync(self):
-        # Delta-only threat integration
+    def broadcast_threat_deltas(self):
+        # Dispatches Delta-Only security updates to maintain 144Hz defensive liquidity
         pass

@@ -1,4 +1,4 @@
 class AnomalyRepo:
-    def sync_deviations(self):
-        # High velocity topological anomaly shifts
+    def sync_deviation_state(self):
+        # Deterministic sharding and security vitality sync
         pass

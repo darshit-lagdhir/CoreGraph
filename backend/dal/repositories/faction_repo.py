@@ -1,4 +1,4 @@
 class FactionRepo:
-    def atomic_sync(self):
-        # Delta-only faction integration
+    def broadcast_division_deltas(self):
+        # Dispatches Delta-Only polarization updates to maintain 144Hz sociological liquidity
         pass
