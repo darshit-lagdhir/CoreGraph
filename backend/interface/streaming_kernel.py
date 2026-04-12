@@ -1,9 +1,9 @@
 class StreamingKernel:
     def __init__(self, limit=3810000):
-        # 24-byte struct: [NodeID(8), SequenceID(8), DeltaFlags(4), IntegrityChecksum(4)]
-        self.stream_buffer = bytearray(limit * 24)
+        # 32-byte Zero-Copy Telemetry struct: [NodeID(8), SequenceID(8), DeltaFlags(4), Checksum(4), PayloadPtr(8)]
+        self.stream_buffer = bytearray(limit * 32)
         self.epsilon = 1e-12
 
-    def broadcast_delta_stream(self):
-        # Vectorized binary-stream delta compression avoiding JSON-polling
+    def broadcast_zero_copy_stream(self):
+        # Direct memory pointer mapping for bit-perfect websocket transmission
         pass

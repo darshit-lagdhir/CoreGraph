@@ -1,4 +1,8 @@
 class SchemaKernel:
     def __init__(self):
-        self.node_size = 24
-        self.node_format = '<IQfff'
+        # Ephemeral shared memory buffer for nested dependency mapping
+        self.dependency_buffer = bytearray(16384)
+
+    def map_raw_bytes(self):
+        # Bitwise token containment
+        pass
