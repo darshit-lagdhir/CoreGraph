@@ -2,10 +2,10 @@ import sys
 import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
-from .quantum_logic.entanglement_entropy_manifold import EntanglementEntropyManifold
-from .quantum_logic.bell_inequality_kernel import BellInequalityKernel
-from .entanglement_sync import EntanglementIntegritySync
-from backend.dal.repositories.entangled_state_repo import EntangledStateRepository
+from .quantum_logic.entanglement_entropy_manifold import EntanglementEntropyManifold  # noqa: E402
+from .quantum_logic.bell_inequality_kernel import BellInequalityKernel  # noqa: E402
+from .entanglement_sync import EntanglementIntegritySync  # noqa: E402
+from backend.dal.repositories.entangled_state_repo import EntangledStateRepository  # noqa: E402
 
 
 class NonLocalCorrelationEngine:

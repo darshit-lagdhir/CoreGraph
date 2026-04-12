@@ -2,10 +2,12 @@ import sys
 import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
-from .finality.stationarity_manifold import RelationalStationarityManifold
-from .finality.stationarity_anchor_kernel import StationarityAnchorKernel
-from .universal_sync import UniversalIntegritySync
-from backend.dal.repositories.universal_hardened_repo import UniversalHardenedRepository
+from .finality.stationarity_manifold import RelationalStationarityManifold  # noqa: E402
+from .finality.stationarity_anchor_kernel import StationarityAnchorKernel  # noqa: E402
+from .universal_sync import UniversalIntegritySync  # noqa: E402
+from backend.dal.repositories.universal_hardened_repo import (  # noqa: E402
+    UniversalHardenedRepository,
+)  # noqa: E402
 
 
 class UniversalHardeningEngine:

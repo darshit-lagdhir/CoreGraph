@@ -2,10 +2,10 @@ import sys
 import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
-from .bulk_geometry.projection_manifold import RelationalProjectionManifold
-from .bulk_geometry.ryu_takayanagi_kernel import RyuTakayanagiKernel
-from .holographic_sync import HolographicIntegritySync
-from backend.dal.repositories.holographic_correspondence_repo import (
+from .bulk_geometry.projection_manifold import RelationalProjectionManifold  # noqa: E402
+from .bulk_geometry.ryu_takayanagi_kernel import RyuTakayanagiKernel  # noqa: E402
+from .holographic_sync import HolographicIntegritySync  # noqa: E402
+from backend.dal.repositories.holographic_correspondence_repo import (  # noqa: E402
     HolographicCorrespondenceRepository,
 )
 
