@@ -29,6 +29,9 @@ services:
 
   coregraph_engine:
     image: coregraph-engine:final-hardened
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     container_name: ingestion_phalanx
     depends_on:
       - db

@@ -31,7 +31,7 @@ class CommunityDetector:
         # 3. Modularity Optimization via Louvain-Modular heuristic
         # We convert to undirected for standard Louvain community detection
         undirected_graph = self.graph.to_undirected()
-        
+
         try:
             partition = community_louvain.best_partition(
                 undirected_graph, random_state=self.seed, weight="weight", resolution=1.0
