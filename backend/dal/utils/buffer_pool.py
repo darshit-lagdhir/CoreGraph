@@ -1,6 +1,6 @@
+from backend.core.memory_manager import MemoryManager
 class BufferPool:
-    def __init__(self, buffer_size=10485760): # 10MB
-        self.buffer = bytearray(buffer_size)
-    
-    def reset(self):
-        pass # Zero-copy override logic applied elsewhere
+    def __init__(self, memory_manager: MemoryManager, size: int):
+        self.offset = memory_manager.allocate(size)
+        self.size = size
+        self.heap_ref = memory_manager.heap
