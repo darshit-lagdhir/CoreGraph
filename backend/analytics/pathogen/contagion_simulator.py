@@ -68,22 +68,33 @@ class PredictivePathogenSimulationManifold:
             return
 
         self._breached_communities.add(root_community_id)
-        evaluation_queue = list(self.macro_graph.successors(root_node))
+        
+        # Hardy Iterative BFS Traversal for Contagion modeling
+        active_queue = [root_node]
+        visited = {root_node}
 
-        for target_node in evaluation_queue:
-            edge_data = self.macro_graph.get_edge_data(
-                root_node, target_node, default={"weight": 1.0}
-            )
-            target_data = self.macro_graph.nodes[target_node]
+        while active_queue:
+            curr_node = active_queue.pop(0)
 
-            boundary_strength = target_data.get("budget", 0.0) / 1000.0
-            resistance = max(1.0, math.log10(boundary_strength + 10.0))
+            for target_node in self.macro_graph.successors(curr_node):
+                if target_node in visited:
+                    continue
 
-            contagion_roll = (kinetic_momentum * edge_data["weight"]) / resistance
+                edge_data = self.macro_graph.get_edge_data(
+                    curr_node, target_node, default={"weight": 1.0}
+                )
+                target_data = self.macro_graph.nodes[target_node]
 
-            if contagion_roll > 1.0:
-                raw_id = str(target_node).replace("SUPER_", "")
-                self._breached_communities.add(raw_id)
+                boundary_strength = target_data.get("budget", 0.0) / 1000.0
+                resistance = max(1.0, math.log10(boundary_strength + 10.0))
+
+                contagion_roll = (kinetic_momentum * edge_data["weight"]) / resistance
+
+                if contagion_roll > 1.0:
+                    visited.add(target_node)
+                    active_queue.append(target_node)
+                    raw_id = str(target_node).replace("SUPER_", "")
+                    self._breached_communities.add(raw_id)
 
     async def run_probabilistic_micro_traversal(self) -> None:
         """
@@ -175,8 +186,15 @@ class PredictivePathogenSimulationManifold:
                 apex_path = [t_node]
 
                 curr_node = t_node
-                while True:
+                
+                depth = 0
+                max_depth = 5000
+                while depth < max_depth:
+                    depth += 1
                     preds = list(sub_graph.predecessors(curr_node))
+                    # Prevent circular tracing loops
+                    preds = [p for p in preds if p not in apex_path]
+                    
                     if not preds:
                         break
 

@@ -1,28 +1,14 @@
 import os
 import redis.asyncio as redis
-import logging
-
-
+import struct
 class GraphCacheManager:
-    """
-    The High-Velocity Memory Mirror. (Task 010 Architecture).
-    Ensures that the 144Hz HUD pulls from Redis L3 cache, not the NVMe vault.
-    """
-
+    __slots__ = ('redis_url', 'client')
     def __init__(self):
-        self.redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/1")
-        self.client = redis.from_url(self.redis_url, decode_responses=True)
-
+        self.redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379/1')
+        pool = redis.ConnectionPool.from_url(self.redis_url, max_connections=64000, decode_responses=False)
+        self.client = redis.Redis(connection_pool=pool)
     async def invalidate_node(self, node_id: str):
-        """Surgical purging of the cached intelligence object."""
-        key = f"cache:intel:{node_id}"
-        await self.client.delete(key)
-        # logging.info(f"[CACHE_MANAGER] Invalidated leaf: {node_id}")
-
-    async def get_node(self, node_id: str):
-        """Retrieves the cached I_Omega blob."""
-        return await self.client.get(f"cache:intel:{node_id}")
-
-
-# Centralized Singleton for the DAL engine
+        await self.client.delete(f'cache:intel:{node_id}'.encode('utf-8'))
+    async def get_node(self, node_id: str) -> bytes:
+        return await self.client.get(f'cache:intel:{node_id}'.encode('utf-8'))
 cache_manager = GraphCacheManager()

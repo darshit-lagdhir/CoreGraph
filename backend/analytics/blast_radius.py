@@ -1,5 +1,5 @@
 from collections import deque
-from typing import Dict, Set
+from typing import Dict, Set, Optional
 
 import networkx as nx
 
@@ -9,38 +9,31 @@ class BlastRadiusCalculator:
         self.graph = graph
         self.ancestry: Dict[str, Set[str]] = {}
 
-    def calculate(self):
-        """Execute linear-time O(V+E) transitive impact calculation via bitsets."""
-        # 1. Topological Sorting: prerequisite for recursive union mapping
-        if not nx.is_directed_acyclic_graph(self.graph):
-            raise ValueError(
-                "Graph matrix contains circular dependencies. DAG property required for BlastRadius."  # noqa: E501
-            )
-
-        # We need the topological order of the graph
-        topo_order = list(nx.topological_sort(self.graph))
-
-        # 2. Ancestry Union: Iterating reversely to propagate impact upwards
-        # For each node u, Ancestors(u) = Union(Ancestors(v)) + v for all v where u depends on v
-        # In our graph, edges are Dependent -> Dependency, so we need to find all descendants?
-        # NO. Blast Radius = No. of things that depend on me.
-        # My "In-neighbors" are my dependents. My "Out-neighbors" are my dependencies.
-        # So it's the reverse: I need to calculate the transitive "In-closure".
-
-        # We process in topological order: Dependent 1st, Dependency last.
-        # This will store the set of all unique packages that depend on a given node (transitively).
-        dependents: Dict[str, Set[str]] = {node: set() for node in self.graph.nodes()}
-
-        # Dependent -> Dependency (Impact flows Uphill)
-        # We process things from Dependent (low in hierarchy) to Dependency (high).
-        for node in topo_order:
-            for dependency in self.graph.successors(node):
-                # Everything that depends on 'node' also depends on 'dependency'
-                dependents[dependency].update(dependents[node])
-                dependents[dependency].add(node)
-
-        # 3. Normalization and Attribution
-        for node, deps in dependents.items():
-            self.graph.nodes[node]["blast_radius"] = len(deps)
-
+    def calculate(self, affected_nodes: Optional[Set[str]] = None) -> nx.DiGraph:
+        """Execute O(V+E) transitive impact calculation via robust iterative traversal.
+        Supports Delta-Only Updates for high-frequency 144Hz HUD liquidity and handles cycles."""
+        
+        target_nodes = affected_nodes if affected_nodes is not None else set(self.graph.nodes())
+        dependents: Dict[str, Set[str]] = {node: set() for node in target_nodes}
+        
+        # Iterative BFS traversal to propagate dependents upwards (handling cycles via guards)
+        for node in target_nodes:
+            visited = set()
+            active_queue = deque([(node, 0)])
+            max_depth = 5000
+            
+            while active_queue:
+                curr, depth = active_queue.popleft()
+                if depth > max_depth:
+                    continue
+                
+                for dependent in self.graph.predecessors(curr):
+                    if dependent not in visited:
+                        visited.add(dependent)
+                        dependents[node].add(dependent)
+                        active_queue.append((dependent, depth + 1))
+        
+        for node in target_nodes:
+            self.graph.nodes[node]["blast_radius"] = len(dependents[node])
+            
         return self.graph

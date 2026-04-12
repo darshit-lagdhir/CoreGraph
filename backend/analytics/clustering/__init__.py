@@ -1,1 +1,0 @@
-from .community_manifold import DistributedLouvainClusteringManifold as CommunityDetector

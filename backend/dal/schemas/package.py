@@ -1,24 +1,12 @@
-import uuid
-from datetime import datetime
-
-from pydantic import BaseModel, ConfigDict, Field
-
-
-class PackageBase(BaseModel):
-    """Foundational Pydantic v2 reflection for type-safe data transit."""
-
-    ecosystem: str = Field(..., max_length=32)
-    name: str = Field(..., max_length=255)
-    version_latest: str | None = Field(None, max_length=64)
-
-
-class PackageCreate(PackageBase):
-    pass
-
-
-class PackageRead(PackageBase):
-    id: uuid.UUID
-    created_at: datetime
-    updated_at: datetime
-
-    model_config = ConfigDict(from_attributes=True)
+import struct
+class Package: pass
+class PackageVersion: pass
+class DependencyEdge: pass
+class BinarySchemaValidator:
+    def __init__(self):
+        self.struct_format = '>32sIf'
+        self.record_size = struct.calcsize(self.struct_format)
+    def validate(self, block: bytes) -> bool:
+        return len(block) == self.record_size
+    def pack_node(self, node_id: bytes, type_code: int, weight: float) -> bytes:
+        return struct.pack(self.struct_format, node_id.ljust(32, b'\x00'), type_code, weight)

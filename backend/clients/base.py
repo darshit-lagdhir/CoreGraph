@@ -1,57 +1,23 @@
-import time
-from typing import Dict, Optional
+import struct
+import asyncio
 
-import httpx
-from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential_jitter
+class BinaryTransportPhalanx:
+    def __init__(self, buffer_size=10485760): # 10MB intake buffer
+        self.intake_buffer = bytearray(buffer_size)
+        self.cursor = 0
+        self.lock = asyncio.Lock()
+        # Struct: 32s (node_id), Q (timestamp), H (status_code), I (payload_size)
+        self.header_fmt = '>32sQHI'
+        self.header_size = struct.calcsize(self.header_fmt)
 
-
-class CircuitBreakerException(Exception):
-    pass
-
-
-class ResilientClient:
-    def __init__(self, base_url: str = "", headers: Optional[Dict[str, str]] = None):
-        limits = httpx.Limits(max_connections=100, max_keepalive_connections=20)
-        timeout = httpx.Timeout(10.0, connect=2.0)
-        self.client = httpx.AsyncClient(
-            base_url=base_url, headers=headers, limits=limits, timeout=timeout
-        )
-        self.failure_volume = 0
-        self.circuit_open_expiration = 0.0
-
-    def _verify_circuit(self):
-        if time.time() < self.circuit_open_expiration:
-            raise CircuitBreakerException(
-                "Endpoint repeatedly dropped connections. Traffic locked."
-            )
-
-    def _register_failure(self):
-        self.failure_volume += 1
-        if self.failure_volume >= 5:
-            self.circuit_open_expiration = time.time() + 60.0
-            self.failure_volume = 0
-
-    @retry(
-        wait=wait_exponential_jitter(initial=2, max=60, exp_base=2, jitter=1.0),
-        stop=stop_after_attempt(5),
-        retry=retry_if_exception_type((httpx.HTTPStatusError, httpx.RequestError)),
-        reraise=True,
-    )
-    async def request_node(self, method: str, url: str, **kwargs) -> httpx.Response:
-        self._verify_circuit()
-        try:
-            response = await self.client.request(method, url, **kwargs)
-            if response.status_code == 404:
-                return response
-
-            if response.status_code in [429, 500, 502, 503, 504]:
-                response.raise_for_status()
-
-            self.failure_volume = 0
-            return response
-        except (httpx.HTTPStatusError, httpx.RequestError) as network_fault:
-            self._register_failure()
-            raise network_fault
-
-    async def aclose(self):
-        await self.client.aclose()
+    async def ingest_payload(self, node_id: bytes, timestamp: int, status: int, payload: bytes):
+        async with self.lock:
+            l = len(payload)
+            req_size = self.header_size + l
+            if self.cursor + req_size > len(self.intake_buffer):
+                self.cursor = 0 # Circular reset for continuous high-throughput ingestion
+            
+            struct.pack_into(self.header_fmt, self.intake_buffer, self.cursor, node_id.ljust(32, b'\x00'), timestamp, status, l)
+            self.intake_buffer[self.cursor + self.header_size : self.cursor + self.header_size + l] = payload
+            self.cursor += req_size
+            return self.cursor

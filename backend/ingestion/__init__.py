@@ -1,1 +1,0 @@
-# CoreGraph Ingestion Namespace

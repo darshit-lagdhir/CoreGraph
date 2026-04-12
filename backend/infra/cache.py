@@ -1,46 +1,32 @@
 import os
 import redis.asyncio as redis
 import json
+import struct
 from typing import Dict, Any
-
-
 class MetricDebouncer:
-    """
-    The Behavioral Buffer.
-    Prevents NVMe SSD wear and database lock contention by buffering
-    high-frequency maintainer activity in the Redis cache.
-    """
-
+    __slots__ = ('redis_url', 'client')
     def __init__(self):
-        # We fetch the URL from environment/settings architecture.
-        self.redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
-        self.client = redis.from_url(self.redis_url, decode_responses=True)
-
+        self.redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+        pool = redis.ConnectionPool.from_url(self.redis_url, max_connections=64000, decode_responses=False)
+        self.client = redis.Redis(connection_pool=pool)
     async def buffer_metric(self, author_id: str, package_id: str, field: str, value: int = 1):
-        """
-        High-speed in-memory increment.
-        This is called by the Module 1 Crawler for every commit event identified.
-        """
-        key = f"debounce:metrics:{author_id}:{package_id}"
-        # Atomic increment in Redis (Thread-safe by design)
-        # Prevents 'Write-Storm' on the primary PostgreSQL vault.
-        await self.client.hincrby(key, field, value)
-        # Set a 2-hour TTL to ensure we don't leak memory in circular activity.
-        await self.client.expire(key, 7200)
-
+        key = f'debounce:metrics:{author_id}:{package_id}'.encode('utf-8')
+        b_field = field.encode('utf-8')
+        pipe = self.client.pipeline(transaction=True)
+        pipe.hincrby(key, b_field, value)
+        pipe.expire(key, 7200)
+        await pipe.execute()
     async def get_all_pending(self) -> Dict[str, Dict[str, str]]:
-        """Fetches all metrics that are waiting for the 'Pulse' sweep into Postgres."""
-        keys = await self.client.keys("debounce:metrics:*")
-        pending = {}
-        for key in keys:
-            # We fetch as mapping due to HINCRBY structure
-            pending[key] = await self.client.hgetall(key)
+        pending: Dict[str, Dict[str, str]] = {}
+        cursor = b'0'
+        while True:
+            cursor, keys = await self.client.scan(cursor=cursor, match=b'debounce:metrics:*', count=5000)
+            for k in keys:
+                raw_hash = await self.client.hgetall(k)
+                if not raw_hash: continue
+                pending[k.decode('utf-8')] = {fk.decode('utf-8'): fv.decode('utf-8') for fk,fv in raw_hash.items()}
+            if cursor == b'0': break
         return pending
-
     async def clear_key(self, key: str):
-        """Removes the key after successful DB persistence."""
-        await self.client.delete(key)
-
-
-# Centralized accessor for the debouncer
+        await self.client.delete(key.encode('utf-8'))
 cache_debouncer = MetricDebouncer()
