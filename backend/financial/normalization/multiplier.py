@@ -1,4 +1,8 @@
 import decimal
+def initialize_subatomic_precision():
+    decimal.setcontext(decimal.Context(prec=28, rounding=decimal.ROUND_HALF_EVEN, traps=[decimal.Overflow, decimal.Underflow]))
+initialize_subatomic_precision()
+import decimal
 import time
 import asyncio
 from typing import Dict, List, Tuple, Any
