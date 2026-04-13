@@ -1,0 +1,91 @@
+name: COREGRAPH CONTINUITY MANIFOLD
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'backend/**'
+      - 'infrastructure/**'
+      - 'Dockerfile'
+      - 'docker-compose.yml'
+      - '.github/workflows/**'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  WORKER_CONCURRENCY: 1
+  COREGRAPH_HEADLESS_MODE: 1
+
+jobs:
+  forensic-audit:
+    name: 1. Systemic Code Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+      
+      - name: Establish Python 3.11 Kernel
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Ingest Requirements
+        run: pip install -r backend/requirements.txt
+        
+      - name: Validate FastAPI Schema Bounds
+        run: |
+          python -c "import sys; sys.path.append('backend'); from schemas.api import ForensicQueryRequest; print('Schema Sovereign')"
+
+  registry-seal:
+    name: 2. Container Registry Manifold
+    needs: forensic-audit
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Registry Handshake
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Structural Hardening (Docker Metadata)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,format=long
+
+      - name: Zero-CC Build & Exfiltration
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            WORKER_CONCURRENCY=1
+
+  cloud-ignition:
+    name: 3. Sovereign Cloud Sync
+    needs: registry-seal
+    runs-on: ubuntu-latest
+    steps:
+      - name: Remote Webhook Trigger
+        env:
+          DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$DEPLOY_HOOK" ]; then
+            echo "[WARN] RENDER_DEPLOY_HOOK not set. Operating in local-seal mode."
+          else
+            curl -X POST -d '{}' "$DEPLOY_HOOK"
+            echo "[INFO] Cloud Sync Dispatched."
+          fi
+

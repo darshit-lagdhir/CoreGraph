@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: coregraph-titan
+    env: docker
+    plan: free # ZERO-CC INFRASTRUCTURE MANIFOLD
+    region: oregon 
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /v1/swagger
+    envVars:
+      - key: WORKER_CONCURRENCY
+        value: "1"
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: COREGRAPH_HEADLESS_MODE
+        value: "1"
+      - key: GEMINI_API_KEY
+        sync: false
+

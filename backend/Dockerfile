@@ -1,25 +1,25 @@
-# Foundation-Release-1.0 : Immutable Hardware-Optimized Baseline (Module 1 SEALED)
-# Stage 1: Compilation Architecture
-FROM python:3.13-slim AS builder
+# Distilled CoreGraph Forensic Kernel - Headless Mode (Module 15 / April 20th Seal)
+FROM python:3.13-alpine AS builder
 
-RUN apt-get update && apt-get install -y \
+RUN apk add --no-cache \
     gcc \
-    libpq-dev \
+    musl-dev \
+    postgresql-dev \
     python3-dev \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/cache/apk/*
 
 WORKDIR /app
 COPY requirements.txt .
 
 RUN pip wheel --no-cache-dir --no-deps --wheel-dir /app/wheels -r requirements.txt
 
-# Stage 2: Runtime Execution Boundary
-FROM python:3.13-slim
+# Absolute Hardware Sovereignty Boundary
+FROM python:3.13-alpine
 
-RUN apt-get update && apt-get install -y libpq-dev && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache libpq && rm -rf /var/cache/apk/*
 
-RUN groupadd -g 10001 coregraph && \
-    useradd -u 10001 -g coregraph -s /bin/bash -m coregraph
+RUN addgroup -g 10001 coregraph && \
+    adduser -u 10001 -G coregraph -s /bin/sh -D coregraph
 
 WORKDIR /app
 
@@ -34,4 +34,5 @@ RUN chown -R coregraph:coregraph /app
 
 USER coregraph
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "main:invoke_orchestration", "--host", "0.0.0.0", "--port", "8000"]
+

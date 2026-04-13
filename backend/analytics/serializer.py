@@ -1,5 +1,5 @@
 import gzip
-import json
+import orjson
 from typing import Any, Dict
 
 import networkx as nx
@@ -34,7 +34,7 @@ class GraphSerializer:
 
         # 2. Binary Compression: Zeroing network overhead for 50MB telemetry clusters
         # Level 9 compression for absolute hypervisor memory economy.
-        raw_json = json.dumps(payload).encode("utf-8")
+        raw_json = orjson.dumps(payload)
         compressed = gzip.compress(raw_json, compresslevel=9)
 
         return compressed
@@ -48,3 +48,4 @@ class GraphSerializer:
                 }
             )
         )
+

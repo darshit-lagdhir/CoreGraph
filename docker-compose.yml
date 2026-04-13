@@ -1,55 +1,35 @@
-version: "3.9"
-
-# COREGRAPH MASTER ENGINEERING SPECIFICATION: MODULE 15 - TASK 08
-# STATE-MACHINE PERSISTENCE & RECOVERY (WAL-HARDENED FINAL SEAL)
+version: "3.8"
 
 services:
-  db:
-    image: postgres:15-alpine
-    container_name: coregraph_db
-    restart: always
-    environment:
-      POSTGRES_USER: coregraph_admin
-      POSTGRES_PASSWORD: coregraph_secret123
-      POSTGRES_DB: coregraph_vault
-    volumes:
-      - coregraph_pgdata:/var/lib/postgresql/data
-    networks:
-      - coregraph_mesh
-    # WAL-HARDENING: Absolute ACID Compliance for 3.81M Node Integrity
-    command: postgres -c "max_connections=500" -c "shared_buffers=1GB" -c "wal_level=replica" -c "full_page_writes=on" -c "checkpoint_timeout=15min" -c "max_wal_size=4GB"
-
-  redis:
-    image: redis:7-alpine
-    container_name: coregraph_cache
-    networks:
-      - coregraph_mesh
-    # AOF-HARDENING: Persistence Sovereignty
-    command: redis-server --appendonly yes --appendfsync everysec
-
-  coregraph_engine:
-    image: coregraph-engine:final-hardened
+  coregraph-titan:
     build:
-      context: ./backend
+      context: .
       dockerfile: Dockerfile
-    container_name: ingestion_phalanx
-    depends_on:
-      - db
-      - redis
-    networks:
-      - coregraph_mesh
+    platform: linux/amd64
     ports:
       - "8000:8000"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-null}
+      - LOG_LEVEL=critical
+      - WORKER_CONCURRENCY=1
+      - MEMORY_LIMIT=150MB
     deploy:
       resources:
         limits:
-          cpus: '0.90'
-          memory: 4GB
+          cpus: "0.5"
+          memory: 150M
+        reservations:
+          cpus: "0.1"
+          memory: 75M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8000/v1/swagger"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
 
 networks:
-  coregraph_mesh:
+  default:
+    name: coregraph_net
     driver: bridge
-    internal: true
 
-volumes:
-  coregraph_pgdata:

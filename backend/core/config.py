@@ -64,6 +64,7 @@ class Settings(BaseSettings):
     # 4. OSINT Secret Interface
     # Failure 3 Resolution: Native SecretStr redaction to prevent accidental telemetry leakage
     GITHUB_GRAPHQL_TOKEN: SecretStr = Field(default="sk-dummy-token")  # type: ignore[assignment]
+    GOOGLE_AI_API_KEY: SecretStr = Field(default="sk-dummy-token")  # type: ignore[assignment]
 
     # 5. Hardware & Operational Constraints (Task-Specific Thresholds)
     # Failure 3 Resolution: Worker concurrency capped at 24 for the i9-13980hx cluster
