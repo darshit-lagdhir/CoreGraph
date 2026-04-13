@@ -72,6 +72,12 @@ class Settings(BaseSettings):
     WSL_MEMORY_LIMIT_MB: int = Field(default=4096, le=8192)
     WS_CHUNK_SIZE: int = Field(default=65536, ge=16384, le=1048576)
 
+    # 6. DAL Ghost-Mapper Budget
+    DAL_MAX_NODES: int = Field(default=3_810_000, ge=1)
+    DAL_MAX_EDGES: int = Field(default=10_000_000, ge=1)
+    DAL_CACHE_SHARDS: int = Field(default=64, ge=1, le=512)
+    DAL_ENABLE_GHOST_VAULT: bool = True
+
     # Failure 1 Resolution: Absolute path resolution via pathlib, neutralizing context-drift
     model_config = SettingsConfigDict(
         env_file=str(Path(__file__).parent.parent.parent / ".env"),
