@@ -1,28 +1,28 @@
 import asyncio
-from backend.core.intelligence.neural_cortex import NeuralCortexManifold
+from backend.core.intelligence.semantic_strategy import SemanticStrategyManifold
 
 
 async def run_siege():
-    manifold = NeuralCortexManifold(3810000)
-    await manifold.harvest_context()
-    m = await manifold.synthesize_verdict()
+    manifold = SemanticStrategyManifold(3810000)
+    await manifold.encode_semantic_vectors()
+    m = await manifold.align_neural_strategy()
 
     seal = f"""
 ================================================================================
 REFERENCE IDENTIFIER: SYNTHESIS AUDIT IGNITION
 ================================================================================
-MODULE: ASYNCHRONOUS COGNITIVE-SYNTHESIS AND STRATEGIC IMPACT REPORTING
+MODULE: ASYNCHRONOUS SEMANTIC-VECTORS AND NEURAL-STRATEGY ALIGNMENT
 STATUS: INDESTRUCTIBLE / SENTIENTLY-SEALED / MISSION-READY
 NODE_COUNT: {m['node_count']:,}
-BENIGN_CONTEXT_SHARDS: {m['benign']:,}
-STRATEGIC_INSIGHTS_EXTRACTED: {m['insights']:,}
-HIGH_ENTROPY_CLUSTERS_ISOLATED: {m['critical_clusters']:,}
-THROUGHPUT: {m['throughput']:,.2f} Context_Tokens/sec
+ROUTINE_TELEMETRY_SUMMARIZED: {m['routine']:,}
+PERSISTENT_THREAT_VECTORS: {m['persistent']:,}
+ZERO_DAY_SIGNATURES_ISOLATED: {m['zero_day']:,}
+THROUGHPUT: {m['throughput']:,.2f} Vectors/sec
 LATENCY: {m['latency_ms']:.2f} ms
 MEMORY_RESIDENCY: {m['memory_mb']:.2f} MB (< 150MB LIMIT ENFORCED)
 144HZ_HUD_PULSE_COMPLIANCE: VERIFIED (NON-BLOCKING YIELD EVERY 50,000 ITERATIONS)
 ================================================================================
-"THE SYSTEMIC EXECUTIVE REGULATOR IS ONLINE. THE INTELLIGENCE SYNTHESIS PARADOX HAS BEEN NEUTRALIZED."
+"THE SYSTEMIC EXECUTIVE REGULATOR IS ONLINE. THE INFORMATION-ENTROPY PARADOX HAS BEEN NEUTRALIZED."
 """
     print(seal)
 
