@@ -27,7 +27,6 @@ sync-check:
 	@if not exist ".env" (echo "CRITICAL FAILURE: Environment matrix absent" && exit 1)
 	@docker info >nul 2>&1 || (echo "CRITICAL FAILURE: Docker hypervisor disconnected" && exit 1)
 	cd backend && alembic current
-	cd frontend && npm install
 	.\venv\Scripts\python.exe -m pip install -r backend\requirements.txt
 	.\venv\Scripts\python.exe scripts\validate_registries.py
 
@@ -72,18 +71,13 @@ prune-sessions:
 	@echo "Disengaging stalled WebSocket tracking boundaries..."
 	docker compose exec -T api bash -c "echo 'ZOMBIE CLEARANCE ACQUIRED'" || echo "Operation successful."
 
-clean-frontend:
 	@echo "Purging frontend caches and minified payloads..."
-	powershell -Command "if (Test-Path frontend/dist) { Remove-Item -Path frontend/dist -Recurse -Force -ErrorAction SilentlyContinue }"
-	powershell -Command "if (Test-Path frontend/node_modules/.vite) { Remove-Item -Path frontend/node_modules/.vite -Recurse -Force -ErrorAction SilentlyContinue }"
 
-clean-frontend-cache:
 	@echo "Wiping hardware-accelerated shader caches..."
 	powershell -Command "if (Test-Path $env:LOCALAPPDATA/Google/Chrome/User` Data/Default/GPUCache) { Remove-Item -Path $env:LOCALAPPDATA/Google/Chrome/User` Data/Default/GPUCache -Recurse -Force -ErrorAction SilentlyContinue }"
 
 prune-shaders:
 	@echo "Neutralizing secondary shader draft loops..."
-	powershell -Command "if (Test-Path frontend/src/shaders) { Get-ChildItem -Path frontend/src/shaders -File | Where-Object { $_.Extension -eq '.tmp' } | Remove-Item -Force }"
 
 lint-glsl:
 	@echo "Executing static analysis of rendering kernels..."
@@ -93,7 +87,6 @@ lint-glsl:
 lint-fix:
 	@echo "Executing automated structural corrections..."
 	.\venv\Scripts\python.exe -m black backend/ --config backend/pyproject.toml
-	cd frontend && npm run lint -- --fix
 
 clean-test-artifacts:
 	@echo "Purging localized test caches and coverage reports..."
@@ -211,12 +204,10 @@ tail-heartbeat-logs:
 
 install-deps:
 	@echo "Executing synchronized dependency matrix across environments..."
-	cd frontend && npm install
 	.\venv\Scripts\python.exe -m pip install -r backend\requirements.txt
 
 build-prod:
 	@echo "Compiling optimized binary distributions..."
-	cd frontend && npm run build
 
 wipe-db-data:
 	@echo "Executing destructive persistence reset..."
@@ -224,7 +215,6 @@ wipe-db-data:
 	docker compose up -d db
 	@echo "Internal storage volumes zeroed. 'make migrate' must be executed."
 
-cleanup: clean-pycache clean-logs clean-migrations prune-sockets prune-sessions flush-tmp clean-frontend
 	docker system prune -a --volumes -f
 clean-all: cleanup clean-docs-cache clean-test-artifacts clean-test-logs clean-config-cache
 
@@ -273,7 +263,6 @@ ci-clean-cache:
 wipe-artifacts:
 	@echo "Executing final workspace pruning for Module 1 Sealing..."
 	@powershell -Command "if (Test-Path backend/logs) { Remove-Item -Path backend/logs/*.log -Force -ErrorAction SilentlyContinue }"
-	@powershell -Command "if (Test-Path frontend/dist) { Remove-Item -Path frontend/dist -Recurse -Force -ErrorAction SilentlyContinue }"
 	@powershell -Command "Get-ChildItem -Path . -Include __pycache__ -Recurse -Force | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue"
 	@powershell -Command "Get-ChildItem -Path . -Include *.pyc -Recurse -Force | Remove-Item -Force -ErrorAction SilentlyContinue"
 	@powershell -Command "if (Test-Path .pytest_cache) { Remove-Item -Path .pytest_cache -Recurse -Force -ErrorAction SilentlyContinue }"
@@ -285,7 +274,6 @@ docker-clean-hard:
 wipe-artifacts:
 	@echo "Executing final workspace pruning for Module 1 Sealing..."
 	@powershell -Command "if (Test-Path backend/logs) { Remove-Item -Path backend/logs/*.log -Force -ErrorAction SilentlyContinue }"
-	@powershell -Command "if (Test-Path frontend/dist) { Remove-Item -Path frontend/dist -Recurse -Force -ErrorAction SilentlyContinue }"
 	@powershell -Command "Get-ChildItem -Path . -Include __pycache__ -Recurse -Force | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue"
 	@powershell -Command "Get-ChildItem -Path . -Include *.pyc -Recurse -Force | Remove-Item -Force -ErrorAction SilentlyContinue"
 	@powershell -Command "if (Test-Path .pytest_cache) { Remove-Item -Path .pytest_cache -Recurse -Force -ErrorAction SilentlyContinue }"
@@ -500,7 +488,6 @@ db-verify-backups:
 
 db-export-intelligence:
 	@echo "[COREGRAPH] Exporting current Intelligence Object (I_Omega) distribution: Preparing for Gemini 1.5 Flash AI handoff..."
-	powershell -Command "$$env:PYTHONPATH='backend'; .\\venv\\Scripts\\python.exe -c 'import asyncio; from dal.engine import CoreGraphEngine; from infra.database import db_manager; async def run(): async with db_manager.session_factory() as s: engine = CoreGraphEngine(s); intel = await engine.get_intelligence_object(\"npm:lodash\"); print(f\"Intelligence Packet Generated: {len(str(intel))} bytes\"); asyncio.run(run())'"
 
 db-beast-status:
 	@echo "[COREGRAPH] CoreGraph Persistence Finalization: Reporting the health, size, and 144Hz performance of the 3.88M node vault..."
@@ -542,11 +529,9 @@ beast-ready: ## Pre-warms the L3 cache and prepares the platform for the Module 
 
 sim-gen-dev: ## Generates a 1,000-node "Lightweight" graph for rapid local testing.
 	@echo "[COREGRAPH] Synthesizing 1,000-node Development Ocean (Seed: 0xDEADBEEF)..."
-	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server/generator'; .\\venv\\Scripts\\python.exe tooling/simulation_server/generator/main.py --count 1000 --seed 3735928559 --eco npm"
 
 sim-gen-titan: ## Generates the full 3.88-million-node "Stress" graph (Saturates 24 cores).
 	@echo "[COREGRAPH] Launching the 'Titan' 3.88M-node Universe Synthesis (S.U.S.E. Protocol)..."
-	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server/generator'; .\\venv\\Scripts\\python.exe tooling/simulation_server/generator/main.py --count 100000 --seed 3735928559 --eco npm"
 
 sim-verify: ## Runs statistical audits to measure graph entropy and determinism.
 	@echo "[COREGRAPH] Auditing Procedural Universe: Determinism, SemVer, and Zipfian Check..."
@@ -595,11 +580,9 @@ beast-ready: ## Pre-warms the L3 cache and prepares the platform for the Module 
 
 sim-gen-dev: ## Generates a 1,000-node "Lightweight" graph for rapid local testing.
 	@echo "[COREGRAPH] Synthesizing 1,000-node Development Ocean (Seed: 0xDEADBEEF)..."
-	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server/generator'; .\\venv\\Scripts\\python.exe tooling/simulation_server/generator/main.py --count 1000 --seed 3735928559 --eco npm"
 
 sim-gen-titan: ## Generates the full 3.88-million-node "Stress" graph (Saturates 24 cores).
 	@echo "[COREGRAPH] Launching the 'Titan' 3.88M-node Universe Synthesis (S.U.S.E. Protocol)..."
-	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server/generator'; .\\venv\\Scripts\\python.exe tooling/simulation_server/generator/main.py --count 100000 --seed 3735928559 --eco npm"
 
 sim-verify: ## Runs statistical audits to measure graph entropy and determinism.
 	@echo "[COREGRAPH] Auditing Procedural Universe: Determinism, SemVer, and Zipfian Check..."
@@ -635,7 +618,6 @@ sim-finance-audit: ## Executes the fiscal audit suite: Exponents, Leviathans, an
 
 sim-benchmark-finance: ## Measures the I/O latency of the asynchronous fiscal resolver.
 	@echo "[COREGRAPH] Benchmarking High-Speed Fiscal Resolution (HFT-Grade)..."
-	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;.'; .\\venv\\Scripts\\python.exe -c 'import time; from fastapi.testclient import TestClient; from main import app; client=TestClient(app); start=time.perf_counter(); [client.get(\"/funding/npm/core-sync-999\") for _ in range(100)]; end=time.perf_counter(); print(f\"[PERF] 100 fiscal requests resolved in {end-start:.4f}s ({ (end-start)/100:.6f}s/req)\")'"
 
 # ==============================================================================
 # 31. CHAOS ENGINEERING & TOPOLOGY POISONING (Task 005)
@@ -674,11 +656,9 @@ sim-restore: ## Restores the S.U.S.E. server to its pristine, healthy state.
 
 sim-genesis: ## The 'Big Bang' Button: Orchestrates the 3.84M node universe synthesis.
 	@echo "[COREGRAPH] Executing Master Ecosystem Genesis Protocol (Task 007)..."
-	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;tooling/simulation_server/generator;.'; .\\venv\\Scripts\\python.exe tooling/simulation_server/core/genesis.py birth --seed 0x3735928559 --count 1000 --eco npm"
 
 sim-status: ## Real-time diagnostic report of the generated software ocean.
 	@echo "[COREGRAPH] S.U.S.E. Physical Ocean Diagnostic..."
-	@powershell -Command "Get-ChildItem -Path tooling/simulation_server/fixtures/npm -Recurse -File | Measure-Object | Select-Object -Property Count, @{Name='Size_GB'; Expression={($$_.Sum / 1GB)}}"
 
 sim-audit: sim-verify sim-graphql-audit sim-finance-audit sim-test-resilience sim-chaos-audit ## Unified Master Audit: Structural, Telemetric, Fiscal, and Chaotic.
 	@echo "[COREGRAPH] Master Infrastructure Audit COMPLETE: The Flight Simulator is Certified."
@@ -763,7 +743,6 @@ sim-syndicate: ## Triggers the 'Syndicate Injection': Populating the software oc
 	@echo "[COREGRAPH] Injecting Maintainer Syndicates ( obf: HIGH )..."
 	@powershell -Command "$$env:PYTHONPATH='tooling/simulation_server;tooling/simulation_server/core;.'; .\\venv\\Scripts\\python.exe tooling/simulation_server/core/syndicate_gen.py"
 
-audit-bridge: ## Executes the 'Global Vision' audit: Unmasking coordinated aliases across NPM, PyPI, and GitHub.
 	@echo "[COREGRAPH] Auditing Multi-Ecosystem Correlation: P-Core Bayesian Scoring..."
 	@powershell -Command "$$env:PYTHONPATH='backend/analytics/correlation;.'; .\\venv\\Scripts\\python.exe backend/analytics/correlation/identity_kernel.py"
 
