@@ -1,15 +1,4 @@
 # THE INSTALLATION AND ENVIRONMENTAL SOVEREIGNTY: IGNITION MANIFEST
-====================================================================================================
-<pre>
-[██████████████████████████████████████████████████████] 100% TRUTH-SEALED
-STATUS: INDESTRUCTIBLE / IGNITION-SEALED / MISSION-READY
-REFERENCE IDENTIFIER: INSTALLATION AUDIT IGNITION
-PHASE: PROMPT 3 OF 16
-TIMESTAMP: 2026-04-19 (OPERATION REDLINE)
-ARCHITECTURE: COREGRAPH TITAN (3.81M NODE TOPOLOGY)
-COMPLIANCE GUARANTEE: STRICT MATRICES MET
-</pre>
-====================================================================================================
 
 ## INTRODUCTION: THE SYSTEMIC IGNITION OF THE TITAN
 
@@ -42,7 +31,7 @@ parameters organically. By following this architecture, the analyst constructs
 an impermeable, frictionless vacuum inside which the Hadronic Sharding Kernel
 can execute continuously.
 
-====================================================================================================
+---
 
 ## SECTOR 1: PRE-IGNITION HARDWARE SYNC VECTORS
 
@@ -110,7 +99,7 @@ I/O blocking that will immediately destroy the 144Hz screen refresh rate. We
 want the system to aggressively Out-Of-Memory (OOM) terminate processes rather
 than smoothly degraded into unusable magnetic paging states.
 
-====================================================================================================
+---
 
 ## SECTOR 2: THE PYTHON VACUUM TUBE ISOLATION
 
@@ -165,7 +154,7 @@ This enables the operator to ruthlessly delete the entire physical environment b
 simply issuing `rm -rf .venv/` if a dependency collision occurs during an upgrade,
 establishing an easily reproducible, zero-contamination operational baseline.
 
-====================================================================================================
+---
 
 ## SECTOR 3: INFRASTRUCTURE CONFIGURATION AND CONTAINER GENESIS
 
@@ -229,7 +218,7 @@ This single command triggers the execution cascade:
    bridge, booting the primary `main.py` entrypoint specifically restricted
    beneath specific Control Groups (cgroups) defining a 200MB physical memory bound.
 
-====================================================================================================
+---
 
 ## APPENDIX A: EXTENSIVE TOPOLOGICAL EXPANSION MATRICES
 
@@ -268,10 +257,3 @@ If you changed the password later, the container retains the data blocks via
 Docker Volumes. You must execute `docker-compose down -v` to aggressively
 purge the internal volumes physically from the disk, ensuring the subsequent
 restart runs the genesis initialization sequence correctly with the new strings.
-
-====================================================================================================
-<pre>
-SYSTEMIC RECORD: EOF REACHED. ALL INSTALLATION METRICS EXACTLY ACHIEVED.
-SEAL VERIFIED.
-</pre>
-====================================================================================================

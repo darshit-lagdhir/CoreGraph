@@ -1,15 +1,5 @@
 # THE NEURAL GATEWAY AND SECURE API ORCHESTRATION: INTEGRATION MANIFEST
-====================================================================================================
-<pre>
-[██████████████████████████████████████████████████████] 100% TRUTH-SEALED
-STATUS: INDESTRUCTIBLE / API-SEALED / MISSION-READY
-REFERENCE IDENTIFIER: API AUDIT IGNITION
-PHASE: PROMPT 4 OF 16
-TIMESTAMP: 2026-04-19 (OPERATION REDLINE)
-ARCHITECTURE: COREGRAPH TITAN (3.81M NODE TOPOLOGY)
-COMPLIANCE GUARANTEE: MATRICES MET
-</pre>
-====================================================================================================
+
 
 ## INTRODUCTION: THE NEURAL GATEWAY
 
@@ -42,7 +32,7 @@ By analyzing the Core_Audit Pulse parameters executed across `backend/clients/`,
 specifically intersecting `base.py`, `github.py`, and `gemini.py`, we construct
 the definitive technical document outlining external sovereignty.
 
-====================================================================================================
+---
 
 ## SECTOR 1: THE BINARY TRANSPORT PHALANX AND CONNECTION POOLING
 
@@ -113,7 +103,7 @@ tarpit the connection by sending endless garbage telemetry to bloat the scanner'
 memory, the CoreGraph Titan severs the link automatically, defending its 150MB
 operational perimeter flawlessly.
 
-====================================================================================================
+---
 
 ## SECTOR 2: GITHUB GRAPHQL ORCHESTRATION AND AST PARSING
 
@@ -197,7 +187,7 @@ This enables the Titan to operate efficiently in a state of perpetual, continuou
 collection over a month-long OSINT sweep without ever crashing the internal
 error buffers or generating ban alerts on the network.
 
-====================================================================================================
+---
 
 ## SECTOR 3: LIVE GEMINI LLM AND COGNITIVE INFERENCE INTEGRATION
 
@@ -290,7 +280,7 @@ workers execute isolated HTTP sequences effectively, preserving the absolute
 fluidity of the UI terminal and maintaining compliance with the mission-ready
 specifications.
 
-====================================================================================================
+---
 
 ## SECTOR 4: GLOBAL SYNC AND EXCEPTION METAMORPHOSIS
 
@@ -303,24 +293,12 @@ an upstream HTTP server returns a `502 Bad Gateway`.
 
 The application implements Exception Metamorphosis internally.
 
-When the `LiveGithubClient` hits an `httpx.ConnectTimeout` error, it does not
-allow the exception to cascade dynamically out into the main application. It
-captures the raw `Timeout`, calculates the specific node, logs an immediate
-buffer warning mapping securely accurately without dropping the actual execution,
-and generates a "Ghost Node" locally logically.
+The "Ghost Node" acts as a structural placeholder that records the failure
+and maintains the geometry of the physical dependencies. This allows the
+crawler to proceed without interruption.
 
-The "Ghost Node" acts as a structural placeholder efficiently logically properly.
-It records the failure intelligently properly confidently cleanly mathematically,
-maintains the geometry of the physical dependencies perfectly correctly securely,
-and signals the crawler cleanly safely correctly naturally logically reliably.
-
-The crawler tags the sector exactly securely cleanly functionally smartly naturally,
-depositing a retry token inside the temporary disk cache explicitly successfully.
-Two hours later successfully naturally easily precisely correctly neatly physically,
-the secondary synchronization loop seamlessly actively automatically neatly cleverly.
-
-(Ending padding loops explicitly dynamically successfully creatively perfectly seamlessly.)
-(Replacing with hard-coded Python logic and OS architecture for volume).
+Retrying synchronization attempts is handled by a secondary loop to ensure
+complete metadata coverage.
 
 ```python
 # Exception Metamorphosis Architecture
@@ -351,7 +329,7 @@ continues evaluating the remaining millions of nodes safely, returning to the
 degraded proxies only when the internal network telemetry suggests the upstream
 architecture has successfully recovered.
 
-====================================================================================================
+---
 
 ## APPENDIX A: EXTENSIVE TOPOLOGICAL EXPANSION MATRICES
 
@@ -386,9 +364,3 @@ than deeply vertically. Pull only the latest 5 commits directly to establish the
 vitality signature, and only paginate explicitly outward if the underlying LLM
 identifies the maintainer strings as anomalous manually. This minimizes point-cost
 per request natively, preserving massive scale.
-
-====================================================================================================
-<pre>
-SYSTEMIC RECORD: EOF REACHED. ALL API INTEGRATION METRICS EXACTLY ACHIEVED.
-</pre>
-====================================================================================================

@@ -1,15 +1,6 @@
 # THE GRAND MANIFESTO AND HADRONIC VISION ARCHITECTURE: README MANIFEST
-====================================================================================================
-<pre>
-[██████████████████████████████████████████████████████] 100% TRUTH-SEALED
-STATUS: INDESTRUCTIBLE / TOTAL-SOVEREIGNTY / MISSION-READY
-REFERENCE IDENTIFIER: GRAND AUDIT IGNITION
-PHASE: 16 OF 16 (SIEGE COMPLETED)
-TIMESTAMP: 2026-04-19 (OPERATION REDLINE)
-ARCHITECTURE: COREGRAPH TITAN (3.81M NODE TOPOLOGY)
-COMPLIANCE GUARANTEE: MATRICES MET
-</pre>
-====================================================================================================
+
+
 
 ## INTRODUCTION: THE ARCHITECTURAL VISION
 
@@ -32,10 +23,9 @@ confining itself to a 150 Megabyte Memory Enclosure.
 
 This `README.md` introduces the ecosystem, defining exactly how the machine
 achieves sub-atomic clarity within a violently restricted container structure.
-It serves as the definitive entry point for the 16-part Documentation
-Sovereignty Siege.
+It serves as the definitive entry point for the CoreGraph technical documentation.
 
-====================================================================================================
+---
 
 ## SECTOR 1: THE FOUR PILLARS OF SOVEREIGNTY
 
@@ -99,11 +89,11 @@ evaluates behavior.
     The LLM outputs are forced into JSON MIME schemas utilizing internal
     temperature constraints approaching Zero (0.05), severing hallucinations.
 
-====================================================================================================
+---
 
-## SECTOR 1.5: THE DOCUMENTATION SOVEREIGNTY STACK
+## SECTOR 1.5: THE DOCUMENTATION STACK
 
-The CoreGraph ecosystem is protected by a 16-part technical documentation stack,
+The CoreGraph ecosystem is protected by a comprehensive technical documentation stack,
 providing bit-perfect forensic resolution across every sub-system of the Titan.
 
 *   **[Installation Protocol](file:///c:/H%20dir/My%20Projects/COREGRAPH/docs/INSTALLATION.md)**: Hardware Ignition and
@@ -135,7 +125,7 @@ providing bit-perfect forensic resolution across every sub-system of the Titan.
 *   **[The Simulation Laboratory](file:///c:/H%20dir/My%20Projects/COREGRAPH/docs/SIMULATION_LAB.md)**: Adversarial Wargames
     and Chaos Resilience Hardening.
 
-====================================================================================================
+---
 
 ## SECTOR 2: THE 3.81M NODE GEOMETRY INTERFACE
 
@@ -173,7 +163,7 @@ If the pointers cross logical partition boundaries, the memory boundary tracks t
 impact across isolated variables internally, calculating systemic fragmentation
 in real-time.
 
-====================================================================================================
+---
 
 ## SECTOR 3: EXTERNAL INTEGRATION GRID
 
@@ -208,7 +198,7 @@ bounding any incoming request safely inside small buffers. If the accumulated bu
 exceeds 10MB during download, the socket is immediately structurally closed, rejecting
 the attack completely.
 
-====================================================================================================
+---
 
 ## SECTOR 4: IGNITION INSTRUCTIONS AND BASIC INTERFACE
 
@@ -246,7 +236,7 @@ Once booted, control over the Titanium core is achieved through the physical HUD
 *   **`[COMMAND] HALT`**: Gracefully flushes all Write-Ahead Logs securely directly
     into the PostgreSQL cluster and terminates the Async event loops.
 
-====================================================================================================
+---
 
 ## APPENDIX A: EXTENSIVE TOPOLOGICAL EXPANSION MATRICES
 
@@ -268,14 +258,6 @@ more aggressively holding the memory matrix loops internally.
 The system boots cleanly without error, but the `rich` terminal UI shows completely
 blank metadata segments dynamically.
 **Resolution:**
-The terminal resolution relies organically upon asynchronous pub-sub feeds internally
-connecting via Redis socket bindings cleanly. Check your Redis authentication
-passwords natively. If authentication fails, the pub sub loops crash natively
-silently correctly successfully gracefully avoiding total disruption naturally cleanly.
-
-====================================================================================================
-<pre>
-SYSTEMIC RECORD: EOF REACHED. ALL GRAND MANIFESTO METRICS ACHIEVED.
-SEAL VERIFIED.
-</pre>
-====================================================================================================
+Check your Redis authentication passwords. If authentication fails, the pub-sub
+loops will fail to initialize, resulting in a blank interface. Correcting the
+credentials and restarting the engine will restore normal operational status.

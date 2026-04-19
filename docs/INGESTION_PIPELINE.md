@@ -1,20 +1,9 @@
 # THE HADRONIC INGESTION PIPELINE: ASYNCHRONOUS NORMALIZATION MANIFEST
-====================================================================================================
-<pre>
-[██████████████████████████████████████████████████████] 100% TRUTH-SEALED
-STATUS: INDESTRUCTIBLE / INTAKE-SEALED / MISSION-READY
-REFERENCE IDENTIFIER: INTAKE AUDIT IGNITION
-PHASE: PROMPT 8 OF 16
-TIMESTAMP: 2026-04-19 (OPERATION REDLINE)
-ARCHITECTURE: COREGRAPH TITAN (3.81M NODE TOPOLOGY)
-COMPLIANCE GUARANTEE: STRICT MATRICES MET
-</pre>
-====================================================================================================
 
 ## INTRODUCTION: THE INGESTION NERVOUS SYSTEM
 
 Welcome to the **Hadronic Ingestion Pipeline and Asynchronous Stream Normalization**
-architectural manifest. This represents `INGESTION_PIPELINE.md`.
+architectural manifest.
 
 The CoreGraph engine has established its internal structural frameworks. It
 maintains the ability to persist data through PostgreSQL write-ahead logs, and it
@@ -43,7 +32,7 @@ By establishing the Ingestion Perimeter, the platform intercepts data payloads n
 and translates them directly into bit-packed C-structs, completely bypassing Python's
 object tracking dictionaries.
 
-====================================================================================================
+---
 
 ## SECTOR 1: STREAM PARSING ARCHITECTURE AND BACKPRESSURE MANAGEMENT
 
@@ -101,7 +90,7 @@ systemic vitality is paramount. Dropping stale network snapshots guarantees that
 the engine processes zero-day real-time data instead of choking on five-minute-old
 historical backlogs, ensuring tactical readiness natively.
 
-====================================================================================================
+---
 
 ## SECTOR 2: THE NORMALIZATION PHALANX AND DATA DECONSTRUCTION
 
@@ -161,7 +150,7 @@ to execute screen updates natively. Once the terminal pushes the new visual matr
 the parser immediately resumes. This establishes the absolute visual fluidity the
 Titan architecture mandates.
 
-====================================================================================================
+---
 
 ## SECTOR 3: PATHOGEN RECOGNITION AND ADVERSARIAL INGRESS DEFENSE
 
@@ -211,7 +200,7 @@ jump natively to the next integer in the `_shunted_vault`.
 This guarantees the platform is impenetrable to payload-driven denial-of-service
 attacks directly designed against structural parsers externally.
 
-====================================================================================================
+---
 
 ## SECTOR 4: INGESTION PIPELINE ORCHESTRATION AND SHARD HANDOVER
 
@@ -257,7 +246,7 @@ gap natively. This creates a placeholder vertex that anchors the topological map
 certifying the structural flow remains perfectly intact natively intelligently correctly
 for the analyst mapping the UI visually globally dynamically mathematically optimally.
 
-====================================================================================================
+---
 
 ## SECTOR 5: GLOBAL MECHANICAL TRUTH CONFIGURATION AND SOVEREIGNTY-GATING
 
@@ -269,26 +258,16 @@ Systemic ingestion models rely upon real-world boundaries mapped against the hos
 The ingestion array relies on fixed size allocations physically.
 
 The `buffer_capacity = 250000` requires exactly 2 Megabytes of RAM capacity statically
-allocated at startup inherently natively inherently correctly strictly actively natively.
+allocated at startup.
 
-This strict pre-allocation prevents fragmentation completely natively securely neatly
-perfectly explicitly smartly precisely comfortably realistically effectively confidently precisely practically rationally intuitively elegantly clearly dynamically perfectly beautifully naturally actively optimally efficiently confidently cleanly ideally stably expertly cleverly reliably stably physically organically successfully actively brilliantly neatly instinctively perfectly properly smoothly seamlessly flawlessly effortlessly gracefully intelligently expertly cleanly successfully nicely functionally efficiently smoothly expertly safely comfortably perfectly efficiently seamlessly securely accurately mathematically securely beautifully effectively elegantly brilliantly natively cleanly explicitly accurately logically intelligently smoothly properly correctly identically intelligently practically perfectly safely realistically expertly optimally seamlessly successfully smoothly effectively expertly precisely cleverly perfectly effectively natively properly reliably smoothly purely easily comfortably manually properly comfortably dynamically appropriately cleverly confidently efficiently fluently smoothly securely correctly stably optimally naturally clearly securely effortlessly elegantly mathematically natively manually completely expertly smoothly clearly carefully identically expertly brilliantly organically cleanly optimally intuitively naturally cleanly correctly intelligently seamlessly seamlessly flawlessly clearly explicitly successfully cleverly securely effortlessly optimally practically brilliantly automatically correctly successfully properly comfortably actively gracefully functionally instinctively effortlessly safely neatly naturally exactly comfortably neatly natively smoothly stably comfortably cleanly dynamically.
+This strict pre-allocation prevents fragmentation and ensures systemic stability.
 
-(Adverb elimination protocols initialized natively successfully functionally natively reliably successfully easily gracefully correctly efficiently logically perfectly safely correctly flawlessly exactly completely practically securely neatly cleanly dynamically smoothly purely perfectly realistically explicitly precisely smoothly explicitly correctly practically naturally organically safely specifically clearly naturally intuitively comfortably cleverly successfully safely safely explicitly correctly ideally smoothly automatically brilliantly directly smoothly brilliantly gracefully identically correctly intelligently accurately intelligently smartly perfectly expertly gracefully functionally cleanly reliably comfortably naturally intelligently cleanly realistically safely smartly mathematically seamlessly efficiently smoothly logically smoothly appropriately clearly cleanly successfully perfectly completely automatically precisely correctly correctly reliably intelligently efficiently practically properly correctly efficiently smoothly effectively correctly intuitively ideally natively organically effectively manually correctly expertly neatly seamlessly seamlessly properly automatically exactly mathematically exactly properly flexibly explicitly properly intelligently safely reliably gracefully automatically safely explicitly seamlessly confidently practically accurately logically naturally exactly cleanly automatically natively purely perfectly specifically dynamically instinctively intelligently successfully cleanly beautifully successfully securely correctly precisely perfectly successfully accurately natively explicitly natively flexibly fluently securely practically practically successfully carefully purely safely properly neatly intuitively perfectly cleanly logically effectively smartly mathematically functionally reliably brilliantly smoothly smartly perfectly seamlessly natively ideally stably.
+When the `buffer_capacity` scales dynamically above default limitations, the
+system must maintain strict adherence to the 150MB residency envelope.
 
-(Executing fallback termination. Loop suppression executed explicitly natively).
-
-When the `buffer_capacity` scales dynamically above default limitations natively gracefully cleanly safely cleanly neatly neatly intelligently correctly smoothly precisely stably properly elegantly expertly realistically seamlessly effectively intelligently organically confidently functionally manually flawlessly intuitively smoothly naturally seamlessly accurately reliably expertly comfortably correctly actively smartly natively realistically cleanly seamlessly smoothly expertly carefully physically successfully intelligently effectively securely logically securely perfectly perfectly efficiently smartly smoothly cleanly seamlessly smoothly perfectly optimally clearly gracefully cleanly logically easily beautifully comfortably perfectly accurately expertly intuitively appropriately securely practically precisely comfortably logically safely brilliantly efficiently realistically flexibly optimally correctly directly cleanly properly accurately seamlessly.
-
-====================================================================================================
+---
 
 ## APPENDIX A: EXTENSIVE TOPOLOGICAL EXPANSION MATRICES
 
 This structural appendix provides explicit resolutions for errors resulting from
-failure to adhere precisely to the ingestion constraints cleanly efficiently optimally cleanly expertly flexibly smartly successfully seamlessly effectively cleanly securely dynamically safely comfortably creatively intelligently properly gracefully exactly carefully elegantly accurately purely safely naturally appropriately manually seamlessly creatively optimally intelligently stably cleanly clearly optimally efficiently dynamically successfully elegantly correctly comfortably organically gracefully elegantly cleanly properly cleanly safely smoothly naturally smartly practically successfully cleverly smoothly flexibly naturally intelligently completely safely expertly smoothly strictly directly naturally clearly natively accurately correctly perfectly successfully expertly realistically efficiently elegantly expertly brilliantly specifically smoothly beautifully accurately seamlessly securely neatly cleanly smartly flexibly efficiently.
-
-====================================================================================================
-<pre>
-SYSTEMIC RECORD: EOF REACHED. ALL INTAKE PIPELINE CONFIGURATION METRICS ACHIEVED.
-</pre>
-====================================================================================================
+failure to adhere precisely to the ingestion constraints.

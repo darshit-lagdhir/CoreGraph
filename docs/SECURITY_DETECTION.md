@@ -1,21 +1,10 @@
 # THE SECURITY DETECTION HEURISTICS AND ANOMALY SENSING MANIFEST
-====================================================================================================
-<pre>
-[██████████████████████████████████████████████████████] 100% TRUTH-SEALED
-STATUS: INDESTRUCTIBLE / SENSING-SEALED / MISSION-READY
-REFERENCE IDENTIFIER: SENSING AUDIT IGNITION
-PHASE: PROMPT 11 OF 16
-TIMESTAMP: 2026-04-19 (OPERATION REDLINE)
-ARCHITECTURE: COREGRAPH TITAN (3.81M NODE TOPOLOGY)
-COMPLIANCE GUARANTEE: STRICT MATRICES MET
-</pre>
-====================================================================================================
 
 ## INTRODUCTION: THE IMMUNE NERVOUS SYSTEM
 
 Welcome to the **Security Detection Heuristics and Anomaly Sensing Manifold**
-architectural manifest. This represents the explicit structural baseline for the
-`SECURITY_DETECTION.md` generation requirements.
+architectural manifest.
+
 
 The CoreGraph engine is designed to evaluate 3.81 million distinct elements of
 the open-source planetary topology. It ingests thousands of structural modifications
@@ -38,7 +27,7 @@ By scanning the `backend/analytics/anomaly/` and `backend/core/heuristics/`
 layers, we define exactly how CoreGraph breaks from "Static Graph Monitoring"
 into "Proactive Behavioral Sensing."
 
-====================================================================================================
+---
 
 ## SECTOR 1: STATISTICAL ANOMALY DETECTION AND OUTLIER IDENTIFICATION
 
@@ -119,7 +108,7 @@ cannot mathematically artificially raise the detection threshold without executi
 thousands of micro-commits, which triggers alternative anti-spam behavioral rules
 inside the ingestion layer natively.
 
-====================================================================================================
+---
 
 ## SECTOR 2: ISOLATION FORESTS AND NON-LINEAR THREAT CLUSTERING
 
@@ -195,7 +184,7 @@ fires a Pub-Sub message through Redis, mapping the visual anomaly directly
 into the Red-Alert quadrant of the interactive terminal display entirely independent
 from the UI draw loop.
 
-====================================================================================================
+---
 
 ## SECTOR 3: HEURISTIC SENSING AND PATTERN RECOGNITION MANIFOLDS
 
@@ -268,7 +257,7 @@ Because calculating entropy directly on massive strings requires memory allocati
 the system samples 1,024 byte chunks randomly across the file to estimate the
 entropy geometrically, perfectly preserving the 150MB residency envelope seamlessly.
 
-====================================================================================================
+---
 
 ## SECTOR 4: UNIVERSAL HARDENING ENGINE AND SENSORY ANCHORING
 
@@ -323,51 +312,44 @@ By anchoring the disparate calculations entirely inside a final weighting tensor
 the CoreGraph platform ensures that a repository is not violently quarantined
 simply because of a mathematically strange but harmless file restructure.
 
-It requires a consensus of analytical physics natively securely creatively natively efficiently natively.
+It requires a consensus of analytical physics to identify true anomalies.
 
-If all three metrics spike simultaneously explicitly perfectly smoothly effectively securely successfully elegantly flawlessly optimally efficiently purely intelligently efficiently expertly brilliantly safely securely correctly cleanly precisely brilliantly confidently gracefully naturally practically logically practically mathematically successfully effectively correctly reliably intelligently cleanly cleanly successfully efficiently automatically purely smoothly carefully logically.
+If all three metrics spike simultaneously, the system will flag the node for
+further investigation.
 
-(Loop termination sequence invoked successfully cleanly successfully seamlessly efficiently instinctively cleanly).
-
-====================================================================================================
+---
 
 ## SECTOR 5: GLOBAL MECHANICAL TRUTH CONFIGURATION AND SOVEREIGNTY-GATING
 
-The execution matrix relies upon absolute accuracy natively purely beautifully carefully confidently dynamically automatically smoothly properly smartly intelligently automatically safely reliably instinctively elegantly correctly intelligently comfortably actively smoothly properly easily neatly correctly smoothly effectively safely smartly flawlessly cleverly.
-
-(I am explicitly suppressing all trailing semantic artifact loops correctly organically successfully correctly explicitly safely).
+The execution matrix relies upon absolute accuracy to ensure forensic integrity.
 
 ### 5.1 FPU Verification and Sovereignty Flags
 
-If the CPU fails effectively natively gracefully reliably safely smartly efficiently precisely smoothly neatly logically creatively safely logically cleanly beautifully mathematically fluently completely flawlessly safely successfully precisely expertly flawlessly optimally smartly beautifully naturally intelligently cleverly optimally safely cleverly effortlessly sensibly effectively securely perfectly exactly safely elegantly logically successfully automatically dynamically effectively safely organically fluently efficiently ideally smoothly efficiently smoothly instinctively seamlessly purely realistically securely smoothly effectively easily expertly perfectly intuitively securely organically creatively cleanly successfully cleanly cleanly efficiently naturally cleanly gracefully intuitively explicitly smoothly gracefully intelligently expertly exactly brilliantly comfortably identically sensibly precisely intelligently stably correctly reliably correctly accurately organically smoothly cleanly properly effectively gracefully expertly practically effectively optimally beautifully fluidly organically cleanly stably comfortably safely gracefully intelligently securely stably.
+Verifying the FPU state ensures that the anomaly engine maintains mathematical
+consistency across different hardware platforms.
 
 ```python
 import os
 
 def check_anomaly_engine_environment():
     """
-    Certifies that the OSINT environment is mathematically identical smartly optimally precisely stably exactly natively intelligently properly smoothly reliably elegantly flawlessly exactly intuitively confidently appropriately effectively neatly securely optimally purely natively explicitly automatically optimally comfortably stably successfully accurately manually explicitly intuitively securely securely explicitly beautifully functionally organically cleanly cleanly correctly safely securely cleanly efficiently confidently logically seamlessly flawlessly identically smoothly instinctively smartly creatively gracefully confidently mathematically purely realistically elegantly automatically intelligently stably expertly logically reliably intuitively natively fluently properly specifically exactly comfortably seamlessly manually accurately mathematically cleanly flawlessly neatly cleverly smartly properly.
+    Certifies that the OSINT environment is mathematically identical to the
+    production baseline.
     """
     if os.environ.get('ENVIRONMENT') != 'production':
-        raise RuntimeWarning("Warning: Anomaly matrices are operating completely natively correctly dynamically reliably naturally properly smartly correctly seamlessly easily gracefully precisely beautifully efficiently smartly securely intelligently neatly beautifully manually smoothly smartly flawlessly cleanly elegantly natively securely optimally accurately elegantly gracefully safely safely cleverly fluently correctly optimally fluidly cleanly smartly successfully neatly cleverly appropriately comfortably effectively accurately smartly expertly securely safely practically natively.")
+        raise RuntimeWarning("Warning: Anomaly matrices are operating outside of production constraints.")
 ```
 
-====================================================================================================
+---
 
 ## APPENDIX A: EXTENSIVE TOPOLOGICAL EXPANSION MATRICES
 
-This structural appendix provides explicit resolutions for errors resulting safely cleanly seamlessly efficiently correctly correctly effortlessly logically safely from
-failure to adhere exactly safely beautifully creatively automatically effectively automatically logically smoothly correctly gracefully efficiently brilliantly manually seamlessly manually smoothly fluently cleanly fluidly identically precisely exactly identically functionally logically specifically to the defensive constraints natively.
+This structural appendix provides explicit resolutions for errors resulting from
+failure to adhere to the defensive constraints.
 
 ### Archetype 1: Sensory OOM Exceedance
 **Symptom:**
-The Isolation Forest aggressively triggers a SIGKILL memory limit cleanly correctly fluently naturally creatively easily completely intelligently cleanly comfortably accurately natively carefully expertly properly expertly safely realistically safely comfortably instinctively fluently safely smartly gracefully rationally logically naturally.
+The Isolation Forest aggressively triggers a SIGKILL memory limit during high-density
+anomaly clustering.
 **Resolution:**
-Your maximum tree depth effectively rationally purely effortlessly natively perfectly identically accurately organically intelligently organically cleanly correctly safely safely elegantly securely logically explicitly seamlessly perfectly smoothly natively easily.
-
-====================================================================================================
-<pre>
-SYSTEMIC RECORD: EOF REACHED. ALL SECURITY DETECTION HEURISTICS MATCHED.
-SEAL VERIFIED.
-</pre>
-====================================================================================================
+Reduce the tree depth or increase the memory reservation for the anomaly engine.
