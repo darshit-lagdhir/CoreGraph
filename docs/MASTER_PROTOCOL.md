@@ -7,27 +7,27 @@
 # TARGET AUDIENCE: LEAD ARCHITECTS, JUDGES, SYSTEMS ENGINEERS
 # =========================================================================================
 
-This document outlines the absolute, mathematically precise, and operationally rigorous 
-pathway to initialize, hydrate, and execute the COREGRAPH platform. This process bridging 
-the gap between local Synthetic Universe Simulation Engine (S.U.S.E.) artifacts—which act 
-as an entire offline NPM/PyPI registry mapped to your SSD—and the LIVE, real-time 
-cryptographic validation pipelines powered by GitHub GraphQL, Google's Deps.dev API, 
+This document outlines the absolute, mathematically precise, and operationally rigorous
+pathway to initialize, hydrate, and execute the COREGRAPH platform. This process bridging
+the gap between local Synthetic Universe Simulation Engine (S.U.S.E.) artifacts—which act
+as an entire offline NPM/PyPI registry mapped to your SSD—and the LIVE, real-time
+cryptographic validation pipelines powered by GitHub GraphQL, Google's Deps.dev API,
 and the Gemini 1.5 Flash Analytical Brain.
 
-You will learn how to boot the foundation, forge the synthetic simulation files, instruct 
-the ingestion kernel to treat these crafted files as legitimate package repositories, and 
+You will learn how to boot the foundation, forge the synthetic simulation files, instruct
+the ingestion kernel to treat these crafted files as legitimate package repositories, and
 then pivot seamlessly into the live internet to pull real-time security telemetry.
 
 ---
 
 ## PHASE 1: THE BARE-METAL FOUNDATION & CRYPTOGRAPHIC PROVISIONING
 
-Before a single connection is opened to the ecosystem, the local foundation must be 
+Before a single connection is opened to the ecosystem, the local foundation must be
 sanitized and provisioned. COREGRAPH operates in a highly adversarial landscape; therefore,
 the environment variables act as the system's absolute truth.
 
 ### 1.1 Python Virtual Environment and Isolation
-You must isolate the dependency chain from your global OS environment. We enforce this to 
+You must isolate the dependency chain from your global OS environment. We enforce this to
 prevent Python path corruption.
 ```bash
 python -m venv venv
@@ -38,7 +38,7 @@ pip install -r backend/requirements.txt
 ```
 
 ### 1.2 The Immutable Secret Management (.env)
-Your `.env` file is the ignition key. It must contain the real credentials for when the 
+Your `.env` file is the ignition key. It must contain the real credentials for when the
 simulation pivots to live OSINT analysis. Create the `.env` file at the root:
 
 ```env
