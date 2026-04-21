@@ -354,4 +354,8 @@ This audit measures the sustained write throughput of the Gen5 NVMe drive during
 
 ## 40. FINAL INSTALLATION VERIFICATION: HARDWARE CERTIFICATION
 
-The final verification confirms that all 40 sectors are operational. The system performs a 5-second "Burn-in" where it executes a high-speed spectral decomposition of the global 3.81M node universe. If the 144Hz HUD maintains stable frequency and the 150MB residency lock is not violated, the system is certified as mission-ready for compliant forensic discovery.
+---
+
+## 41. MISSION-CRITICAL SETUP: THE MASTER PROTOCOL
+
+For a complete, step-by-step walkthrough of the system genesis, including the Synthetic Universe Simulation Engine (S.U.S.E.) and the Live OSINT pivot, refer to the **[MASTER_PROTOCOL.md](MASTER_PROTOCOL.md)**. This document contains the definitive 7-phase execution sequence and the judge-facing demonstration audit.

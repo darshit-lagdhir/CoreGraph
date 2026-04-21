@@ -394,6 +394,7 @@ The CoreGraph engine is intended for use in professional OSINT and cyber-forensi
 Detailed technical resolution is provided in the following manuscripts:
 
 - **[INSTALLATION.md](docs/INSTALLATION.md)**: Hardware certification and ignition protocol.
+- **[MASTER_PROTOCOL.md](docs/MASTER_PROTOCOL.md)**: Complete system genesis and execution walkthrough.
 - **[HADRONIC_CORE.md](docs/CORE_HADRONIC.md)**: Bit-packing and pointer-sharding logic.
 - **[DATA_ACCESS_DAL.md](docs/DATA_ACCESS_DAL.md)**: Persistence layers and WAL durability.
 - **[INGESTION_PIPELINE.md](docs/INGESTION_PIPELINE.md)**: Asynchronous normalization and cleaning.
