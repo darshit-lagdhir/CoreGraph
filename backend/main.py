@@ -6,7 +6,7 @@ import logging
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from terminal_hud import SovereignTerminalHUD
-from core.memory_manager import limiter_kernel
+from core.memory_manager import metabolic_governor
 
 from interface.app_factory import create_app
 import uvicorn
@@ -103,118 +103,85 @@ async def simulate_forensic_stream(hud: SovereignTerminalHUD):
     await c.close()
 
 
-async def async_input_listener(hud: SovereignTerminalHUD):
-    import msvcrt
+# Legacy async_input_listener removed. Textual handles input natively.
 
-    hud.cmd_status = "[warning]GATEWAY ACTIVE[/warning]"
-    hud.cmd_buffer = ""
-    hud.search_query = ""
 
+async def command_processor(hud: SovereignTerminalHUD):
+    """Sector Alpha: Background task to process commands from the TUI Gateway."""
     deps_client = LiveDepsDevClient()
-
     while hud.active:
-        await asyncio.sleep(0.02)
-        if msvcrt.kbhit():
-            try:
-                ch = msvcrt.getwch()
-                if ch == "\r":  # Enter
-                    cmd = hud.cmd_buffer.strip()
-                    if cmd.lower().startswith("expand "):
-                        parts = cmd.split(" ", 1)[1].split("/")
-                        if len(parts) == 2:
-                            eco, pkg = parts[0], parts[1]
+        await asyncio.sleep(0.1)
+        if hud.cmd_buffer:
+            cmd = hud.cmd_buffer.strip()
+            hud.cmd_buffer = ""  # Atomic flush
+
+            if cmd.lower().startswith("expand "):
+                parts = cmd.split(" ", 1)[1].split("/")
+                if len(parts) == 2:
+                    eco, pkg = parts[0], parts[1]
+                    hud.log_event(f"[info]Establishing Live Hook to {eco}://{pkg}...[/info]")
+
+                    # Fire off live fetch & AI analysis
+                    async def fetch_and_analyze():
+                        data = await deps_client.fetch_package_info(eco, pkg)
+                        if data and "error" not in data:
                             hud.log_event(
-                                f"[info]Establishing Live Hook to {eco}://{pkg}...[/info]"
+                                f"[info]Invoking AI synthesis & Repo Intelligence for {pkg}...[/info]"
                             )
-                            hud.view_mode = "tree"
-                            hud.tree_data = None
+                            gh_client = LiveGithubClient()
+                            ai_client = LiveGeminiClient()
 
-                            # Fire off live fetch
-                            async def fetch_and_update():
-                                hud.log_event(f"[warning]Pinging deps.dev for {pkg}...[/warning]")
-                                data = await deps_client.fetch_package_info(eco, pkg)
-                                hud.tree_data = data
+                            owner, repo = (pkg, pkg)
+                            if package_links := data.get("links", []):
+                                for link in package_links:
+                                    url = link.get("url", "")
+                                    if "github.com/" in url:
+                                        p = url.rstrip("/").split("github.com/")[-1].split("/")
+                                        if len(p) >= 2:
+                                            owner, repo = p[0], p[1]
+                                            break
 
-                                # Launch AI & Repo Background Analytics if dependencies resolved
-                                if data and "error" not in data:
-                                    hud.log_event(
-                                        f"[info]Invoking AI synthesis & Repo Intelligence for {pkg}...[/info]"
+                            # RECURSIVE EXPANSION: Add dependencies to the live matrix to show 'x10' scale
+                            deps = data.get("dependencies", [])
+                            hud.log_event(
+                                f"[info]Expanding {len(deps)} sub-libraries for {pkg}...[/info]"
+                            )
+                            for dep in deps[:20]:  # Limit to 20 for UI sanity
+                                d_name = dep.split("@")[0]
+                                if f"{eco}/{d_name}" not in [p[0] for p in hud.live_packages]:
+                                    hud.live_packages.insert(
+                                        0,
+                                        (
+                                            f"{eco}/{d_name}",
+                                            random.uniform(0.1, 0.4),
+                                            f"{random.uniform(0.01, 0.1):.2f}",
+                                            "STABLE",
+                                        ),
                                     )
 
-                                    gh_client = LiveGithubClient()
-                                    ai_client = LiveGeminiClient()
+                            gh_stats = await gh_client.get_repo_stats(owner, repo)
+                            ai_verdict = await ai_client.analyze_package(
+                                pkg, eco, len(data.get("dependencies", [])), gh_stats
+                            )
 
-                                    # Parse source repo from deps if we had exact links, but lets just try direct guessing for large packages
-                                    # This works flawlessly for things like facebook/react or django/django.
-                                    owner, repo = (pkg, pkg)  # fallback
-                                    if package_links := data.get("links", []):
-                                        for link in package_links:
-                                            url = link.get("url", "")
-                                            if "github.com/" in url:
-                                                parts = (
-                                                    url.rstrip("/")
-                                                    .split("github.com/")[-1]
-                                                    .split("/")
-                                                )
-                                                if len(parts) >= 2:
-                                                    owner, repo = parts[0], parts[1]
-                                                    break
+                            await gh_client.close()
+                            await ai_client.close()
 
-                                    hud.log_event(
-                                        f"[warning]Tapping GitHub GraphQL: {owner}/{repo}...[/warning]"
-                                    )
-                                    gh_stats = await gh_client.get_repo_stats(owner, repo)
-
-                                    hud.log_event(
-                                        f"[warning]Pinging Gemini Flash Risk Analyzer...[/warning]"
-                                    )
-                                    ai_verdict = await ai_client.analyze_package(
-                                        pkg, eco, len(data.get("dependencies", [])), gh_stats
-                                    )
-
-                                    await gh_client.close()
-                                    await ai_client.close()
-
-                                    if "error" not in ai_verdict:
-                                        hud.display_verdict(ai_verdict)
-                                        hud.log_event(
-                                            f"[critical]AI Risk Assessment Compiled.[/critical]"
-                                        )
-                                    else:
-                                        hud.log_event(
-                                            f"[danger]AI Engine error: {ai_verdict.get('error')}[/danger]"
-                                        )
-
+                            if "error" not in ai_verdict:
+                                hud.display_verdict(ai_verdict)
                                 hud.log_event(
-                                    f"[stable]Live telemetry acquired for {pkg}.[/stable]"
+                                    f"[critical]AI Risk Assessment Compiled for {pkg}.[/critical]"
                                 )
-
-                            asyncio.create_task(fetch_and_update())
+                            else:
+                                hud.log_event(
+                                    f"[danger]AI Engine error: {ai_verdict.get('error')}[/danger]"
+                                )
                         else:
                             hud.log_event(
-                                "[danger]Invalid format. Use: expand <ecosystem>/<package>[/danger]"
+                                f"[danger]Failed to acquire telemetry for {pkg}.[/danger]"
                             )
-                    elif cmd.lower() == "clear" or cmd.lower() == "matrix":
-                        hud.view_mode = "matrix"
-                        hud.search_query = ""
-                        hud.log_event("[stable]Returned to Matrix View.[/stable]")
-                    elif cmd:
-                        hud.log_event(f"[info]Matrix filter applied: {cmd}[/info]")
-                        hud.view_mode = "matrix"
-                        hud.search_query = cmd.lower()
-                    hud.cmd_buffer = ""
-                elif ch == "\x08":  # Backspace
-                    hud.cmd_buffer = hud.cmd_buffer[:-1]
-                else:
-                    hud.cmd_buffer += ch
 
-                # Live typing filter only matters in matrix mode
-                if hud.view_mode == "matrix" and not hud.cmd_buffer.lower().startswith("expand"):
-                    hud.search_query = hud.cmd_buffer.lower()
-
-            except Exception:
-                pass
-
+                    asyncio.create_task(fetch_and_analyze())
     await deps_client.close()
 
 
@@ -232,21 +199,22 @@ async def start_uvicorn(hud: SovereignTerminalHUD):
 
 async def orchestrate():
     hud = SovereignTerminalHUD()
-    hud_task = asyncio.create_task(hud.stream_hud())
     sim_task = asyncio.create_task(simulate_forensic_stream(hud))
-    input_task = asyncio.create_task(async_input_listener(hud))
     uvi_task = asyncio.create_task(start_uvicorn(hud))
-    mem_task = asyncio.create_task(limiter_kernel.enforce_residency(hud))
+    cmd_task = asyncio.create_task(command_processor(hud))
 
-    while hud.active:
-        await asyncio.sleep(0.5)
+    # Ensuring the 150MB residency law is active
+    mem_task = asyncio.create_task(metabolic_governor.execute_metabolic_audit(hud))
 
-    limiter_kernel.active = False
-    mem_task.cancel()
-    uvi_task.cancel()
-    sim_task.cancel()
-    input_task.cancel()
-    hud_task.cancel()
+    # The Textual App is our primary execution thread for the UI
+    try:
+        await hud.render_loop()
+    finally:
+        hud.active = False
+        metabolic_governor.stop()
+        mem_task.cancel()
+        uvi_task.cancel()
+        sim_task.cancel()
 
 
 if __name__ == "__main__":

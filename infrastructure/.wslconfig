@@ -1,5 +1,23 @@
+# =========================================================================================
+# COREGRAPH INFRASTRUCTURE HARDENING: WSL2 CONFIGURATION
+# =========================================================================================
+# MANDATE: Prioritize TTY throughput and Zero-Copy Ingestion.
+# ARCHITECTURE: CPU Core Pinning and Virtio-FS Optimization.
+# =========================================================================================
+
 [wsl2]
-memory=8GB
-processors=24
-guiApplications=false
-autoMemoryReclaim=disabled
+# Pinning CoreGraph to high-performance cores
+processors=8
+memory=1GB # Hard ceiling for the WSL instance to enforce host-level sovereignty
+
+# Networking: Enable Mirroring mode for raw socket access
+networkingMode=mirrored
+dnsTunneling=true
+
+# Optimization: Memory reclaiming for the 150MB mandate
+autoMemoryReclaim=gradual
+
+[experimental]
+autoProxy=true
+sparseVhd=true
+virtioFs=true

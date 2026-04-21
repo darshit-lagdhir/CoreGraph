@@ -29,3 +29,15 @@ task-matrix.json
 tooling/simulation_server/fixtures/*
 tooling/simulation_server/fixtures
 .env.hardware_profile
+
+# =========================================================================================
+# COREGRAPH SOVEREIGN DATA EXCLUSION
+# =========================================================================================
+# MANDATE: Protect the Persistence Vault and Siege Analytics from Version Control.
+# =========================================================================================
+vault/
+.benchmarks/
+tests/analytics/
+tests/forensic_logs/
+*.wal
+*.bin

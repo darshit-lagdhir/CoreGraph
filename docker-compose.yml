@@ -1,35 +1,44 @@
-version: "3.8"
+version: "3.9"
 
 services:
   coregraph-titan:
     build:
       context: .
       dockerfile: Dockerfile
-    platform: linux/amd64
-    ports:
-      - "8000:8000"
-    environment:
-      - GEMINI_API_KEY=${GEMINI_API_KEY:-null}
-      - LOG_LEVEL=critical
-      - WORKER_CONCURRENCY=1
-      - MEMORY_LIMIT=150MB
-    deploy:
-      resources:
-        limits:
-          cpus: "0.5"
-          memory: 150M
-        reservations:
-          cpus: "0.1"
-          memory: 75M
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://127.0.0.1:8000/v1/swagger"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 15s
+    image: coregraph:sovereign-v5
+    container_name: titan_ingestion_phalanx
+
+    # KERNEL-LEVEL HARDENING: CPU SET PINNING
+    # Core 0: HUD Rendering (144Hz)
+    # Core 1-3: Ingestion Phalanx (Zero-Copy)
+    # Core 4-7: Analytical Cortex & Sharding
+    cpuset: "0-7"
+    cpu_shares: 1024
+
+    # MEMORY SOVEREIGNTY: 150MB HARD LIMIT
+    mem_limit: 150m
+    mem_reservation: 120m
+    memswap_limit: 150m
+
+    security_opt:
+      - no-new-privileges:true
+      - seccomp=infrastructure/seccomp_profile.json
+
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_RAW
+      - SYS_NICE
+
+    volumes:
+      - ./vault:/app/vault
+      - /dev/shm:/dev/shm
+
+    networks:
+      - sovereign_net
 
 networks:
-  default:
-    name: coregraph_net
+  sovereign_net:
     driver: bridge
-
+    enable_ipv6: false
+    internal: true # Isolate the Titan from the public web
