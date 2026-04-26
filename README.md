@@ -1,3 +1,12 @@
+---
+title: CoreGraph Titan
+emoji: ??
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 7860
+pinned: true
+---
 # CoreGraph 3.81M: The Production-Sealed Intelligence Platform
 
 CoreGraph is a high-performance, **battle-hardened** graph engine designed to analyze 3.81 million nodes in real-time. It has been engineered to be **indestructible**, **silent**, and **self-healing**, making it ready for the most difficult professional environments.
@@ -63,3 +72,4 @@ CoreGraph has passed a brutal 10-part deep-testing sequence:
 
 **Status**: SEALED / MISSION-READY.
 **Developer**: Antigravity (Advanced Agentic Coding Team).
+

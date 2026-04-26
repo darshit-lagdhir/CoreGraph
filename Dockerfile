@@ -1,30 +1,44 @@
-# MULTI-STAGE ZERO-CC DEPLOYMENT KERNEL
-# STAGE 1: COMPILATION MANIFOLD
-FROM python:3.11-slim as builder
-WORKDIR /build
-COPY backend/requirements.txt .
-RUN pip wheel --no-cache-dir --no-deps --wheel-dir /build/wheels -r requirements.txt
+# COREGRAPH MASTER ENGINEERING SPECIFICATION: CLOUD PHALANX
+# HUGGING FACE SPACE DEPLOYMENT (PORT 7860, NON-ROOT, TEXTUAL-WEB WEBSOCKET TUNNEL)
 
-# STAGE 2: RUNTIME ENCAPSULATION MANIFOLD
-FROM python:3.11-slim as runtime
-WORKDIR /app
+FROM python:3.11-slim
 
-# STRICT INFRASTRUCTURE-GATING AUDIT
+# Enforce 150MB RSS Mandate & Cloud Security
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PYTHONASYNCIODEBUG=0 \
-    WORKER_CONCURRENCY=1 \
-    COREGRAPH_HEADLESS_MODE=1
+    MALLOC_ARENA_MAX=2 \
+    PYTHONPATH=/app:/app/backend
 
-# ASYNCHRONOUS MECHANICAL SHIELD
-COPY --from=builder /build/wheels /wheels
-COPY --from=builder /build/requirements.txt .
-RUN pip install --no-cache /wheels/* && rm -rf /wheels
+# Create non-root user (UID 1000) for Hugging Face security compliance
+RUN useradd -m -u 1000 coregraph_user
 
-# IN-PLACE ARCHITECTURAL MECHANICAL SEAL
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Layer Caching: Requirements
+COPY requirements.txt .
+# Ensure textual-web is installed for the websocket bridge
+RUN pip install --no-cache-dir -r requirements.txt textual-web
+
+# Copy the Backend Core and Terminal HUD
 COPY backend/ ./backend/
+COPY master_orchestrator.py .
+COPY terminal_hud.py .
 
-# ZERO-CC CONTAINER GATEWAY IGNITION
-EXPOSE 8000
-CMD ["python", "backend/main.py"]
+# Physical Permissions Handshake
+RUN chown -R 1000:1000 /app
 
+# Switch to Sovereign User
+USER 1000
+
+# Cloud Ingress Port
+EXPOSE 7860
+
+# Terminal End-to-End Handshake
+# Tunneling the 144Hz HUD via Textual-Web on 0.0.0.0:7860
+CMD ["textual", "serve", "--port", "7860", "--host", "0.0.0.0", "python", "terminal_hud.py"]
