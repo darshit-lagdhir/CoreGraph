@@ -1,363 +1,362 @@
-# COREGRAPH: SYSTEM INITIALIZATION AND ENVIRONMENT CONFIGURATION
+# CoreGraph: The Ultimate Step-by-Step Setup and Installation Guide
 
-This document specifies the hardware requirements and procedural synchronization required to deploy the CoreGraph analytical engine. Successful operation is contingent upon the alignment of host resources with the internal memory-sharding and HUD synchronization kernels. Deviation from the established parameters will result in increased latency and potential residency violations. Every operational sector must be audited against the bit-perfect performance baseline identified in this manuscript.
+Welcome to the CoreGraph Titan. This document is the ultimate, comprehensive, step-by-step manual designed specifically for a third party (someone who has never seen this project before) to set up, run, and understand the entire system from scratch.
 
----
+By the end of this guide, you will have a fully functional, production-ready environment running on your local machine. You will learn how to install and configure:
+1. **Git**: To download the source code.
+2. **Docker Desktop**: To run our isolated, secure application containers.
+3. **PostgreSQL**: Our permanent, highly secure relational database.
+4. **Redis**: Our lightning-fast in-memory cache for real-time tracking.
+5. **DBeaver**: A powerful visual database tool to interact with your data.
 
-## 1. HARDWARE OPTIMIZATION AND ARCHITECTURE BOUNDS
-
-The CoreGraph system is designed for high-throughput execution on multi-core architectures. While the application maintains a strict 150MB Resident Set Size (RSS) lock, the underlying graph operations require significant CPU cache bandwidth and I/O velocity. The ingestion of 3.81M nodes requires a non-blocking memory bus configuration and optimized PCIe Gen5 lane allocation for the Write-Ahead Log (WAL) persistence layers.
-
-### 1.1 Reference Hardware: Intel Core i9-13980HX
-Technical benchmarks were performed on the ASUS ROG Strix G16 (2023/2024) platform.
-- **CPU**: Intel Core i9-13980HX (24 Logical Cores: 8 P-cores, 16 E-cores).
-- **Instruction Set**: AVX-512 and AMX support required for vectorized graph arithmetic.
-- **RAM**: 16GB DDR5-5600 operating in dual-channel mode to minimize memory-sharding stall cycles.
-- **Storage**: Gen5 NVMe (Sequence Read > 10GB/s, Random 4K Write > 1M IOPS).
+This guide is written in plain, easy-to-understand English. Follow every step carefully, and you will have the 3.81 million node engine running perfectly.
 
 ---
 
-## 2. RESOURCE LIMITER LOGIC AND RSS CONSTRAINTS
-
-The engine is governed by a **Metabolic Limiter** that enforces a hard ceiling of 150MB of system memory. This limiter operates as a high-priority background thread that interrogates the OS process status using direct `/proc/self/smaps` (on Linux) or `GetProcessMemoryInfo` (on Windows).
-
-### 2.1 Residency Limits and Eviction Triggers
-The residency lifecycle is divided into three critical alarm states to prevent OOM termination by the host hypervisor.
-- **Soft Limit (140MB)**: Triggers incremental garbage collection (GC) of transient telemetry buffers and flushes inactive JSON fragments from the normalization manifold.
-- **Hard Limit (148MB)**: Executes immediate LRU shard purgation, where the least recently accessed bit-packed node shards are de-allocated from the resident memory pool and persisted to the WAL.
-- **Termination Threshold (150MB)**: Performs an emergency process freeze and memory-mapped flush. This state is designed to protect the integrity of the 3.81M node graph topology during critical resource contention.
-
----
-
-## 3. FREQUENCY ANALYSIS FOR HUD SYNC
-
-To maintain a frame rate of 144Hz, the host processor must be capable of completing the full analytical loop within 6.94ms. The required frequency ($f_{req}$) is calculated based on the traversal cost of the bit-packed pointer adjacency matrix.
-
-$$f_{req} = \frac{N \times \tau}{T}$$
-
-Parameters for the 3.81M node universe:
-- $N$ (Nodes): $3.81 \times 10^6$
-- $\tau$ (Op Latency): $2.1 \times 10^{-9}$ s (optimized for i9-13980HX L1 cache).
-- $T$ (Frame Time): $0.00694$ s (144.0 Hz).
-
-Failure to maintain $f_{req}$ above 1.15 GHz will result in visual frame dropping and telemetric jitter in the radiant UI rendering manifold.
+## Table of Contents
+1. [Understanding the Ecosystem](#chapter-1-understanding-the-ecosystem)
+2. [Hardware Prerequisites](#chapter-2-hardware-prerequisites)
+3. [Installing Git](#chapter-3-installing-git)
+4. [Installing Docker Desktop](#chapter-4-installing-docker-desktop)
+5. [Installing DBeaver](#chapter-5-installing-dbeaver)
+6. [Downloading the Project](#chapter-6-downloading-the-project)
+7. [Starting the System (Docker Compose)](#chapter-7-starting-the-system)
+8. [Verifying the Installation](#chapter-8-verifying-the-installation)
+9. [Setting up DBeaver (Visual Database Access)](#chapter-9-setting-up-dbeaver)
+10. [Exploring the Database](#chapter-10-exploring-the-database)
+11. [Accessing the HUD (Visual Map)](#chapter-11-accessing-the-hud)
+12. [Shutting Down the System](#chapter-12-shutting-down-the-system)
+13. [Extensive Troubleshooting Guide](#chapter-13-extensive-troubleshooting-guide)
 
 ---
 
-## 4. CPU CORE AFFINITY AND THREAD SCHEDULING
+## Chapter 1: Understanding the Ecosystem
 
-Optimal performance requires pinning critical threads to high-speed cores to avoid scheduling jitter and cross-CCX latency. The CoreGraph orchestrator utilizes localized thread-pinning to lock high-priority tasks onto specific silicon segments.
+Before installing anything, it is very important to understand *what* we are installing and *why*. CoreGraph is not just a single program you double-click; it is an ecosystem of powerful tools working together.
 
-| Process Component | Priority | Dedicated Core | Operational Mandate |
-| :--- | :--- | :--- | :--- |
-| **HUD Redraw** | REALTIME | Core 0 (P-Core) | Ensures 144Hz frame buffer synchronization without preemption. |
-| **Ingestion** | HIGH | Cores 2-4 (P-Cores) | Processes 85,000 nodes/sec into the asynchronous ring buffer. |
-| **Metabolic Limiter** | CRITICAL | Core 5 (P-Core) | Low-latency monitoring of the 150MB RSS boundary. |
-| **Sharding Kernels** | NORMAL | Cores 8-23 (E-Cores) | Parallelized graph partitioning and spectral decomposition. |
+### What is Docker?
+Imagine you write a piece of software on your computer, and it works perfectly. But when you send it to your friend, it breaks because they have a different version of Windows, or they are missing a specific file. 
+**Docker** solves this. It packs the application and everything it needs to run into a tiny, virtual box called a **Container**. This container will run exactly the same way on your computer, your friend's computer, or a massive server.
 
----
+### What is PostgreSQL?
+PostgreSQL (often called Postgres) is an incredibly powerful, open-source database. Think of it as a massive, hyper-organized filing cabinet. We use Postgres to permanently store our 3.81 million nodes. If the power goes out, Postgres ensures that absolutely no data is lost.
 
-## 5. OPERATING SYSTEM KERNEL CONFIGURATION
+### What is Redis?
+While Postgres is safe and permanent, it can sometimes be a little slow for real-time graphics. **Redis** is an "in-memory" database. It is like the short-term memory of the system. It holds the live coordinates of the nodes so the visual screen can update instantly without waiting for the filing cabinet (Postgres).
 
-The host OS must be configured to provide low-latency context switching. For desktop Linux environments, the Zen kernel is required to minimize the scheduling overhead of non-foreground processes.
-
-### 5.1 Linux Scheduler Tuning
-```bash
-# Reduce the scheduling slice for foreground precision
-sudo sysctl -w kernel.sched_min_granularity_ns=500000
-sudo sysctl -w kernel.sched_wakeup_granularity_ns=1000000
-# Optimize dirty page flush frequency for NVMe
-sudo sysctl -w vm.dirty_ratio=10
-sudo sysctl -w vm.dirty_background_ratio=5
-```
+### What is DBeaver?
+Databases like Postgres do not have a graphical interface built-in. If you want to see the data, you normally have to type complex code into a black screen. **DBeaver** is a visual tool (a Database GUI) that lets you click, view, and manage your database using a friendly, spreadsheet-like interface.
 
 ---
 
-## 6. WSL2 MEMORY AND PROCESSOR SEGREGATION
+## Chapter 2: Hardware Prerequisites
 
-For Windows-based deployments using WSL2, the `.wslconfig` file must be meticulously tuned to isolate the virtualized environment from the NT kernel's background telemetry.
+Because CoreGraph is a massive engine designed for millions of data points, your computer needs to meet certain requirements to run it smoothly.
 
-```ini
-[wsl2]
-memory=4GB
-processors=16
-pageReporting=false
-guiApplications=false
-nestedVirtualization=true
-[experimental]
-autoMemoryReclaim=dropcache
-```
+### Minimum Requirements:
+- **Processor (CPU)**: Any modern 4-core processor (Intel Core i5 or AMD Ryzen 5).
+- **Memory (RAM)**: 8 Gigabytes of RAM minimum (16GB is highly recommended).
+- **Storage**: At least 10 Gigabytes of free hard drive space (SSD is highly recommended over an older HDD).
+- **Operating System**: Windows 10/11 (Pro or Home), macOS (Intel or Apple Silicon), or Linux (Ubuntu/Debian).
 
-This configuration ensures that the Linux kernel within WSL2 has sufficient head-room for the 4GB ingest buffer while maintaining the 150MB residency lock for the primary CoreGraph process.
+### Recommended Requirements (For 144Hz Experience):
+- **Processor (CPU)**: 8+ Core Processor (Intel Core i9 or AMD Ryzen 9).
+- **Memory (RAM)**: 32 Gigabytes of RAM.
+- **Graphics (GPU)**: A dedicated graphics card (like an NVIDIA RTX 3060 or better) to render the web visuals smoothly.
 
 ---
 
-## 7. LINUX SYSFS AND SCHEDULER TUNING
+## Chapter 3: Installing Git
 
-In addition to the standard sysctl parameters, the SysFS interface must be utilized to lock the CPU frequency governor. Scaling jitter is a primary cause of HUD latency spikes.
+Git is a tool that allows you to download (or "clone") the exact code from our online repository to your computer.
 
-```bash
-# Force Performance Governor across all 24 logical cores
-for i in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do
-    echo "performance" | sudo tee $i
-done
-```
+### For Windows Users:
+1. Open your web browser and go to: `https://git-scm.com/download/win`
+2. Click on "64-bit Git for Windows Setup".
+3. Once the `.exe` file downloads, double-click it to start the installer.
+4. The installer has many screens. You do not need to change anything. Just keep clicking the **"Next"** button until the installation is complete.
+5. Click **"Finish"**.
 
----
+### For macOS Users:
+1. Open the "Terminal" application (you can find it using Spotlight search).
+2. Type `git --version` and press Enter.
+3. If Git is not installed, your Mac will automatically ask if you want to install the "Command Line Developer Tools". Click **"Install"** and follow the prompts.
 
-## 8. WINDOWS PRIORITY SEPARATION AND REGISTRY SETTINGS
-
-For deployments prioritizing the Windows 11 host architecture, specific registry overrides are required to enhance the scheduling quantum for long-running analytical threads.
-- **Registry Path**: `HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl\Win32PrioritySeparation`
-- **Value**: `0x26` (Fixed, short, variable)
-- **Impact**: Provides the HUD rendering thread with the highest possible priority within the NT scheduler.
-
----
-
-## 9. PYTHON 3.13 RUNTIME AND DEPENDENCY MATRIX
-
-CoreGraph utilizes a polyglot architecture, combining the strategic reasoning of Python 3.13 with the raw performance of C-based memory manifolds.
-
-### 9.1 Runtime Specifications
-Only 64-bit distributions of Python 3.12 or 3.13 are supported. The system requires the CFFI (Foreign Function Interface) library to facilitate zero-copy interactions between the Python event loop and the sharded pointer matrix.
+### Verifying Git Installation:
+1. Open your Command Prompt (Windows) or Terminal (Mac).
+2. Type `git --version` and press Enter.
+3. You should see a message like `git version 2.40.0.windows.1`. If you see this, Git is installed perfectly!
 
 ---
 
-## 10. ENVIRONMENT ISOLATION AND VENV CONFIGURATION
+## Chapter 4: Installing Docker Desktop
 
-Initialization of the deployment environment must occur within a synchronized virtual environment to prevent version-drift within the analytical kernels.
+Docker is the most critical piece of software. It will act as the host for our databases and the CoreGraph application.
 
-```powershell
-# Create hardened environment
-python -m venv venv
-.\venv\Scripts\Activate.ps1
-# Ingest the bit-perfect dependency list
-pip install -r requirements.txt
-```
+### Important Note for Windows Users (WSL 2):
+Docker on Windows requires a feature called **WSL 2** (Windows Subsystem for Linux). Docker will usually install this for you, but if it asks you to update or install WSL 2 during the setup, always click **Yes** or follow the link it provides.
 
----
+### Step-by-Step Installation:
+1. Open your web browser and go to: `https://www.docker.com/products/docker-desktop/`
+2. Click the large blue button that says **"Download for Windows"** (or Mac if you are on an Apple computer).
+3. Once the installer (`Docker Desktop Installer.exe`) is downloaded, double-click it.
+4. A window will appear asking if you want to use WSL 2 instead of Hyper-V. **Leave this checked (enabled)**. It is much faster.
+5. Click **"Ok"** to begin the installation. It may take a few minutes.
+6. Once it finishes, click **"Close and Restart"**. Your computer will reboot.
+7. After your computer turns back on, Docker Desktop should launch automatically. You will see a small "Whale" icon in the bottom-right corner of your screen (near the clock).
+8. A window will pop up asking you to accept the Docker Subscription Service Agreement. Click **"Accept"**.
+9. You do not need to sign in or create an account. You can click **"Continue without signing in"** or "Skip".
 
-## 11. C-FFI COMPILATION PIPELINE
-
-The sharding and memory-packing logic is implemented in C and must be compiled into a shared object (.so) or dynamic link library (.dll) for the host architecture.
-
-### 11.1 Native Optimization Flags
-```bash
-# Build the sharding bridge with native AVX-512 support
-gcc -O3 -march=native -shared -fPIC -ffast-math -o libsharding.so backend/core/sharding/sharding_core.c
-```
-The use of `-ffast-math` is strictly required for the spectral graph decomposition kernels to achieve the 412ms convergence target.
-
----
-
-## 12. POINTER ARITHMETIC AND SHARDING LOGIC VERIFICATION
-
-The 3.81M nodes are managed through a bit-packed 64-bit addressing manifold. This sharding logic ensures that node relationships are stored as absolute memory offsets rather than Python objects. This approach reduces the per-node relationship overhead from 1,200 bytes to 8 bytes, enabling massive topology scaling within the 150MB limit.
+### Verifying Docker Installation:
+1. Open your Command Prompt or Terminal.
+2. Type `docker --version` and press Enter.
+3. You should see something like `Docker version 24.0.2, build cb74dfc`.
+4. Next, type `docker-compose --version`. You should see `Docker Compose version v2.18.1`. 
+If you see both of these, Docker is perfectly ready!
 
 ---
 
-## 13. CACHE ALIGNMENT AND L3 GEOMETRY OPTIMIZATION
+## Chapter 5: Installing DBeaver
 
-Graph traversal logic is optimized to align with 64-byte cache lines. The system pre-fetches node adjacency data into the L1/L2 cache before the analytical kernels execute their spectral analysis. This minimizes stall cycles during the 144Hz HUD redraw.
+Now we will install the visual tool that will allow us to look inside our Postgres database.
 
----
+1. Open your web browser and go to: `https://dbeaver.io/download/`
+2. Look for the section titled **"DBeaver Community Edition"** (this version is completely free).
+3. Click on the **"Windows (installer)"** link (or the Mac/Linux link depending on your computer).
+4. Once the file downloads, double-click it to start the installer.
+5. Choose **"English"** and click **"OK"**.
+6. Click **"Next"**, then **"I Agree"** to the license.
+7. Choose **"For anyone who uses this computer"** and click **"Next"**.
+8. Keep all the default checkboxes selected and click **"Next"**, then **"Install"**.
+9. Once it finishes, check the box that says **"Create Desktop Shortcut"** and click **"Finish"**.
 
-## 14. BIT-PACKED POINTER ADDRESSING MATH
-
-Address translation for the 3.81M node graph follows a deterministic bit-shift protocol.
-$$Addr(node\_id) = Base\_Addr + (node\_id \times 12)$$
-The 12-byte payload consists of one 64-bit pointer and one 32-bit status bitfield (metadata header). This geometry is mirrored exactly across all 64 memory shards.
-
----
-
-## 15. MEMORY-MAPPED STORAGE (WAL) IMPLEMENTATION
-
-State persistence is maintained via a Write-Ahead Log (WAL) that maps directly to the NVMe storage. When the Metabolic Limiter triggers a residency flush, the active node shard is serialized into a 128MB WAL segment using the Zstandard (zstd) compression algorithm for maximum I/O throughput.
+You now have DBeaver installed! We will use it later in Chapter 9.
 
 ---
 
-## 16. ENVIRONMENT VARIABLE SYNC (.ENV)
+## Chapter 6: Downloading the Project
 
-The following parameters must be correctly configured in the `.env` file to activate the residency locks.
-- `RSS_PERIMETER_MB=150`: Fixed residency ceiling.
-- `HUD_SYNC_ENABLED=true`: Activates the 144Hz refresh manifold.
-- `FFI_ALIGNMENT_BYTES=64`: Memory alignment for C-based sharding kernels.
+Now that we have all the required software, we need to download the actual CoreGraph code.
 
----
-
-## 17. INITIALIZATION STABILITY MATRIX (ISM) FORMULA
-
-The system executes a pre-ignition audit to ensure environment health. The process will hard-halt if the ISM value is below 1.0.
-$$ISM = \frac{\sum (Check_{i} \times Weight_{i})}{Total\_Weight}$$
-Checks include binary presence, dependency version alignment, and host CPU frequency certification.
-
----
-
-## 18. NETWORK PROXY CONFIGURATION (SOCKS5)
-
-Ingestion of external telemetric streams can be routed through a local SOCKS5 relay to mask the collector's origin. The system supports asynchronous proxy rotation every 300 seconds to prevent rate-limiting from global repository APIs (GitHub, npm, etc.).
-
----
-
-## 19. TLS 1.3 AND CERTIFICATE PINNING
-
-Security sovereignty is ensured via mandatory TLS 1.3 for all outgoing ingestion streams. The engine uses certificate pinning to prevent man-in-the-middle attacks, ensuring that the 3.81M node graph is constructed from authenticated forensic telemetry.
+1. Open your Command Prompt (Windows) or Terminal (Mac).
+2. We want to navigate to a folder where we will store the project. For example, your Documents folder. Type:
+   ```bash
+   cd Documents
+   ```
+3. Now, we will use Git to download the code. Type this command and press Enter:
+   ```bash
+   git clone https://github.com/your-username/COREGRAPH.git
+   ```
+   *(Note: If you have the code locally already in a ZIP file, simply extract it to a folder named COREGRAPH).*
+4. Move into the newly created folder by typing:
+   ```bash
+   cd COREGRAPH
+   ```
+5. You are now inside the project directory! You can type `dir` (on Windows) or `ls` (on Mac) to see the files. You should see files like `README.md`, `Dockerfile`, and `docker-compose.yml`.
 
 ---
 
-## 20. POST-INSTALLATION PERFORMANCE AUDIT
+## Chapter 7: Starting the System (Docker Compose)
 
-Upon completion of the setup, the user must execute the high-velocity performance audit. This suite verifies that the host hardware can maintain the 6.94ms frame budget under a simulated 3.81M node load.
-```bash
-make sync-check
-```
+This is where the magic happens. We have a file called `docker-compose.yml` that acts as a blueprint. When we give this blueprint to Docker, it automatically does all the hard work: it downloads Postgres, downloads Redis, builds our CoreGraph engine, and networks them all together safely.
 
----
+1. Ensure your Command Prompt is currently inside the `COREGRAPH` folder.
+2. Type the following command and press Enter:
+   ```bash
+   docker-compose up -d --build
+   ```
 
-## 21. FFI POINTER VALIDATION SCRIPT
+### What is happening right now?
+The screen will start filling with downloading bars and text. This is completely normal! Here is what Docker is doing in the background:
+- **Pulling Postgres**: It is reaching out to the official Docker servers to download the perfectly secure version of PostgreSQL.
+- **Pulling Redis**: It is downloading the fast, in-memory cache system.
+- **Building CoreGraph**: It is looking at our `Dockerfile` and building the 155MB Distroless application from scratch. It is installing Python, downloading our code, and packing it tightly.
+- **Creating the Network**: It is creating an "Air-Gapped" internal network called `coregraph_mesh`. It places the database, the cache, and the engine onto this private network so they can talk to each other, but the outside world cannot reach them.
+- **Starting Up**: Finally, it turns them all on. The `-d` in our command stands for "Detached", which means it runs them quietly in the background so you can keep using your terminal window.
 
-The `ffi_validation.py` tool performs a sub-atomic audit of the sharded memory matrix. It iterates through the bit-packed array, verifying that every 64-bit pointer resolves to a valid node address and that no memory-bank fragmentation has occurred during the FFI handshake. This tool is critical for certifying the memory-safety of the 150MB residency lock.
-
----
-
-## 22. SPECTRAL CONNECTIVITY REGRESSION TESTS
-
-This test suite executes the Laplacian decomposition on a reference 10,000-node graph to verify that the spectral kernels are producing deterministic results. It measures the convergence time of the Lanczos Iterator, ensuring that the eigenvalue calculation falls within a ±1% stability delta. Any deviation indicates an architectural mismatch in the host's floating-point unit (FPU) or a compilation error in the C-FFI binaries.
-
----
-
-## 23. METABOLIC LIMITER THRESHOLD TUNING
-
-Advanced users can tune the `METABOLIC_PROACTIVE_GC` parameter to adjust the frequency of the LRU purgation. On high-throughput NVMe drives, the purgation threshold can be relaxed to 142MB to reduce CPU overhead, while on slower SSDs, it should be tightened to 135MB to prevent the process from exceeding the 150MB termination threshold during high-velocity telemetry bursts.
+This process might take 2 to 5 minutes depending on your internet speed. Wait until you see green `Started` messages for all three containers.
 
 ---
 
-## 24. DISK I/O AND NVME BLOCK ALIGNMENT
+## Chapter 8: Verifying the Installation
 
-The persistence engine aligns all WAL writes with the physical 4KB sector boundaries of the NVMe storage. By utilizing direct I/O (`O_DIRECT`), CoreGraph bypasses the host OS page cache, ensuring that the 3.81M nodes are flushed to disk with zero-copy overhead. This maximizes the write-bandwidth of Gen5 storage controllers and prevents the kernel from cannibalizing the 150MB residency pool for file buffers.
+We need to make sure all three parts of the system are actually running successfully without errors.
 
----
+1. In your terminal, type:
+   ```bash
+   docker ps
+   ```
+   You should see a list that looks like this:
+   ```text
+   CONTAINER ID   IMAGE                           COMMAND                  STATUS         PORTS                    NAMES
+   abc123def456   coregraph-engine:final-hardened "python master_orch..."  Up 2 minutes   0.0.0.0:8000->8000/tcp   ingestion_phalanx
+   def456ghi789   postgres:15-alpine              "docker-entrypoint.s…"   Up 2 minutes   5432/tcp                 coregraph_db
+   ghi789jkl012   redis:7-alpine                  "docker-entrypoint.s…"   Up 2 minutes   6379/tcp                 coregraph_cache
+   ```
+   If you see all three listed as `Up`, the system is running perfectly!
 
-## 25. DOCKER BUILD PROCESS AND LOCAL SHARDING
-
-The provided `Dockerfile` utilizes a three-stage build process. The first stage compiles the C-FFI sharding kernels in a hardened GCC environment; the second stage installs the Python 3.13 dependencies in a slim Alpine footprint; and the final stage combines the artifacts into a distroless execution container. This ensures that the production environment is free of shell binaries and development tools, minimizing the attack surface while maintaining bit-perfect parity with the local setup.
-
----
-
-## 26. DATABASE SCHEMA MIGRATION AND HEAD REVISION
-
-CoreGraph uses Postgres for long-term relational storage and Redis for high-speed inter-kernel indexing. The initialization process requires a full schema synchronization via Alembic. This creates the GiST and GIN indices required for trigram-based search discovery and spatial node mapping.
-```bash
-cd backend && alembic upgrade head
-```
-
----
-
-## 27. HUD RENDERING RESOLUTION AND BUFFER MATH
-
-The 144Hz HUD calculates its redraw buffer based on the terminal resolution (standardized at 1920x1080).
-$$Buffer\_Size = Res_{x} \times Res_{y} \times Color\_Depth$$
-For 24-bit TrueColor spectral mapping, the frame buffer consumes ~6.2MB, which is subtracted from the 150MB residency pool. The engine uses a double-buffering technique to prevent visual tearing during high-heat telemetric pulses.
+2. **Checking the Logs (Optional but helpful):**
+   If you want to see what the CoreGraph engine is actually thinking and doing, you can read its live logs. Type:
+   ```bash
+   docker logs ingestion_phalanx -f
+   ```
+   You will see the system booting up, connecting to the database, and starting the 144Hz HUD. To exit the logs, press `Ctrl + C` on your keyboard.
 
 ---
 
-## 28. DIAGNOSTIC CLI COMMAND REFERENCE
+## Chapter 9: Setting up DBeaver (Visual Database Access)
 
-The following commands are integrated into the `rich` based terminal interface for real-time system monitoring.
-- `status --vitals`: Provides a high-resolution breakdown of RSS memory splits, CPU core saturation, and L3 cache miss rates.
-- `audit --integrity`: Launches a parallelized scan of the sharded matrix to identify any topological anomalies or zombie edges.
-- `clear --cache`: Forces an immediate sweep of the Metabolic Limiter and resets the LRU queues for all 64 node shards.
+The CoreGraph engine is running and saving data into PostgreSQL. Let's connect to PostgreSQL using the visual tool we installed earlier (DBeaver) so we can look at the raw data with our own eyes.
 
----
+1. Open the **DBeaver** application from your Start Menu or Desktop.
+2. If a popup asks if you want to create a sample database, click **"No"**.
+3. In the very top-left corner of the window, click on the icon that looks like a plug with a plus sign (it is called **"New Database Connection"**).
+4. A large menu of database types will appear. Click on the icon for **PostgreSQL** (it looks like a blue elephant).
+5. Click **Next**.
+6. You will now see the "Connection Settings" window. Fill in these exact details:
+   - **Host**: `localhost`
+   - **Port**: `5432` (This should be filled in by default)
+   - **Database**: `coregraph_vault`
+   - **Username**: `coregraph_admin`
+   - **Password**: `coregraph_secret123`
+7. At the bottom left of this window, click the **"Test Connection"** button.
+   - *Important Note*: Because this is your first time using DBeaver, a small window might pop up saying "Driver files are missing." This is totally normal! Just click the **"Download"** button. DBeaver will automatically download the tiny piece of software it needs to talk to Postgres.
+8. After it downloads (or immediately if you already have the driver), a box will pop up saying "Connected!". It will show the version of PostgreSQL. Click **OK**.
+9. Finally, click the **"Finish"** button at the bottom right.
 
-## 29. ERROR HANDLING AND FAULT ISOLATION (FFI_COLLISION)
-
-The `FFI_COLLISION_0x88` error occurs when the compiled sharding binary is incompatible with the Python runtime's address space. This is typically caused by a 32-bit vs 64-bit mismatch. To remediate, the architect must verify that the `LIBRARY_PATH` and `LD_LIBRARY_PATH` point to the correct 64-bit object files and that the `gcc` target architecture matches the host CPU's instruction set.
-
----
-
-## 30. SYSTEM CERTIFICATION AND VERIFICATION AUDIT
-
-The final setup step is the global certification audit. This process aggregates the findings from the hardware scan, the FFI validation, and the spectral connectivity tests into a single JSON-formatted report. If the final health score is 1.0, the orchestrator generates a SHA-384 truth-seal, certifying the environment as structurally sovereign and ready for 3.81M node ingestion.
-
----
-
-## 31. DETAILED PERFORMANCE MAPPING (144HZ)
-
-The 6.94ms frame budget is partitioned into four sub-atomic execution phases, as visualized in the following diagram.
-
-```mermaid
-graph TD
-    A[Start Frame] --> B[Ingest: 0.8ms]
-    B --> C[Compute: 4.2ms]
-    C --> D[Render: 1.5ms]
-    D --> E[Sync Wait: 0.44ms]
-    E --> F[Total: 6.94ms]
-```
-Any latency spike in the "Compute" phase that exceeds 5.0ms will trigger an immediate prioritization of the HUD Redraw thread via the Metabolic Limiter.
+You are now connected! Look at the left side of your DBeaver window. You will see a panel called **"Database Navigator"**. You will see your new connection named `postgres - localhost` (or something similar). 
 
 ---
 
-## 32. MEMORY SHARD GEOMETRY AND POINTER-PACKING
+## Chapter 10: Exploring the Database
 
-The graph is sharded into 64 distinct memory compartments, each managing 59,531 nodes. Each shard utilizes a contiguous block of memory-mapped RAM, ensuring that node lookups occur in $O(1)$ time. This geometry prevents the creation of a massive global lock, allowing the 49 analytical kernels to access node data in parallel without causing thread-contention or mutex-bottlenecks.
+Let's navigate through DBeaver to actually find the 3.81 million nodes that CoreGraph is managing.
 
----
+1. In the **Database Navigator** on the left side of DBeaver, click the tiny arrow `>` next to your connection to expand it.
+2. Click the arrow `>` next to **Databases**.
+3. Click the arrow `>` next to **coregraph_vault** (This is our specific database).
+4. Click the arrow `>` next to **Schemas**.
+5. Click the arrow `>` next to **public** (This is where user tables are stored).
+6. Click the arrow `>` next to **Tables**.
 
-## 33. ASYNCHRONOUS IO RING BUFFER ARCHITECTURE
+You will now see a list of the tables the CoreGraph engine has created! For example, you might see tables like `nodes`, `edges`, or `telemetry_logs`.
 
-Inter-kernel communication is handled via a zero-copy ring buffer with a capacity of 1,024 telemetric frames. This buffer facilitates the high-velocity flow of data between the Material Layer (physics) and the Cognitive Layer (agential reasoning). The ring buffer utilizes memory barriers to ensure thread-safe operation without the heavy overhead of Python's standard `queue.Queue`.
+### Viewing the Data:
+1. Double-click on the `nodes` table.
+2. A new window will open in the middle of your screen. Look for the tabs at the top of this middle window (Properties, Data, ER Diagram).
+3. Click on the **"Data"** tab.
+4. You are now looking at a spreadsheet view of your database! You will see rows upon rows of data representing the CoreGraph nodes. You can scroll through them, sort them, or filter them just like an Excel spreadsheet.
 
----
-
-## 34. SIGNAL FIDELITY MEASUREMENT ($\Psi$)
-
-The $\Psi$ metric quantifies the confidence level of the forensic audit. It is calculated by integrating the stability of ingestion signals over a 500ms sliding window.
-$$\Psi(t) = \int_{t-0.5}^{t} \frac{Sidelity(u)}{Latency(u)} du$$
-A $\Psi$ value of 1.0 indicates perfect synchronization, while values below 0.8 trigger a forensic alert in the HUD.
-
----
-
-## 35. RECOVERY VELOCITY BENCHMARKS (SIGKILL SURVIVAL)
-
-The system is tested for survival against forced process termination. Upon a SIGKILL event, the orchestrator can reconstitute the 3.81M node graph state from the WAL segments in under 1,500ms. This is achieved by utilizing memory-mapped re-loading, where the sharded binaries are re-attached to the existing on-disk segments with zero data-move operations.
-
----
-
-## 36. L3 CACHE MISS REDUCTION STRATEGIES (TILE-BASED ACCESS)
-
-To minimize the L3 cache miss rate, CoreGraph implements a tile-based access strategy during spectral graph traversal. Instead of random node access, the analytical kernels group nodes into localized clusters that fit entirely within the 36MB L3 cache of the i9-13980HX. This results in a measured cache-hit ratio of 94.2% even during high-density graph mutations.
-
----
-
-## 37. KERNEL THREAD PINNING PROCEDURE (LINUX TASKSET)
-
-On Linux hosts, the architect is required to pin the CoreGraph process to the performancecores (0-15) using the `taskset` utility. This prevents the OS from migrating the high-priority analytical threads to the slower E-cores, which would result in a frame-rate drop to 60Hz.
-```bash
-# Pin process to P-Cores
-taskset -pc 0,2,4,6,8,10,12,14 [COREGRAPH_PID]
-```
+### Writing Custom SQL (For Advanced Users):
+If you want to run custom queries:
+1. At the top of DBeaver, click the **"SQL Editor"** button (it looks like a small scroll with a magnifying glass).
+2. A blank text area will open. Type:
+   ```sql
+   SELECT COUNT(*) FROM nodes;
+   ```
+3. Press `Ctrl + Enter` (or click the orange Play button on the left).
+4. At the bottom of the screen, it will show you the exact number of nodes currently in the database!
 
 ---
 
-## 38. HUD VERTEX COORDINATE MAPPING AND TRANSFORM
+## Chapter 11: Accessing the HUD (Visual Map)
 
-The UI manifold translates 3D graph coordinates $(x, y, z)$ into the 2D terminal grid $(u, v)$ for real-time visualization. This transform uses a specialized floating-point kernel that operates on the sharded node positions at 144Hz. The resulting vertex stream is then snapped to the nearest character cell in the 1920x1080 matrix.
+Looking at spreadsheets in DBeaver is great for engineers, but CoreGraph is designed to be a visual masterpiece. We need to see the 144Hz WebGL rendering of the data.
+
+Because our `docker-compose.yml` file forwarded port `8000` to your local computer, accessing the visual dashboard is incredibly simple.
+
+1. Open your favorite modern web browser (Google Chrome, Microsoft Edge, Mozilla Firefox, or Safari).
+2. Click on the address bar at the top.
+3. Type in the following exact address and press Enter:
+   ```text
+   http://localhost:8000
+   ```
+
+### What to expect on the screen:
+- You will see a dark, sleek, premium user interface.
+- In the center of the screen, you will see thousands of glowing points of light. These are your nodes.
+- You will see lines connecting them, representing the relationships.
+- On the side panels, you will see real-time metrics showing the "Ingestion Rate" (how fast data is coming in), the "Vitality Status" (the health of the system), and the "System Heat" (how hard the mathematical engines are working).
+- The map is completely interactive! You can click and drag to pan around the universe, use your scroll wheel to zoom in to specific clusters, and hover over individual nodes to see their specific properties.
+- The screen is updating using Binary Delta-Encoding, which means it is rendering at 144 frames per second. It should feel incredibly liquid and smooth, with absolutely zero stuttering or lag.
 
 ---
 
-## 39. DISK PERSISTENCE THROUGHPUT AUDIT (GEN5 NVME)
+## Chapter 12: Shutting Down the System
 
-This audit measures the sustained write throughput of the Gen5 NVMe drive during a node-ingestion spike. The system requires a minimum sustained velocity of 2GB/s to ensure that the 3.81M nodes can be persisted without causing the ingestion ring buffer to overflow. The audit logs the p99 latency of every sector flush to the forensic ledger.
+When you are finished using CoreGraph, it is important to shut it down properly so it does not continue using your computer's RAM and CPU in the background.
+
+1. Open your Command Prompt or Terminal.
+2. Make sure you are still inside the `COREGRAPH` folder.
+3. Type the following command and press Enter:
+   ```bash
+   docker-compose down
+   ```
+
+### What is happening right now?
+Docker is safely sending a "Stop" signal to the CoreGraph engine, telling it to finish any math it is doing. It then sends a stop signal to Redis and PostgreSQL. Postgres ensures that the WAL (Write-Ahead Logs) are safely written to the hard drive so zero data is lost.
+Finally, Docker destroys the temporary internal network.
+
+**Important Note about Data:**
+Even though the containers are shut down and destroyed, **your data is perfectly safe**. Docker keeps the database files stored in a special invisible folder on your hard drive called a "Volume". The next time you type `docker-compose up -d`, the database will reconnect to this volume, and all your millions of nodes will still be there exactly as you left them!
 
 ---
 
-## 40. FINAL INSTALLATION VERIFICATION: HARDWARE CERTIFICATION
+## Chapter 13: Extensive Troubleshooting Guide
 
-The final verification confirms that all 40 sectors are operational. The system performs a 5-second "Burn-in" where it executes a high-speed spectral decomposition of the global 3.81M node universe. If the 144Hz HUD maintains stable frequency and the 150MB residency lock is not violated, the system is certified as mission-ready for compliant forensic discovery.
+Sometimes things go wrong. Computers are complex. Here are the most common issues you might face and exactly how to solve them.
+
+### Problem 1: "Ports are not available: listen tcp 0.0.0.0:5432"
+**The Cause:** This error happens when you type `docker-compose up -d`. It means another program on your computer is already using port 5432. 99% of the time, this is because you installed PostgreSQL directly onto your Windows/Mac computer in the past, and it is running in the background.
+**The Solution:**
+1. Open the `docker-compose.yml` file in any text editor (like Notepad).
+2. Look for the `db:` section. If it has a line that says `ports: - "5432:5432"`, change it to `ports: - "5433:5432"`.
+3. Save the file and run `docker-compose up -d` again. 
+4. *Note: If you do this, when you connect via DBeaver (Chapter 9), you must type `5433` into the port box instead of `5432`.*
+
+### Problem 2: "Docker Daemon is not running" or "Cannot connect to the Docker daemon"
+**The Cause:** Docker Desktop is closed, or it crashed. The terminal command cannot talk to Docker because Docker is asleep.
+**The Solution:**
+1. Open your Start Menu or Applications folder.
+2. Search for "Docker Desktop" and click it.
+3. Wait 30 seconds for the application to fully load. You should see a green bar that says "Engine Running" in the bottom left of the Docker window.
+4. Try your terminal command again.
+
+### Problem 3: The `docker-compose up --build` command freezes or fails during the `npm install` or `pip install` step.
+**The Cause:** This is almost always caused by a slow or unstable internet connection. The build process needs to download hundreds of megabytes of libraries from the internet. If your Wi-Fi drops for even a second, the build might fail.
+**The Solution:**
+1. In your terminal, hold the `Ctrl` key and press `C` to cancel the frozen process.
+2. Type `docker-compose build --no-cache` and press Enter. This forces Docker to try downloading everything fresh from the beginning.
+3. Make sure you have a strong internet connection.
+4. Once the build finishes successfully, run `docker-compose up -d` as normal.
+
+### Problem 4: DBeaver says "Connection Refused" or "FATAL: password authentication failed"
+**The Cause:** You either typed the password wrong, or you are connecting to the wrong database.
+**The Solution:**
+1. Double-check your spelling! The username MUST be exactly `coregraph_admin` and the password MUST be exactly `coregraph_secret123`.
+2. Ensure you selected "PostgreSQL" and not "MySQL" when creating the connection.
+3. Ensure Docker is actually running. Type `docker ps` in your terminal to verify that `coregraph_db` is currently listed as "Up". If the database is off, DBeaver cannot connect to it.
+
+### Problem 5: I go to `http://localhost:8000` but my browser says "This site can’t be reached".
+**The Cause:** The CoreGraph Engine container is either not running, or it crashed immediately after starting.
+**The Solution:**
+1. Type `docker ps` in your terminal. Look for `ingestion_phalanx`. Is it there? If not, it crashed.
+2. Type `docker ps -a` (this shows crashed containers too). Look for `ingestion_phalanx`.
+3. Type `docker logs ingestion_phalanx`. This will print out exactly why it crashed. It might say something like "Cannot connect to database" (which means Postgres took too long to start) or "Out of Memory".
+4. If it was just a temporary glitch, you can type `docker-compose restart` to force all three containers to reboot and try again.
+
+### Problem 6: The system is using too much RAM and my computer is lagging.
+**The Cause:** CoreGraph is designed to be extremely memory efficient (155MB residency), but PostgreSQL can use a lot of RAM if it is given permission.
+**The Solution:**
+1. Open Docker Desktop.
+2. Click the **Gear Icon (Settings)** in the top right.
+3. Click on **Resources** on the left menu.
+4. Lower the **Memory Limit** slider to something like 4GB or 6GB.
+5. Click **Apply & Restart**. Docker will now strictly limit how much RAM the entire ecosystem is allowed to use, saving your computer from lagging.
 
 ---
 
-## 41. MISSION-CRITICAL SETUP: THE MASTER PROTOCOL
+## Conclusion
+Congratulations! You have successfully installed, configured, verified, and interacted with a production-grade, distributed OSINT platform. By understanding Docker, PostgreSQL, Redis, and DBeaver, you now possess the core skills required to manage enterprise-level infrastructure.
 
-For a complete, step-by-step walkthrough of the system genesis, including the Synthetic Universe Simulation Engine (S.U.S.E.) and the Live OSINT pivot, refer to the **[MASTER_PROTOCOL.md](MASTER_PROTOCOL.md)**. This document contains the definitive 7-phase execution sequence and the judge-facing demonstration audit.
+Welcome to the CoreGraph Titan.
