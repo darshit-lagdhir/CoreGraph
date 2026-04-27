@@ -7,7 +7,8 @@ FROM python:3.11-slim
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     MALLOC_ARENA_MAX=2 \
-    PYTHONPATH=/app:/app/backend
+    PYTHONPATH=/app:/app/backend \
+    TEXTUAL_DRIVER=textual.drivers.headless_driver.HeadlessDriver
 
 # Create non-root user (UID 1000) for Hugging Face security compliance
 RUN useradd -m -u 1000 coregraph_user
