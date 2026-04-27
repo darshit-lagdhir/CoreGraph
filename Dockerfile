@@ -1,24 +1,38 @@
+# COREGRAPH SOVEREIGN DOCKERFILE - APPROACH B (TTYD)
 FROM python:3.11-slim
 
-# Set environment for the Hugging Face non-root user (UID 1000)
+# Switch to root to install the system-level bridge
+USER root
+RUN apt-get update && apt-get install -y \
+    ttyd \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set up the Sovereign User (Hugging Face UID 1000)
 RUN useradd -m -u 1000 user
-USER user
-ENV HOME=/home/user \
-    PATH=/home/user/.local/bin:$PATH \
-    PYTHONPATH=/home/user/app:/home/user/app/backend
+WORKDIR /home/user/app
 
-WORKDIR $HOME/app
-
-# Copy and install requirements first for caching
+# Copy and install Python sinew
 COPY --chown=user requirements.txt .
 RUN pip install --no-cache-dir --user -r requirements.txt
 
-# Copy the rest of the project
+# Copy the Hadronic Core
 COPY --chown=user . .
 
-# EXPOSE the mandatory Hugging Face port
+# Ensure the user owns the workspace
+RUN chown -R user:user /home/user/app
+USER user
+
+# Set environment for terminal radiance
+ENV PATH="/home/user/.local/bin:${PATH}" \
+    PYTHONPATH="/home/user/app:/home/user/app/backend" \
+    TERM=xterm-256color
+
+# EXPOSE the mandatory Cloud Phalanx port
 EXPOSE 7860
 
-# MANDATORY: Run via absolute path and use the config file
-# for standalone server mode (Port 7860 is set in the .toml).
-CMD ["/home/user/.local/bin/textual-web", "--config", "/home/user/app/textual-web.toml"]
+# THE ZENITH HANDSHAKE:
+# ttyd -p [port] -i [interface] [command]
+# This serves your backend directly to the web with NO config files required.
+# Note: Using terminal_hud.py as it is our supreme TUI entry point.
+CMD ["ttyd", "-p", "7860", "-i", "0.0.0.0", "python", "backend/terminal_hud.py"]
