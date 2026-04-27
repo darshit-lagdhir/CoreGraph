@@ -1,4 +1,5 @@
 # COREGRAPH SOVEREIGN DOCKERFILE - APPROACH B (TTYD)
+# HEARTBEAT: 2026-04-27T08:24:50Z | GENESIS RE-IGNITION
 FROM python:3.11-slim
 
 # Switch to root to install the system-level bridge and dependencies
