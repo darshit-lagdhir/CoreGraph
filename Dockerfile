@@ -1,7 +1,7 @@
 # COREGRAPH SOVEREIGN DOCKERFILE - APPROACH B (TTYD)
 FROM python:3.11-slim
 
-# Switch to root to install the system-level bridge
+# Switch to root to install the system-level bridge and dependencies
 USER root
 RUN apt-get update && apt-get install -y curl \
     && curl -fsSL https://github.com/tsl0922/ttyd/releases/download/1.7.3/ttyd.x86_64 -o /usr/bin/ttyd \
@@ -15,27 +15,25 @@ RUN apt-get update && apt-get install -y curl \
 RUN useradd -m -u 1000 user
 WORKDIR /home/user/app
 
-# Copy and install Python sinew
-COPY --chown=user requirements.txt .
-RUN pip install --no-cache-dir --user -r requirements.txt
+# Install Python dependencies GLOBALLY as root to avoid PATH/Module issues
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the Hadronic Core
-COPY --chown=user . .
-
-# Ensure the user owns the workspace
+# Copy the Hadronic Core and establish ownership
+COPY . .
 RUN chown -R user:user /home/user/app
+
+# Switch to Sovereign User for runtime security
 USER user
 
 # Set environment for terminal radiance
 ENV PATH="/home/user/.local/bin:${PATH}" \
     PYTHONPATH="/home/user/app:/home/user/app/backend" \
-    TERM=xterm-256color
+    TERM=xterm-256color \
+    PYTHONUNBUFFERED=1
 
 # EXPOSE the mandatory Cloud Phalanx port
 EXPOSE 7860
 
 # THE ZENITH HANDSHAKE:
-# ttyd -p [port] -i [interface] [command]
-# This serves your backend directly to the web with NO config files required.
-# Note: Using terminal_hud.py as it is our supreme TUI entry point.
 CMD ["ttyd", "-p", "7860", "-i", "0.0.0.0", "python", "backend/terminal_hud.py"]
