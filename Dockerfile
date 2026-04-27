@@ -40,4 +40,4 @@ EXPOSE 7860
 
 # Terminal End-to-End Handshake
 # Tunneling the 144Hz HUD via Textual-Web on 0.0.0.0:7860
-CMD ["python", "-m", "textual_web", "--port", "7860", "--command", "python backend/terminal_hud.py"]
+CMD ["sh", "-c", "export PATH=$PATH:/home/coregraph_user/.local/bin; textual-web --port 7860 --command 'python backend/terminal_hud.py'"]

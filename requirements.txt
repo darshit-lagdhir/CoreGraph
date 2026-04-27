@@ -35,4 +35,4 @@ jsonschema
 watchdog==3.0.0
 aiofiles==23.1.0
 textual
-textual-web
+textual-web==0.12.0
