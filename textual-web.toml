@@ -2,6 +2,6 @@
 command = "python backend/terminal_hud.py"
 title = "CoreGraph Titan"
 
-[terminal.shell]
-command = "bash"
-title = "Titan Terminal"
+[server]
+host = "0.0.0.0"
+port = 7860

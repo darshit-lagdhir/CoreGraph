@@ -19,6 +19,6 @@ COPY --chown=user . .
 # EXPOSE the mandatory Hugging Face port
 EXPOSE 7860
 
-# MANDATORY: Run via absolute path to bypass PATH issues
-# and use the config file to force standalone mode.
-CMD ["/home/user/.local/bin/textual-web", "--config", "textual-web.toml", "--port", "7860", "--host", "0.0.0.0"]
+# MANDATORY: Run via absolute path and use the config file
+# for standalone server mode (Port 7860 is set in the .toml).
+CMD ["/home/user/.local/bin/textual-web", "--config", "textual-web.toml"]
