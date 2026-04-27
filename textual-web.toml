@@ -1,0 +1,7 @@
+[app]
+command = "python backend/terminal_hud.py"
+name = "CoreGraph Titan HUD"
+
+[server]
+host = "0.0.0.0"
+port = 7860
