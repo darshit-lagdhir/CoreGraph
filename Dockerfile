@@ -11,6 +11,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 # Create non-root user (UID 1000) for Hugging Face security compliance
 RUN useradd -m -u 1000 coregraph_user
+ENV PATH="/home/coregraph_user/.local/bin:${PATH}"
 
 WORKDIR /app
 
@@ -39,4 +40,4 @@ EXPOSE 7860
 
 # Terminal End-to-End Handshake
 # Tunneling the 144Hz HUD via Textual-Web on 0.0.0.0:7860
-CMD ["textual", "serve", "--port", "7860", "--host", "0.0.0.0", "python", "backend/terminal_hud.py"]
+CMD ["sh", "-c", "textual serve --port 7860 --host 0.0.0.0 python backend/terminal_hud.py"]

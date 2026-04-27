@@ -24,6 +24,8 @@ from rich.progress import BarColumn, Progress, TextColumn
 
 from backend.core.sharding.hadronic_pool import uhmp_pool
 from backend.core.memory_manager import metabolic_governor
+from backend.core.universal_zenith import UniversalZenithEngine
+from backend.persistence.persistent_vault_engine import PersistentVaultEngine
 
 # =========================================================================================
 # COREGRAPH TITAN HUD V2: MODERN REACTIVE TUI (TEXTUAL)
@@ -149,6 +151,10 @@ class CoreGraphTitanApp(App):
         self.active = True
         self.last_matrix_data = None
 
+        # Sector Alpha: Universal Sovereign Zenith Initialization
+        self.vault = PersistentVaultEngine()
+        self.zenith = UniversalZenithEngine(self.vault)
+
     def compose(self) -> ComposeResult:
         yield Header(show_clock=True)
         with Container(id="main_container"):
@@ -191,6 +197,10 @@ class CoreGraphTitanApp(App):
         self.detail = self.query_one("#node_detail", Static)
         self.vuln_widget = self.query_one("#vuln_intel", Static)
         self.tree_widget = self.query_one("#tree_view", Static)
+
+        # Sector Iota: Final Operational Genesis Handshake
+        asyncio.create_task(self.zenith.initiate_zenith_handshake())
+        asyncio.create_task(self.zenith.run_zenith_heartbeat())
 
         # Configure Matrix columns
         self.matrix.add_columns("NODE ID", "ENTROPY", "RISK", "SOVEREIGN STATUS")
