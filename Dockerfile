@@ -1,43 +1,24 @@
-# COREGRAPH MASTER ENGINEERING SPECIFICATION: CLOUD PHALANX
-# HUGGING FACE SPACE DEPLOYMENT (PORT 7860, NON-ROOT, TEXTUAL-WEB WEBSOCKET TUNNEL)
-
 FROM python:3.11-slim
 
-# Enforce 150MB RSS Mandate & Cloud Security
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    MALLOC_ARENA_MAX=2 \
-    PYTHONPATH=/app:/app/backend
+# Set environment for the Hugging Face non-root user (UID 1000)
+RUN useradd -m -u 1000 user
+USER user
+ENV HOME=/home/user \
+    PATH=/home/user/.local/bin:$PATH \
+    PYTHONPATH=/home/user/app:/home/user/app/backend
 
-# Create non-root user (UID 1000) for Hugging Face security compliance
-RUN useradd -m -u 1000 coregraph_user
-ENV PATH="/home/coregraph_user/.local/bin:${PATH}"
+WORKDIR $HOME/app
 
-WORKDIR /app
+# Copy and install requirements first for caching
+COPY --chown=user requirements.txt .
+RUN pip install --no-cache-dir --user -r requirements.txt
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
+# Copy the rest of the project
+COPY --chown=user . .
 
-# Layer Caching: Requirements
-COPY requirements.txt .
-# Install as root to ensure global availability
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy the Backend Core and Terminal HUD
-COPY backend/ ./backend/
-
-# Physical Permissions Handshake
-RUN chown -R 1000:1000 /app
-
-# Switch to Sovereign User
-USER 1000
-
-# Cloud Ingress Port
+# EXPOSE the mandatory Hugging Face port
 EXPOSE 7860
 
-# Terminal End-to-End Handshake
-# Tunneling the 144Hz HUD via Textual-Web configuration
-CMD ["sh", "-c", "export PATH=$PATH:/home/coregraph_user/.local/bin; textual-web --config textual-web.toml"]
+# MANDATORY: Run via 'python -m' to bypass PATH issues
+# and use the config file to force standalone mode.
+CMD ["python", "-m", "textual_web", "--config", "textual-web.toml", "--port", "7860", "--host", "0.0.0.0"]
