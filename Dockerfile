@@ -24,7 +24,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Layer Caching: Requirements
 COPY requirements.txt .
 # Install as root to ensure global availability
-RUN pip install --no-cache-dir -r requirements.txt textual-web
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the Backend Core and Terminal HUD
 COPY backend/ ./backend/
