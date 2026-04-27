@@ -23,7 +23,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Layer Caching: Requirements
 COPY requirements.txt .
-# Ensure textual-web is installed for the websocket bridge
+# Install as root to ensure global availability
 RUN pip install --no-cache-dir -r requirements.txt textual-web
 
 # Copy the Backend Core and Terminal HUD
@@ -40,4 +40,4 @@ EXPOSE 7860
 
 # Terminal End-to-End Handshake
 # Tunneling the 144Hz HUD via Textual-Web on 0.0.0.0:7860
-CMD ["sh", "-c", "textual serve --port 7860 --host 0.0.0.0 python backend/terminal_hud.py"]
+CMD ["python", "-m", "textual", "serve", "--port", "7860", "--host", "0.0.0.0", "python", "backend/terminal_hud.py"]
