@@ -21,4 +21,4 @@ EXPOSE 7860
 
 # MANDATORY: Run via absolute path and use the config file
 # for standalone server mode (Port 7860 is set in the .toml).
-CMD ["/home/user/.local/bin/textual-web", "--config", "textual-web.toml"]
+CMD ["/home/user/.local/bin/textual-web", "--config", "/home/user/app/textual-web.toml"]
