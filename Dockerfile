@@ -3,8 +3,11 @@ FROM python:3.11-slim
 
 # Switch to root to install the system-level bridge
 USER root
-RUN apt-get update && apt-get install -y \
-    ttyd \
+RUN apt-get update && apt-get install -y curl \
+    && curl -fsSL https://github.com/tsl0922/ttyd/releases/download/1.7.3/ttyd.x86_64 -o /usr/bin/ttyd \
+    && chmod +x /usr/bin/ttyd \
+    && apt-get purge -y curl \
+    && apt-get autoremove -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
