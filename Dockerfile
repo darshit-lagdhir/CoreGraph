@@ -40,4 +40,4 @@ EXPOSE 7860
 
 # Terminal End-to-End Handshake
 # Tunneling the 144Hz HUD via Textual-Web configuration
-CMD ["sh", "-c", "export PATH=$PATH:/home/coregraph_user/.local/bin; textual-web"]
+CMD ["sh", "-c", "export PATH=$PATH:/home/coregraph_user/.local/bin; textual-web --config textual-web.toml"]
