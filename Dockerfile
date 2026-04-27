@@ -7,8 +7,7 @@ FROM python:3.11-slim
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     MALLOC_ARENA_MAX=2 \
-    PYTHONPATH=/app:/app/backend \
-    TEXTUAL_DRIVER=textual.drivers.headless_driver.HeadlessDriver
+    PYTHONPATH=/app:/app/backend
 
 # Create non-root user (UID 1000) for Hugging Face security compliance
 RUN useradd -m -u 1000 coregraph_user
@@ -41,4 +40,4 @@ EXPOSE 7860
 
 # Terminal End-to-End Handshake
 # Tunneling the 144Hz HUD via Textual-Web on 0.0.0.0:7860
-CMD ["python", "-m", "textual", "serve", "--port", "7860", "--host", "0.0.0.0", "python", "backend/terminal_hud.py"]
+CMD ["python", "-m", "textual_web", "--port", "7860", "--command", "python backend/terminal_hud.py"]
