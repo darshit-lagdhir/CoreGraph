@@ -5,7 +5,6 @@ import struct
 import logging
 import os
 import ctypes
-from ctypes import wintypes
 from typing import Final, List
 from backend.core.sharding.hadronic_pool import uhmp_pool
 
@@ -18,18 +17,25 @@ from backend.core.sharding.hadronic_pool import uhmp_pool
 
 logger = logging.getLogger(__name__)
 
-# Windows Memory Resource Notification FFI (Sector Alpha)
+# OS-Aware Kernel Hooks (Sector Alpha)
 LowMemoryResourceNotification = 0
-kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
-CreateMemoryResourceNotification = kernel32.CreateMemoryResourceNotification
-CreateMemoryResourceNotification.restype = wintypes.HANDLE
-CreateMemoryResourceNotification.argtypes = [wintypes.DWORD]
-
-WaitForSingleObject = kernel32.WaitForSingleObject
-WaitForSingleObject.restype = wintypes.DWORD
-WaitForSingleObject.argtypes = [wintypes.HANDLE, wintypes.DWORD]
-
 WAIT_OBJECT_0 = 0x00000000
+
+kernel32 = None
+CreateMemoryResourceNotification = None
+WaitForSingleObject = None
+
+if os.name == "nt":
+    from ctypes import wintypes
+
+    kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+    CreateMemoryResourceNotification = kernel32.CreateMemoryResourceNotification
+    CreateMemoryResourceNotification.restype = wintypes.HANDLE
+    CreateMemoryResourceNotification.argtypes = [wintypes.DWORD]
+
+    WaitForSingleObject = kernel32.WaitForSingleObject
+    WaitForSingleObject.restype = wintypes.DWORD
+    WaitForSingleObject.argtypes = [wintypes.HANDLE, wintypes.DWORD]
 
 
 class MetabolicLimiter:
@@ -46,13 +52,18 @@ class MetabolicLimiter:
         self.utility_map = uhmp_pool.utility_view
         self.last_audit = time.perf_counter()
 
-        # Sector Alpha: Initialize Kernel-level Memory Pressure Hook
-        # Utilizes Windows Low-Memory Notification Handle via Native FFI.
-        self.h_mem_notice = CreateMemoryResourceNotification(LowMemoryResourceNotification)
-        if not self.h_mem_notice:
-            logger.error("[Alpha] Failed to initialize LowMemoryResourceNotification hook.")
+        # Sector Alpha: Initialize Kernel-level Memory Pressure Hook (OS-Aware)
+        self.h_mem_notice = None
+        if CreateMemoryResourceNotification:
+            self.h_mem_notice = CreateMemoryResourceNotification(LowMemoryResourceNotification)
+            if not self.h_mem_notice:
+                logger.error("[Alpha] Failed to initialize LowMemoryResourceNotification hook.")
+            else:
+                logger.info("[Alpha] Kernel-level Memory Pressure Hook initialized (Sector Alpha).")
         else:
-            logger.info("[Alpha] Kernel-level Memory Pressure Hook initialized (Sector Alpha).")
+            logger.info(
+                "[Alpha] Non-Windows Substrate Detected. Kernel Hooks Bypassed. Relying on Psutil RSS."
+            )
 
         # Sector Mu: MLOCKALL simulation (Physical residency guarantee)
         # Prevents UI buffers from being swapped to disk, maintaining 144Hz liquidity.
