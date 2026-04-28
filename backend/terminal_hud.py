@@ -152,6 +152,9 @@ class CoreGraphTitanApp(App):
         )
         self.log_panel.write_line(f"[info]Local Time: {datetime.now().strftime('%H:%M:%S')}[/info]")
 
+        if self.legacy_hud and self.legacy_hud.verdict:
+            self.impact.update_verdict(self.legacy_hud.verdict)
+
     def refresh_system_telemetry(self) -> None:
         try:
             metabolic_governor.audit_heartbeat()
