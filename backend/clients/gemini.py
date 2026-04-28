@@ -20,7 +20,7 @@ class LiveGeminiClient:
         system_prompt = f"""
         Analyze '{package}' in the '{eco}' ecosystem.
         Live telemetry: Direct Dependencies: {deps_count}. GitHub metrics: {gh_stats.get('stars', 'Unknown')} stars, {gh_stats.get('issues', 'Unknown')} open issues.
-        Return EXACTLY 3 short, easy-to-understand sentences explaining what this package does, its security/risk level, and its overall maintenance health. Keep it very simple and straightforward.
+        Return EXACTLY 2-3 short, highly in-depth technical sentences. Focus strictly on what the package is doing at a low level, its structural importance, and any real-world adversarial/security risks associated with it. Do not use fluff.
         """
 
         payload = {"contents": [{"parts": [{"text": system_prompt}]}]}

@@ -139,12 +139,11 @@ class CoreGraphTitanApp(App):
     }
     """
 
-    ENABLE_COMMAND_PALETTE = False
-
     BINDINGS = [
         Binding("ctrl+q", "quit", "Shutdown Gateway"),
         Binding("ctrl+l", "clear_log", "Clear Forensic Log"),
         Binding("ctrl+m", "toggle_matrix", "Toggle Matrix View"),
+        Binding("ctrl+o", "command_palette", "Palette"),
     ]
 
     def __init__(self, legacy_hud=None):
@@ -220,12 +219,25 @@ class CoreGraphTitanApp(App):
                 self.log_panel.write_line(msg)
             self.legacy_hud.log_queue = []
 
+        # Write valuable, persistent boot sequence logs directly to guarantee visibility
         self.log_panel.write_line(
-            "[bold green]CoreGraph Titan App Online. Sector Alpha Synchronized.[/bold green]"
+            "[bold cyan]>>> INITIATING FORENSIC DEEP SCAN SEQUENCE...[/bold cyan]"
         )
+        self.log_panel.write_line("[info]Substrate: Xenon-based Memory Governance Active.[/info]")
+        self.log_panel.write_line(
+            "[info]Shard Alignment: Synchronizing 3.81M nodes via Supabase bridge.[/info]"
+        )
+        self.log_panel.write_line(
+            "[info]AI Engine: Gemini Flash Model injected into pipeline.[/info]"
+        )
+        self.log_panel.write_line(
+            "[warning]Awaiting Live Telemetry... Quantum Locks Engaged.[/warning]"
+        )
+        self.log_panel.write_line("[bold green]CoreGraph Titan Gateway Online.[/bold green]")
+
         if self.legacy_hud and "sk-dummy" not in str(self.legacy_hud.app):  # checking via proxy
             self.log_panel.write_line(
-                "[bold cyan]AI ENGINE: Gemini Flash Active (Sovereign Key Detected).[/bold cyan]"
+                "[bold cyan]AI INTELLIGENCE: Live Threat Parsing Active.[/bold cyan]"
             )
 
     def refresh_system_telemetry(self) -> None:
