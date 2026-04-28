@@ -39,7 +39,8 @@ async def fetch_supabase_shard(hud: SovereignTerminalHUD):
     """
     db_url = os.getenv("CLOUD_DATABASE_URL")
     if not db_url:
-        hud.log_event("[danger]CLOUD_DATABASE_URL missing. Supabase ingestion aborted.[/danger]")
+        hud.log_event("[danger]CLOUD_DATABASE_URL missing. Using fallback telemetry.[/danger]")
+        await generate_fallback_data(hud)
         return
 
     if "+asyncpg" in db_url:
@@ -47,32 +48,58 @@ async def fetch_supabase_shard(hud: SovereignTerminalHUD):
 
     hud.log_event("[info]Connecting to Supabase Forensic Vault...[/info]")
     try:
-        conn = await asyncpg.connect(db_url)
+        # Sector Gamma: Secure Connection Handshake
+        conn = await asyncpg.connect(db_url, timeout=10)
         hud.log_event("[info]Engaging Surgical Ingestion: Fetching 5000-node Shard...[/info]")
 
-        # Fetch nodes
-        nodes = await conn.fetch("SELECT id, risk_weight, metadata FROM nodes LIMIT 5000")
+        # Sector Gamma: Rapid Shard Retrieval
+        nodes = await conn.fetch(
+            "SELECT id, risk_weight FROM nodes ORDER BY risk_weight DESC LIMIT 100"
+        )
 
-        for record in nodes:
-            node_id = record["id"]
-            risk = record["risk_weight"]
-            # metadata = json.loads(record['metadata'])
-            status = "STABLE" if risk < 0.7 else "ANOMALY"
+        if not nodes:
+            hud.log_event("[warning]Forensic Vault is empty. Generating seed data...[/warning]")
+            await generate_fallback_data(hud)
+        else:
+            for record in nodes:
+                node_id = record["id"]
+                risk = record["risk_weight"] or 0.0
+                status = "STABLE" if risk < 0.7 else "ANOMALY"
 
-            # Format for HUD Matrix: (pkg, ent, risk, status)
-            hud.live_packages.append(
-                (
-                    node_id,
-                    random.uniform(0.1, 0.3) if status == "STABLE" else random.uniform(0.8, 0.95),
-                    f"{risk:.2f}",
-                    status,
+                hud.live_packages.append(
+                    (
+                        node_id,
+                        (
+                            random.uniform(0.1, 0.3)
+                            if status == "STABLE"
+                            else random.uniform(0.8, 0.95)
+                        ),
+                        f"{risk:.2f}",
+                        status,
+                    )
                 )
+            hud.log_event(
+                f"[stable]Sovereign Shard Manifested: {len(nodes)} nodes ingested.[/stable]"
             )
 
-        hud.log_event(f"[stable]Sovereign Shard Manifested: {len(nodes)} nodes ingested.[/stable]")
         await conn.close()
     except Exception as e:
         hud.log_event(f"[danger]Supabase Ingestion Failed: {e}[/danger]")
+        hud.log_event("[info]Switching to Local Fallback Metabolism...[/info]")
+        await generate_fallback_data(hud)
+
+
+async def generate_fallback_data(hud: SovereignTerminalHUD):
+    """Sector Omega: Fallback data to prevent black-screen vacuum."""
+    fallbacks = [
+        ("npm/react", 0.11, "0.02", "STABLE"),
+        ("pypi/requests", 0.15, "0.04", "STABLE"),
+        ("crates/serde", 0.12, "0.01", "STABLE"),
+        ("npm/lodash", 0.95, "0.85", "ANOMALY"),
+        ("pypi/django", 0.22, "0.05", "STABLE"),
+    ]
+    for pkg, ent, risk, status in fallbacks:
+        hud.live_packages.append((pkg, ent, risk, status))
 
 
 async def simulate_forensic_stream(hud: SovereignTerminalHUD):
@@ -93,35 +120,42 @@ async def simulate_forensic_stream(hud: SovereignTerminalHUD):
     hud.log_event("[info]Initiating Local Hadronic Stream...[/info]")
 
     while hud.active:
-        if not queue:
-            queue = seed_packages[:]
-            await asyncio.sleep(5)
-            continue
+        try:
+            if not queue:
+                queue = seed_packages[:]
+                await asyncio.sleep(5)
+                continue
 
-        eco, pkg = queue.pop(0)
-        node_id = f"{eco}/{pkg}"
-        if node_id in visited:
-            continue
-        visited.add(node_id)
+            eco, pkg = queue.pop(0)
+            node_id = f"{eco}/{pkg}"
+            if node_id in visited:
+                continue
+            visited.add(node_id)
 
-        if len(hud.live_packages) > 50:
-            hud.live_packages.pop()
+            if len(hud.live_packages) > 50:
+                hud.live_packages.pop()
 
-        data = await c.fetch_package_info(eco, pkg)
-        if "error" not in data:
-            hud.live_packages.insert(
-                0,
-                (node_id, random.uniform(0.1, 0.45), f"{random.uniform(0.01, 0.15):.2f}", "STABLE"),
-            )
-            hud.log_event(
-                f"[stable]Mapped {len(data.get('dependencies', []))} deps for {node_id}[/stable]"
-            )
+            data = await c.fetch_package_info(eco, pkg)
+            if "error" not in data:
+                hud.live_packages.insert(
+                    0,
+                    (
+                        node_id,
+                        random.uniform(0.1, 0.45),
+                        f"{random.uniform(0.01, 0.15):.2f}",
+                        "STABLE",
+                    ),
+                )
+                hud.log_event(
+                    f"[stable]Mapped {len(data.get('dependencies', []))} deps for {node_id}[/stable]"
+                )
 
-            # Simulate a few deps expansion
-            for dep in data.get("dependencies", [])[:3]:
-                d_name = dep.split("@")[0]
-                if f"{eco}/{d_name}" not in visited:
-                    queue.append((eco, d_name))
+                for dep in data.get("dependencies", [])[:3]:
+                    d_name = dep.split("@")[0]
+                    if f"{eco}/{d_name}" not in visited:
+                        queue.append((eco, d_name))
+        except Exception as e:
+            hud.log_event(f"[danger]Stream Drift: {e}[/danger]")
 
         await asyncio.sleep(random.uniform(1.0, 3.0))
     await c.close()
@@ -134,12 +168,12 @@ async def command_processor(hud: SovereignTerminalHUD):
         if hud.cmd_buffer:
             cmd = hud.cmd_buffer.strip()
             hud.cmd_buffer = ""
-            # Logic for expansion, AI analysis etc.
-            # (Keeping it simple for stability, but bridge is open)
+            # Command logic...
 
 
 async def start_uvicorn(hud: SovereignTerminalHUD):
     try:
+        # Use 0.0.0.0 for Render compliance
         config = uvicorn.Config(
             app, host="0.0.0.0", port=8000, log_level="critical", access_log=False
         )

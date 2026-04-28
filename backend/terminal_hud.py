@@ -4,6 +4,7 @@ import time
 import psutil
 import os
 import logging
+from datetime import datetime
 from typing import Dict, List, Any, Optional
 
 from textual.app import App, ComposeResult
@@ -67,6 +68,7 @@ class CoreGraphTitanApp(App):
     """
 
     TITLE = "CoreGraphTitanApp"
+    SUB_TITLE = "SYSTEM_PULSE: INITIALIZING..."
 
     CSS = """
     Screen { background: #0b0f19; }
@@ -91,6 +93,7 @@ class CoreGraphTitanApp(App):
         super().__init__()
         self.legacy_hud = legacy_hud
         self.last_matrix_data = None
+        self.cpu_usage = 0.0
 
         # Initialize Vault & Zenith (if not in Lean mode, but kept for structural integrity)
         try:
@@ -99,7 +102,6 @@ class CoreGraphTitanApp(App):
             asyncio.create_task(self.zenith.initiate_zenith_handshake())
             asyncio.create_task(self.zenith.run_zenith_heartbeat())
         except Exception:
-            # Fallback for environments where file-backed vault fails
             self.vault = None
             self.zenith = None
 
@@ -139,59 +141,77 @@ class CoreGraphTitanApp(App):
         self.matrix.cursor_type = "row"
         self.matrix.focus()
 
-        self.set_interval(0.1, self.refresh_system_telemetry)
+        # Sector Alpha: Telemetry Pulse
+        self.set_interval(0.2, self.refresh_system_telemetry)
+
+        # First call to initialize CPU
+        psutil.cpu_percent(interval=None)
 
         self.log_panel.write_line(
             "[bold green]CoreGraph Titan App Online. Sector Alpha Synchronized.[/bold green]"
         )
+        self.log_panel.write_line(f"[info]Local Time: {datetime.now().strftime('%H:%M:%S')}[/info]")
 
     def refresh_system_telemetry(self) -> None:
-        metabolic_governor.audit_heartbeat()
-        rss = metabolic_governor.get_physical_rss_us()
+        try:
+            metabolic_governor.audit_heartbeat()
+            rss = metabolic_governor.get_physical_rss_us()
 
-        node_count = len(self.legacy_hud.live_packages) if self.legacy_hud else 0
-        self.sub_title = f"RSS: {rss:.1f}MB / 149.0MB | CPU: {psutil.cpu_percent()}% | AI: ACTIVE"
-        self.spark.data = [random.random() for _ in range(20)]
+            # Non-blocking CPU measurement
+            self.cpu_usage = psutil.cpu_percent(interval=None)
 
-        if self.legacy_hud:
-            query = self.legacy_hud.search_query.lower()
-            current_data = [
-                p for p in self.legacy_hud.live_packages if not query or query in str(p[0]).lower()
-            ]
+            node_count = len(self.legacy_hud.live_packages) if self.legacy_hud else 0
+            # Sector Alpha: Radiant Sub-title Update
+            self.sub_title = (
+                f"NODES: {node_count} | RSS: {rss:.1f}MB | CPU: {self.cpu_usage:.1f}% | AI: ACTIVE"
+            )
 
-            if current_data != self.last_matrix_data:
-                cursor_row = self.matrix.cursor_row
-                self.matrix.clear()
-                for pkg, ent, risk, status in current_data[:40]:
-                    ent_color = "red" if ent > 0.8 else ("yellow" if ent > 0.4 else "green")
-                    # Clean status of legacy tags
-                    clean_status = (
-                        str(status)
-                        .replace("[stable]", "")
-                        .replace("[/stable]", "")
-                        .replace("[anomaly]", "")
-                        .replace("[/anomaly]", "")
-                        .replace("[critical]", "")
-                        .replace("[/critical]", "")
-                    )
-                    status_styled = (
-                        f"[bold green]{clean_status}[/bold green]"
-                        if "STABLE" in clean_status
-                        else f"[bold red]{clean_status}[/bold red]"
-                    )
+            # Pulse Sparkline
+            self.spark.data = [random.random() for _ in range(20)]
 
-                    self.matrix.add_row(
-                        f"[bold cyan]{pkg}[/bold cyan]",
-                        f"[{ent_color}]{ent:.2f}[/{ent_color}]",
-                        f"[bold]{risk}[/bold]",
-                        status_styled,
-                    )
-                if cursor_row < len(current_data):
-                    self.matrix.move_cursor(row=cursor_row)
-                self.last_matrix_data = current_data
+            if self.legacy_hud:
+                query = self.legacy_hud.search_query.lower()
+                current_data = [
+                    p
+                    for p in self.legacy_hud.live_packages
+                    if not query or query in str(p[0]).lower()
+                ]
 
-            if self.legacy_hud.verdict:
-                self.impact.update_verdict(self.legacy_hud.verdict)
+                if current_data != self.last_matrix_data:
+                    cursor_row = self.matrix.cursor_row
+                    self.matrix.clear()
+                    for pkg, ent, risk, status in current_data[:40]:
+                        ent_color = "red" if ent > 0.8 else ("yellow" if ent > 0.4 else "green")
+                        clean_status = (
+                            str(status)
+                            .replace("[stable]", "")
+                            .replace("[/stable]", "")
+                            .replace("[anomaly]", "")
+                            .replace("[/anomaly]", "")
+                            .replace("[critical]", "")
+                            .replace("[/critical]", "")
+                        )
+                        status_styled = (
+                            f"[bold green]{clean_status}[/bold green]"
+                            if "STABLE" in clean_status
+                            else f"[bold red]{clean_status}[/bold red]"
+                        )
+
+                        self.matrix.add_row(
+                            f"[bold cyan]{pkg}[/bold cyan]",
+                            f"[{ent_color}]{ent:.2f}[/{ent_color}]",
+                            f"[bold]{risk}[/bold]",
+                            status_styled,
+                        )
+                    if cursor_row < len(current_data):
+                        self.matrix.move_cursor(row=cursor_row)
+                    self.last_matrix_data = current_data
+
+                if self.legacy_hud.verdict:
+                    self.impact.update_verdict(self.legacy_hud.verdict)
+        except Exception as e:
+            # Prevent telemetry crash from breaking the app
+            pass
 
     def on_data_table_row_selected(self, event: DataTable.RowSelected) -> None:
         row_data = self.matrix.get_row(event.row_key)
