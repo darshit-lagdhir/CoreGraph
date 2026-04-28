@@ -1,13 +1,3 @@
----
-title: CoreGraph Titan
-emoji: 🌌
-colorFrom: blue
-colorTo: indigo
-sdk: docker
-app_port: 7860
-pinned: true
----
-
 # COREGRAPH: HIGH-FIDELITY FORENSIC GRAPH INFRASTRUCTURE
 
 CoreGraph is a sovereign analytical engine designed for planetary-scale Open Source Intelligence (OSINT) and software supply-chain attribute sensing. The infrastructure represents a technical breakthrough in resident-memory topology, managing an interactome of 3.81 million nodes within a rigid 150MB Resident Set Size (RSS) perimeter. By modeling software dependencies as physical materials subject to the laws of thermodynamics and spectral graph theory, CoreGraph achieves a resolution in vulnerability attribution that transcends traditional metadata-based scanning.
