@@ -46,7 +46,12 @@ async def fetch_supabase_shard(hud: SovereignTerminalHUD):
                 "SELECT id, risk_weight FROM nodes ORDER BY risk_weight DESC LIMIT 100"
             )
             if not nodes:
-                hud.log_event("[warning]Forensic Vault is empty.[/warning]")
+                hud.log_event(
+                    "[warning]Forensic Vault is empty. Engaging Active Fallback Scanner...[/warning]"
+                )
+                await conn.close()
+                await simulate_forensic_stream(hud)
+                return
             else:
                 current_len = len(hud.live_packages)
                 if current_len > 100:

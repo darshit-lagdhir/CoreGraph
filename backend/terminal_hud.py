@@ -346,12 +346,23 @@ class SovereignTerminalHUD:
 
     def __init__(self):
         self.active = True
-        self.live_packages = []
+        self.live_packages = [
+            ("npm/react", 0.11, "0.02", "[stable]STABLE[/stable]"),
+            ("pypi/requests", 0.15, "0.04", "[stable]STABLE[/stable]"),
+            ("crates/serde", 0.12, "0.01", "[stable]STABLE[/stable]"),
+            ("npm/lodash", 0.95, "0.85", "[anomaly]ANOMALY[/anomaly]"),
+            ("pypi/django", 0.22, "0.05", "[stable]STABLE[/stable]"),
+        ]
         self.cmd_buffer = ""
         self.search_query = ""
         self.view_mode = "matrix"
         self.tree_data = None
-        self.verdict = None
+        self.verdict = {
+            "adversarial": "False",
+            "maintenance": "High",
+            "structural": "Stable",
+            "verdict": "GENESIS_STABLE",
+        }
         self.log_queue = []
         self.app = CoreGraphTitanApp(legacy_hud=self)
 
