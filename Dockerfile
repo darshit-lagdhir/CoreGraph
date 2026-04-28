@@ -37,4 +37,4 @@ ENV PATH="/home/user/.local/bin:${PATH}" \
 EXPOSE 7860
 
 # THE ZENITH HANDSHAKE:
-CMD ["ttyd", "-p", "7860", "-i", "0.0.0.0", "python", "backend/terminal_hud.py"]
+CMD ["ttyd", "-p", "7860", "-i", "0.0.0.0", "--read-only", "--check-origin", "python", "backend/terminal_hud.py"]

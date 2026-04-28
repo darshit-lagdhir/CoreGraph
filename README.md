@@ -408,3 +408,33 @@ Detailed technical resolution is provided in the following manuscripts:
 - **[SYSTEM_HARDENING.md](docs/SYSTEM_HARDENING.md)**: Environment-level security specs.
 - **[API_SPECIFICATION.md](docs/API_SPECIFICATION.md)**: Full REST/WebSocket endpoint documentation.
 - **[FORENSIC_KERNEL_AUDIT.md](docs/FORENSIC_KERNEL_AUDIT.md)**: Deep-dive into all 49+ modules.
+
+---
+
+# PART II: THE HYBRID CLOUD-LOCAL MANIFOLD
+
+## 25. SYSTEMIC HYBRID EVOLUTION
+The CoreGraph Titan has been optimized for global accessibility through a hybrid manifold. This architecture ensures the sovereignty of the Hadronic Core while projecting a high-performance forensic aperture via the cloud substrate.
+
+### 25.1 Hybrid Sovereignty & Dual-Mode Logic
+The system utilizes the **Environment Sentry Kernel** to bifurcate its metabolism:
+- **BEAST-MODE (Local)**: The 3.81M node monolith operates with full system resources and multi-gigabyte spectral traversals.
+- **LEAN-MODE (Cloud)**: The cloud-side selection (5,000 nodes) operates within a rigid **150.0 MB RSS Perimeter**, utilizing 16-bit address optimization to maintain visual liquidity.
+
+### 25.2 The Read-Only Phalanx (Security Seal)
+The web-based ingress is protected by a multi-layered defensive perimeter.
+- **Gatekeeper**: TTYD is configured with `--read-only` and `--check-origin`.
+- **Input Sentinel**: A lexical phalanx intercepts all websocket characters, permitting only whitelisted forensic commands (**SCAN**, **TRACE**, **AUDIT**, **FILTER**).
+
+### 25.3 Asynchronous Hydration & Integrity Shield
+Data flows from the **Supabase Vault** via a persistent TLS 1.3 conduit.
+- **Jitter-Free Ingestion**: A dedicated stream-buffer ensures the 144Hz HUD remains radiant during data hydration.
+- **The Integrity Shield**: Every shard received is validated against SHA-256 sovereign checksums to ensure bit-perfect forensic truth.
+
+### 25.4 Agentic HUD V6 [Radiant]
+The interface functions as a dynamic forensic workstation:
+- **Lexical Parser**: Sub-millisecond resolution of analytical commands.
+- **Chromatic Feedback**: Cyan pulses for success, amber flickers for syntax anomalies.
+- **Spectral Re-orientation**: Commands trigger instant topological relaxation to maintain analytical clarity.
+
+**COREGRAPH TITAN: RADIANCE. RIGOR. REVOLUTION.**
