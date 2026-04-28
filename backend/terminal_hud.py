@@ -139,10 +139,12 @@ class CoreGraphTitanApp(App):
     }
     """
 
+    ENABLE_COMMAND_PALETTE = False
+
     BINDINGS = [
-        Binding("q", "quit", "Shutdown Gateway"),
-        Binding("c", "clear_log", "Clear Forensic Log"),
-        Binding("m", "toggle_matrix", "Toggle Matrix View"),
+        Binding("ctrl+q", "quit", "Shutdown Gateway"),
+        Binding("ctrl+l", "clear_log", "Clear Forensic Log"),
+        Binding("ctrl+m", "toggle_matrix", "Toggle Matrix View"),
     ]
 
     def __init__(self, legacy_hud=None):
@@ -363,7 +365,13 @@ class SovereignTerminalHUD:
             "structural": "Stable",
             "verdict": "GENESIS_STABLE",
         }
-        self.log_queue = []
+        self.log_queue = [
+            "SYSTEM BOOT SEQUENCE INITIATED...",
+            "Loading Metabolic Governor... OK",
+            "Establishing Forensic Matrix Shards... OK",
+            "Awaiting Live Telemetry Stream...",
+            "Ready for command input.",
+        ]
         self.app = CoreGraphTitanApp(legacy_hud=self)
 
     def process_command(self, cmd: str):

@@ -18,9 +18,9 @@ class LiveGeminiClient:
             return {"error": "Dummy AI token active.", "verdict": "SCAN ABORTED"}
 
         system_prompt = f"""
-        Act as a Principal Infrastructure Security Architect. Perform a high-speed risk and dependency blast-radius analysis for '{package}' in the '{eco}' ecosystem.
-        Live telemetry reading: Direct Dependency Count: {deps_count}. GitHub metrics: {gh_stats.get('stars', 'Unknown')} stars, {gh_stats.get('issues', 'Unknown')} open issues.
-        Return EXACTLY 3 short, professional, highly-technical sentences assessing structural reliance, adversarial risks, and overall maintenance health.
+        Analyze '{package}' in the '{eco}' ecosystem.
+        Live telemetry: Direct Dependencies: {deps_count}. GitHub metrics: {gh_stats.get('stars', 'Unknown')} stars, {gh_stats.get('issues', 'Unknown')} open issues.
+        Return EXACTLY 3 short, easy-to-understand sentences explaining what this package does, its security/risk level, and its overall maintenance health. Keep it very simple and straightforward.
         """
 
         payload = {"contents": [{"parts": [{"text": system_prompt}]}]}
