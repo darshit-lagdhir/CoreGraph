@@ -151,6 +151,7 @@ class CoreGraphTitanApp(App):
         self.legacy_hud = legacy_hud  # Bridge to main.py state
         self.active = True
         self.last_matrix_data = None
+        self.last_verdict = None
 
         # Sector Alpha: Universal Sovereign Zenith Initialization
         try:
@@ -182,6 +183,11 @@ class CoreGraphTitanApp(App):
                         yield Static(
                             "Select a node to view deep forensic intel...", id="node_detail"
                         )
+                        yield Static("\n[bold purple]GEMINI AI ANALYSIS[/bold purple]")
+                        yield Static(
+                            "AI standing by. Select a node to trigger live scan...",
+                            id="gemini_intel",
+                        )
                         yield Static("\n[bold red]VULNERABILITY INTELLIGENCE[/bold red]")
                         yield Static("No active CVEs detected in local shard.", id="vuln_intel")
                     with TabPane("Dependency Tree"):
@@ -200,6 +206,7 @@ class CoreGraphTitanApp(App):
         self.detail = self.query_one("#node_detail", Static)
         self.vuln_widget = self.query_one("#vuln_intel", Static)
         self.tree_widget = self.query_one("#tree_view", Static)
+        self.gemini_widget = self.query_one("#gemini_intel", Static)
 
         # Sector Iota: Final Operational Genesis Handshake
         if self.zenith:
@@ -212,33 +219,6 @@ class CoreGraphTitanApp(App):
         self.matrix.focus()
 
         self.set_interval(0.1, self.refresh_system_telemetry)
-
-        # Flush buffered logs from Sector Alpha initialization
-        if self.legacy_hud:
-            for msg in self.legacy_hud.log_queue:
-                self.log_panel.write_line(msg)
-            self.legacy_hud.log_queue = []
-
-        # Write valuable, persistent boot sequence logs directly to guarantee visibility
-        self.log_panel.write_line(
-            "[bold cyan]>>> INITIATING FORENSIC DEEP SCAN SEQUENCE...[/bold cyan]"
-        )
-        self.log_panel.write_line("[info]Substrate: Xenon-based Memory Governance Active.[/info]")
-        self.log_panel.write_line(
-            "[info]Shard Alignment: Synchronizing 3.81M nodes via Supabase bridge.[/info]"
-        )
-        self.log_panel.write_line(
-            "[info]AI Engine: Gemini Flash Model injected into pipeline.[/info]"
-        )
-        self.log_panel.write_line(
-            "[warning]Awaiting Live Telemetry... Quantum Locks Engaged.[/warning]"
-        )
-        self.log_panel.write_line("[bold green]CoreGraph Titan Gateway Online.[/bold green]")
-
-        if self.legacy_hud and "sk-dummy" not in str(self.legacy_hud.app):  # checking via proxy
-            self.log_panel.write_line(
-                "[bold cyan]AI INTELLIGENCE: Live Threat Parsing Active.[/bold cyan]"
-            )
 
     def refresh_system_telemetry(self) -> None:
         """Pulse the underlying hardened kernels and update UI."""
@@ -286,9 +266,25 @@ class CoreGraphTitanApp(App):
 
                 self.last_matrix_data = current_data
 
-            # Sync Verdict
-            if self.legacy_hud.verdict:
+            # Sync Verdict conditionally to prevent Textual render loop glitches
+            if self.legacy_hud.verdict and self.legacy_hud.verdict != self.last_verdict:
                 self.impact.update_verdict(self.legacy_hud.verdict)
+
+                # Update Gemini Intelligence Panel
+                g_lines = [
+                    f"[bold cyan]Adversarial:[/bold cyan] {self.legacy_hud.verdict.get('adversarial', '')}",
+                    f"[bold cyan]Maintenance:[/bold cyan] {self.legacy_hud.verdict.get('maintenance', '')}",
+                    f"[bold cyan]Structural:[/bold cyan] {self.legacy_hud.verdict.get('structural', '')}",
+                ]
+                self.gemini_widget.update(Panel("\n".join(g_lines), border_style="purple"))
+
+                self.last_verdict = self.legacy_hud.verdict.copy()
+
+            # Dynamically flush logs to prevent empty logs on boot timing issues
+            if self.legacy_hud.log_queue:
+                for msg in self.legacy_hud.log_queue:
+                    self.log_panel.write_line(msg)
+                self.legacy_hud.log_queue.clear()
 
     def on_data_table_row_selected(self, event: DataTable.RowSelected) -> None:
         """Sector Gamma: Node Intelligence Drill-down & Expansion."""
@@ -372,17 +368,19 @@ class SovereignTerminalHUD:
         self.view_mode = "matrix"
         self.tree_data = None
         self.verdict = {
-            "adversarial": "False",
-            "maintenance": "High",
-            "structural": "Stable",
+            "adversarial": "False. Seed node pre-validated.",
+            "maintenance": "High maintenance threshold confirmed.",
+            "structural": "Stable root topology.",
             "verdict": "GENESIS_STABLE",
         }
         self.log_queue = [
-            "SYSTEM BOOT SEQUENCE INITIATED...",
-            "Loading Metabolic Governor... OK",
-            "Establishing Forensic Matrix Shards... OK",
-            "Awaiting Live Telemetry Stream...",
-            "Ready for command input.",
+            "[bold cyan]>>> INITIATING FORENSIC DEEP SCAN SEQUENCE...[/bold cyan]",
+            "[info]Substrate: Xenon-based Memory Governance Active.[/info]",
+            "[info]Shard Alignment: Synchronizing 3.81M nodes via Supabase bridge.[/info]",
+            "[info]AI Engine: Gemini Flash Model injected into pipeline.[/info]",
+            "[warning]Awaiting Live Telemetry... Quantum Locks Engaged.[/warning]",
+            "[bold green]CoreGraph Titan Gateway Online.[/bold green]",
+            "[bold cyan]AI INTELLIGENCE: Live Threat Parsing Active.[/bold cyan]",
         ]
         self.app = CoreGraphTitanApp(legacy_hud=self)
 
