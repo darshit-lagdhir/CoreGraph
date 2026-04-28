@@ -115,7 +115,7 @@ class CoreGraphTitanApp(App):
                         yield Log(id="log_panel")
                     with TabPane("System Health"):
                         yield Static(" [bold yellow]METABOLIC OSCILLOSCOPE[/bold yellow]")
-                        self.spark = Sparkline([0] * 20, summary="RSS")
+                        self.spark = Sparkline([0] * 20)
                         yield self.spark
                     with TabPane("Node Intelligence"):
                         self.detail = Static(
