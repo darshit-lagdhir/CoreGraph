@@ -152,8 +152,12 @@ class CoreGraphTitanApp(App):
         self.last_matrix_data = None
 
         # Sector Alpha: Universal Sovereign Zenith Initialization
-        self.vault = PersistentVaultEngine()
-        self.zenith = UniversalZenithEngine(self.vault)
+        try:
+            self.vault = PersistentVaultEngine()
+            self.zenith = UniversalZenithEngine(self.vault)
+        except Exception:
+            self.vault = None
+            self.zenith = None
 
     def compose(self) -> ComposeResult:
         yield Header(show_clock=True)
@@ -199,8 +203,9 @@ class CoreGraphTitanApp(App):
         self.tree_widget = self.query_one("#tree_view", Static)
 
         # Sector Iota: Final Operational Genesis Handshake
-        asyncio.create_task(self.zenith.initiate_zenith_handshake())
-        asyncio.create_task(self.zenith.run_zenith_heartbeat())
+        if self.zenith:
+            asyncio.create_task(self.zenith.initiate_zenith_handshake())
+            asyncio.create_task(self.zenith.run_zenith_heartbeat())
 
         # Configure Matrix columns
         self.matrix.add_columns("NODE ID", "ENTROPY", "RISK", "SOVEREIGN STATUS")
