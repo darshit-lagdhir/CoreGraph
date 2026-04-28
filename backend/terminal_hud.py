@@ -179,14 +179,12 @@ class CoreGraphTitanApp(App):
                         yield SovereignImpact(id="verdict_panel")
                     with TabPane("Node Intelligence"):
                         yield Static(
-                            id="node_detail", content="Select a node to view deep forensic intel..."
+                            "Select a node to view deep forensic intel...", id="node_detail"
                         )
                         yield Static("\n[bold red]VULNERABILITY INTELLIGENCE[/bold red]")
-                        yield Static(
-                            id="vuln_intel", content="No active CVEs detected in local shard."
-                        )
+                        yield Static("No active CVEs detected in local shard.", id="vuln_intel")
                     with TabPane("Dependency Tree"):
-                        yield Static(id="tree_view", content="Expanding graph topology...")
+                        yield Static("Expanding graph topology...", id="tree_view")
         with Horizontal(id="input_container"):
             yield Static(" [GATEWAY ACTIVE] > ", id="prompt")
             yield Input(placeholder="Enter Command (expand, clear, matrix...)", id="cmd_input")
