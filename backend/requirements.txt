@@ -21,4 +21,5 @@ zstandard
 google-genai
 pytest
 pytest-asyncio
-
+psutil
+textual

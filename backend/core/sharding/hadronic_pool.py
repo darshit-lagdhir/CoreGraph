@@ -116,23 +116,28 @@ class UnifiedHadronicMemoryPool:
 
         # Total Allocation: Exactly 150.0 MB (Sector SIGMA: RSS Sovereignty)
         self.TOTAL_POOL_SIZE = 150 * 1024 * 1024
+        self._mmap = None
 
         # Sector Alpha: Physical Persistence Bridge (Vault Integration)
-        # This creates the .bin files according to the hardware profile in vault/shards.
-        vault_path = "vault/shards/hadronic_substrate.bin"
-        os.makedirs(os.path.dirname(vault_path), exist_ok=True)
+        # Bypass for Lean-Mode/Cloud to comply with 150MB RSS limit without massive file creation.
+        if os.getenv("RENDER") or os.getenv("LEAN_MODE"):
+            logger.info("[UHMP] RENDER_DETECTED: Bypassing local Hadronic Core for Lean-Mode.")
+            self._mmap = mmap.mmap(-1, 1024 * 1024)  # Small anonymous map for structural integrity
+        else:
+            vault_path = "vault/shards/hadronic_substrate.bin"
+            os.makedirs(os.path.dirname(vault_path), exist_ok=True)
 
-        if not os.path.exists(vault_path):
-            logger.info(f"[UHMP] Creating sovereign substrate: {vault_path}")
-            with open(vault_path, "wb") as f:
-                f.seek(self.TOTAL_POOL_SIZE - 1)
-                f.write(b"\0")
+            if not os.path.exists(vault_path):
+                logger.info(f"[UHMP] Creating sovereign substrate: {vault_path}")
+                with open(vault_path, "wb") as f:
+                    f.seek(self.TOTAL_POOL_SIZE - 1)
+                    f.write(b"\0")
 
-        self.f = open(vault_path, "r+b")
-        logger.info(
-            f"[UHMP] Materializing Final Unified Hadronic Pool v50 (File-Backed): {self.TOTAL_POOL_SIZE/(1024*1024):.2f}MB"
-        )
-        self._mmap = mmap.mmap(self.f.fileno(), self.TOTAL_POOL_SIZE)
+            self.f = open(vault_path, "r+b")
+            logger.info(
+                f"[UHMP] Materializing Final Unified Hadronic Pool v50 (File-Backed): {self.TOTAL_POOL_SIZE/(1024*1024):.2f}MB"
+            )
+            self._mmap = mmap.mmap(self.f.fileno(), self.TOTAL_POOL_SIZE)
 
         # --- KERNEL VIEWS ---
         self.edge_view = self._get_view(self.EDGE_MAP_OFFSET, self.EDGE_MAP_SIZE, "Q")
