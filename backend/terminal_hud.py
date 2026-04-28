@@ -25,16 +25,14 @@ from rich.text import Text
 from rich.panel import Panel
 
 from backend.core.memory_manager import metabolic_governor
-from backend.persistence.persistent_vault_engine import PersistentVaultEngine
-from backend.core.universal_zenith import UniversalZenithEngine
 
 # =========================================================================================
-# COREGRAPH TITAN HUD V3: HYPER-ROBUST GENESIS
+# COREGRAPH TITAN HUD V4: ZERO-DEPENDENCY GENESIS (DEPLOYMENT READY)
 # =========================================================================================
 
 
 class MatrixTable(DataTable):
-    """Sector Beta: The Central Hadronic Audit Matrix (Reactive)."""
+    """Sector Beta: The Central Hadronic Audit Matrix."""
 
     pass
 
@@ -61,12 +59,12 @@ class SovereignImpact(Static):
 
 class CoreGraphTitanApp(App):
     """
-    The Supreme Terminal Application: Bridges Hardened Kernels to Modern TUI.
-    Sector Alpha: Reactive Systemic Unification.
+    The Supreme Terminal Application.
+    Sector Alpha: High-Velocity Forensic Visualization.
     """
 
     TITLE = "CoreGraphTitanApp"
-    SUB_TITLE = "SYSTEM_PULSE: CONNECTING..."
+    SUB_TITLE = "SYSTEM_PULSE: STARTING..."
 
     CSS = """
     Screen { background: #0b0f19; }
@@ -84,7 +82,6 @@ class CoreGraphTitanApp(App):
     BINDINGS = [
         Binding("q", "quit", "Shutdown Gateway"),
         Binding("c", "clear_log", "Clear Forensic Log"),
-        Binding("m", "toggle_matrix", "Toggle Matrix View"),
     ]
 
     def __init__(self, legacy_hud=None):
@@ -93,16 +90,6 @@ class CoreGraphTitanApp(App):
         self.last_matrix_data = None
         self.cpu_usage = 0.0
 
-        # Initialize Vault & Zenith
-        try:
-            self.vault = PersistentVaultEngine()
-            self.zenith = UniversalZenithEngine(self.vault)
-            asyncio.create_task(self.zenith.initiate_zenith_handshake())
-            asyncio.create_task(self.zenith.run_zenith_heartbeat())
-        except Exception:
-            self.vault = None
-            self.zenith = None
-
     def compose(self) -> ComposeResult:
         yield Header(show_clock=True)
         with Container(id="main_container"):
@@ -110,8 +97,8 @@ class CoreGraphTitanApp(App):
                 yield Static(" [bold cyan]CENTRAL HADRONIC AUDIT MATRIX[/bold cyan]")
                 yield MatrixTable(id="matrix_view")
             with Vertical(id="right_panel"):
-                with TabbedContent(initial="log_tab"):
-                    with TabPane("Forensic Log", id="log_tab"):
+                with TabbedContent():
+                    with TabPane("Forensic Log"):
                         yield Log(id="log_panel")
                     with TabPane("System Health"):
                         yield Static(" [bold yellow]METABOLIC OSCILLOSCOPE[/bold yellow]")
@@ -139,14 +126,10 @@ class CoreGraphTitanApp(App):
         self.matrix.cursor_type = "row"
         self.matrix.focus()
 
-        # Sector Alpha: Telemetry Pulse
         self.set_interval(0.2, self.refresh_system_telemetry)
-
         psutil.cpu_percent(interval=None)
 
-        self.log_panel.write_line(
-            "[bold green]CoreGraph Titan App Online. Sector Alpha Synchronized.[/bold green]"
-        )
+        self.log_panel.write_line("[bold green]CoreGraph Titan App Online.[/bold green]")
 
         if self.legacy_hud and self.legacy_hud.verdict:
             self.impact.update_verdict(self.legacy_hud.verdict)
@@ -158,17 +141,12 @@ class CoreGraphTitanApp(App):
             self.cpu_usage = psutil.cpu_percent(interval=None)
 
             node_count = len(self.legacy_hud.live_packages) if self.legacy_hud else 0
-            self.sub_title = (
-                f"NODES: {node_count} | RSS: {rss:.1f}MB | CPU: {self.cpu_usage:.1f}% | AI: ACTIVE"
-            )
-
-            self.spark.data = [random.random() for _ in range(20)]
+            self.sub_title = f"NODES: {node_count} | RSS: {rss:.1f}MB | CPU: {self.cpu_usage:.1f}%"
 
             if self.legacy_hud:
                 query = self.legacy_hud.search_query.lower()
-                current_data = list(self.legacy_hud.live_packages)  # Atomic snapshot
+                current_data = list(self.legacy_hud.live_packages)
 
-                # Filter
                 if query:
                     current_data = [p for p in current_data if query in str(p[0]).lower()]
 
@@ -177,27 +155,25 @@ class CoreGraphTitanApp(App):
                     self.matrix.clear()
                     for pkg, ent, risk, status in current_data[:40]:
                         ent_color = "red" if ent > 0.8 else ("yellow" if ent > 0.4 else "green")
-                        # Style status
-                        s_str = str(status).upper()
                         s_styled = (
                             f"[bold green]STABLE[/bold green]"
-                            if "STABLE" in s_str
-                            else f"[bold red]{s_str}[/bold red]"
+                            if "STABLE" in str(status).upper()
+                            else f"[bold red]{status}[/bold red]"
                         )
-
                         self.matrix.add_row(
                             f"[bold cyan]{pkg}[/bold cyan]",
                             f"[{ent_color}]{ent:.2f}[/{ent_color}]",
                             f"[bold]{risk}[/bold]",
                             s_styled,
                         )
+
                     if cursor_row < len(current_data):
                         self.matrix.move_cursor(row=cursor_row)
                     self.last_matrix_data = current_data
 
                 if self.legacy_hud.verdict:
                     self.impact.update_verdict(self.legacy_hud.verdict)
-        except Exception as e:
+        except Exception:
             pass
 
     def on_data_table_row_selected(self, event: DataTable.RowSelected) -> None:
@@ -207,25 +183,15 @@ class CoreGraphTitanApp(App):
             if "]" in str(row_data[0])
             else str(row_data[0])
         )
-
         intel = [
             f"[bold cyan]NODE:[/bold cyan] {pkg_name}",
             f"[bold yellow]ENTROPY:[/bold yellow] {row_data[1]}",
             f"[bold red]RISK VECTOR:[/bold red] {row_data[2]}",
             f"[bold green]STATUS:[/bold green] {row_data[3]}",
-            "",
-            "[bold white]Deep Forensic Intel:[/bold white]",
-            f"- Spectral Coherence: {random.uniform(0.8, 1.0):.4f}",
-            f"- Hadronic Utility: {random.uniform(0.1, 0.5):.4f}",
-            f"- AI Analysis: Active via Gemini Flash",
         ]
         self.detail.update(Panel("\n".join(intel), border_style="cyan"))
-
         if self.legacy_hud:
             self.legacy_hud.process_command(f"expand {pkg_name}")
-
-    def action_clear_log(self) -> None:
-        self.log_panel.clear()
 
     async def on_input_submitted(self, event: Input.Submitted) -> None:
         cmd = event.value.strip()
@@ -248,16 +214,12 @@ class SovereignTerminalHUD:
         cmd_lower = cmd.lower()
         if cmd_lower.startswith("expand "):
             self.cmd_buffer = cmd
-            self.log_event(f"Expanding: {cmd[7:]}")
-        elif cmd_lower == "clear":
-            self.app.action_clear_log()
-            self.search_query = ""
         else:
             self.search_query = cmd_lower
 
     def log_event(self, msg: str):
         try:
-            if hasattr(self.app, "log_panel") and self.app.log_panel:
+            if self.app.log_panel:
                 self.app.log_panel.write_line(msg)
         except Exception:
             pass
